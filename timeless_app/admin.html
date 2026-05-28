@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeless — Consola Editorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #0A0A09;
+      --card-bg: #131311;
+      --ink: #F7F3EE;
+      --text-muted: #8E8E89;
+      --gold: #C9A96E;
+      --gold-dark: #A68B58;
+      --border: rgba(201, 169, 110, 0.15);
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    /* Loading Overlay */
+    #auth-check-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .editorial-logo {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: 4px;
+      color: var(--ink);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    
+    .console-title {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 600;
+    }
+
+    .form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      margin-bottom: 30px;
+    }
+
+    .form-section-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 25px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      background: #1C1C1A;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--ink);
+      padding: 12px 16px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 8px rgba(201, 169, 110, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* Chapters Area */
+    .chapter-block {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
+
+    .chapter-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .chapter-number-label {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .btn-remove-ch {
+      background: none;
+      border: none;
+      color: #FF5F57;
+      cursor: pointer;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn-remove-ch:hover { text-decoration: underline; }
+
+    .btn-add-chapter {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed var(--gold);
+      color: var(--gold);
+      padding: 16px;
+      border-radius: 10px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+    .btn-add-chapter:hover {
+      background: rgba(201, 169, 110, 0.05);
+      border-style: solid;
+    }
+
+    /* Actions Row */
+    .actions-row {
+      display: flex;
+      gap: 15px;
+      margin-top: 40px;
+    }
+
+    .btn-submit {
+      flex: 2;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 16px;
+      border-radius: 10px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(201, 169, 110, 0.3);
+    }
+    .btn-submit:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px);
+    }
+    .btn-submit:disabled {
+      background: #555;
+      color: #888;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 16px;
+      border-radius: 10px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .btn-cancel:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    /* Success Overlay */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      padding: 20px;
+    }
+    .success-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .success-content {
+      background: var(--card-bg);
+      border: 1px solid var(--gold);
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      transform: scale(0.9);
+      transition: transform 0.4s ease;
+    }
+    .success-overlay.visible .success-content {
+      transform: scale(1);
+    }
+    .success-icon {
+      font-size: 50px;
+      margin-bottom: 20px;
+    }
+    .success-title {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      margin-bottom: 12px;
+    }
+    .success-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .btn-view-book {
+      display: block;
+      width: 100%;
+      background: var(--gold);
+      color: #000;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 12px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-view-book:hover { background: var(--gold-dark); }
+    .btn-close-success {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Lock Overlay -->
+  <div id="auth-check-overlay">
+    <div class="spinner"></div>
+    <p id="auth-message" style="font-family: var(--font-serif); font-style: italic; color: var(--gold); letter-spacing: 1px;">Verificando credenciales editoriales...</p>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="editorial-logo">Timeless</div>
+      <div class="console-title">Consola de Carga Editorial</div>
+    </header>
+
+    <main>
+      <form id="book-upload-form">
+        <!-- SECCIÓN 1: METADATOS DE LA OBRA -->
+        <div class="form-card">
+          <h3 class="form-section-title">Detalles de la Obra</h3>
+          
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="book-title">Título de la Obra</label>
+              <input type="text" id="book-title" placeholder="Ej: Memoria de la Niebla" required />
+            </div>
+            
+            <div class="form-group">
+              <label for="book-author">Autor de la Obra</label>
+              <input type="text" id="book-author" value="Matías Orejas" placeholder="Ej: Claudia Iriarte" required />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="book-cat">Categoría del Catálogo</label>
+              <select id="book-cat" required>
+                <option value="ficcion">Ficción</option>
+                <option value="ensayo">Ensayo</option>
+                <option value="biografia">Biografía</option>
+                <option value="tecnica">Técnica</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="book-genre">Género Literario (Subtítulo)</label>
+              <input type="text" id="book-genre" placeholder="Ej: Ficción literaria" required />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="book-cover">Portada Premium (Ruta de Imagen)</label>
+              <select id="book-cover" required>
+                <option value="assets/cover_memoria.png">La Memoria del Agua (Azul profundo)</option>
+                <option value="assets/cover_umbral.png">En el Umbral (Rojo atardecer)</option>
+                <option value="assets/cover_arquitecto.png">El Arquitecto de Sombras (Gris ceniza)</option>
+                <option value="assets/cover_contemplacion.png">El Arte de la Contemplación (Marrón cuero)</option>
+                <option value="custom">-- Usar URL personalizada --</option>
+              </select>
+              <input type="text" id="book-cover-custom" placeholder="Ej: assets/mi_portada.png" style="display:none; margin-top:8px;" />
+            </div>
+            
+            <div class="form-group">
+              <label for="book-badge">Etiqueta de Portada (Badge)</label>
+              <select id="book-badge">
+                <option value="none">Ninguna</option>
+                <option value="new">Nuevo</option>
+                <option value="excl">Exclusivo</option>
+              </select>
+              <input type="text" id="book-badge-text" placeholder="Ej: Edición Especial" style="margin-top:8px;" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="book-pages">Cantidad aproximada de Páginas</label>
+              <input type="number" id="book-pages" placeholder="Ej: 342" required />
+            </div>
+            
+            <div class="form-group">
+              <label for="book-duration">Tiempo aproximado de Lectura</label>
+              <input type="text" id="book-duration" placeholder="Ej: 8h 20min" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="book-desc">Sinopsis / Descripción Literaria</label>
+            <textarea id="book-desc" placeholder="Escribe la sinopsis con el tono poético y minimalista de la editorial..." required></textarea>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: CARGA DE CAPÍTULOS -->
+        <div class="form-card">
+          <h3 class="form-section-title">Manuscrito (Capítulos)</h3>
+          
+          <div id="chapters-container">
+            <!-- Dynamic chapter blocks injected here -->
+          </div>
+          
+          <button type="button" class="btn-add-chapter" id="btn-add-chapter-ui">+ Añadir Capítulo</button>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="actions-row">
+          <a href="index.html" class="btn-cancel">Cancelar</a>
+          <button type="submit" class="btn-submit" id="btn-publish-submit">Publicar en Timeless</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <!-- Success Modal Overlay -->
+  <div id="success-overlay" class="success-overlay">
+    <div class="success-content">
+      <div class="success-icon">✨</div>
+      <h2 class="success-title">¡Obra Incorporada!</h2>
+      <p class="success-desc" id="success-message">La obra ha sido incorporada al catálogo dinámico de Timeless de forma segura.</p>
+      <a href="#" id="btn-go-reader" class="btn-view-book">Leer ahora</a>
+      <button class="btn-close-success" id="btn-close-success-ui">Cargar otra obra</button>
+    </div>
+  </div>
+
+  <script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>

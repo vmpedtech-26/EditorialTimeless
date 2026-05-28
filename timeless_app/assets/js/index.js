@@ -297,12 +297,17 @@ if (btnLogout) {
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
+  const btnAdmin = document.getElementById('btn-admin-console');
   if (user) {
     if(authBtns) authBtns.style.display = 'none';
     if(userProf) userProf.classList.add('visible');
+    if (btnAdmin) {
+      btnAdmin.style.display = user.email === 'matiaseorejas@gmail.com' ? 'flex' : 'none';
+    }
   } else {
     if(authBtns) authBtns.style.display = 'flex';
     if(userProf) userProf.classList.remove('visible');
+    if (btnAdmin) btnAdmin.style.display = 'none';
   }
   fetchLibrary(currentCat);
 });
