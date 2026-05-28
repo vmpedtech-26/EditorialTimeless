@@ -1,0 +1,17 @@
+{
+  "name": "timeless-agent-server",
+  "version": "1.0.0",
+  "description": "Servidor local para Timeless Editorial — Agente Escritor con Gemini AI",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "stripe": "^22.1.1"
+  }
+}

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timeless — Agente Escritor</title>
+  <meta name="description" content="Timeless Editorial — Motor literario de IA. Pipeline de generación desde el outline hasta la exportación final." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/agent.css" />
+  
+  <!-- PWA & Apple Web App Meta -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Timeless" />
+  <link class="apple-touch-icon" rel="apple-touch-icon" href="assets/cover_memoria.png" />
+</head>
+<body>
+
+  <!-- ============================================================
+       NAV
+  ============================================================ -->
+  <nav>
+    <a href="index.html" class="nav-logo">Timeless <span>Editorial</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="reader.html">Lector</a></li>
+      <li><a href="agent.html" class="active">Agente IA</a></li>
+      <li><a href="architecture.html">Arquitectura</a></li>
+    </ul>
+
+    <div class="user-profile" id="user-prof">
+      <div class="user-avatar" id="user-avatar-btn">?</div>
+      <div class="user-menu" id="user-menu">
+        <a href="index.html" class="menu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Inicio
+        </a>
+        <button class="menu-item logout" id="btn-logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ============================================================
+       HERO
+  ============================================================ -->
+  <section id="hero">
+    <div>
+      <div class="hero-eyebrow">Asistente de Escritura Editorial</div>
+      <h1 class="hero-title">Donde la idea<br><em>se convierte</em> en obra</h1>
+      <p class="hero-desc">
+        Un entorno de creación literaria que respeta la estructura y el ritmo del autor. Desde el primer borrador hasta la edición final.
+      </p>
+      <div class="hero-badges">
+        <span class="badge badge-gold">Ficción · Ensayo</span>
+        <span class="badge badge-gold">Biografía · Técnica</span>
+        <span class="badge badge-green">Estándar BSC</span>
+        <span class="badge badge-blue">Exportación DRM</span>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="mini-term">
+        <div class="term-bar">
+          <div class="dot dr"></div>
+          <div class="dot dy"></div>
+          <div class="dot dg"></div>
+          <span class="term-bar-title">timeless.agent — modo: ficción</span>
+        </div>
+        <div class="term-body">
+          <div><span class="tp">›</span> <span class="tg">agent.init</span> <span class="tdk">--genre=ficcion --chapters=8</span></div>
+          <div><span class="tp">›</span> <span class="tc">Cargando modelo literario v3.2...</span></div>
+          <div><span class="tgn">✓</span> <span class="tdk">Vocabulario narrativo: activo</span></div>
+          <div><span class="tgn">✓</span> <span class="tdk">Motor de arcos: activo</span></div>
+          <div>&nbsp;</div>
+          <div><span class="tp">›</span> <span class="tg">outline.generate</span> <span class="tdk">--theme="memoria y tiempo"</span></div>
+          <div><span class="tgn">✓</span> <span class="tc">I. El umbral del silencio</span></div>
+          <div><span class="tgn">✓</span> <span class="tc">II. La mirada que no nombra</span></div>
+          <div><span class="tgn">✓</span> <span class="tc">III. Leer como acto sagrado</span></div>
+          <div><span class="tb">→</span> <span class="tdk">5 capítulos adicionales...</span></div>
+          <div>&nbsp;</div>
+          <div><span class="tp">›</span> <span class="tg">draft.start</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PIPELINE
+  ============================================================ -->
+  <section id="pipeline">
+    <div class="section-header reveal">
+      <div class="hero-eyebrow">Pipeline completo</div>
+      <h2 class="section-title">Del prompt al libro final</h2>
+      <p class="section-sub">5 fases secuenciales con validación automática en cada transición.</p>
+    </div>
+
+    <div class="pipeline-track">
+
+      <!-- Step 1: Prompt -->
+      <div class="pipeline-step">
+        <div class="step-card">
+          <div class="step-phase c-gold">Fase 01 · Entrada</div>
+          <div class="step-title">Prompt y Configuración</div>
+          <div class="step-desc">El usuario define el concepto central, género literario, extensión aproximada y parámetros de estilo. El agente interpreta la intención y establece restricciones de calidad.</div>
+          <div class="step-tags">
+            <span class="step-tag">Género literario</span>
+            <span class="step-tag">Tema central</span>
+            <span class="step-tag">Tono y voz</span>
+            <span class="step-tag">Capítulos</span>
+          </div>
+          <div class="step-code">
+<span class="hl">prompt</span>: "Una novela sobre el tiempo y la memoria"
+<span class="hl">genre</span>: <span class="hl2">"ficcion"</span>
+<span class="hl">tone</span>:   <span class="hl2">"contemplatif"</span>
+<span class="hl">len</span>:    <span class="hl3">8</span> chapters, ~<span class="hl3">60_000</span> words
+<span class="hl">quality</span>: <span class="hl2">"bsc"</span></div>
+        </div>
+        <div class="step-node">
+          <div class="node-circle nc-gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div class="node-num">01</div>
+        </div>
+        <div class="step-empty"></div>
+      </div>
+
+      <!-- Step 2: Outline -->
+      <div class="pipeline-step">
+        <div class="step-empty"></div>
+        <div class="step-node">
+          <div class="node-circle nc-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+          <div class="node-num">02</div>
+        </div>
+        <div class="step-card">
+          <div class="step-phase c-green">Fase 02 · Estructura</div>
+          <div class="step-title">Generación del Outline</div>
+          <div class="step-desc">El agente construye la arquitectura narrativa completa: capítulos, arcos de personaje, puntos de inflexión, subtramas y ritmo dramático. Validación BSC antes de avanzar.</div>
+          <div class="step-tags">
+            <span class="step-tag">Arcos narrativos</span>
+            <span class="step-tag">Personajes</span>
+            <span class="step-tag">Puntos de giro</span>
+            <span class="step-tag">Validación BSC</span>
+          </div>
+          <div class="step-code">
+<span class="hl2">OUTLINE VALIDADO</span>
+├── Cap I   · Planteamiento  [<span class="hl2">✓</span>]
+├── Cap II  · Incidente     [<span class="hl2">✓</span>]
+├── Cap III · Desarrollo    [<span class="hl2">✓</span>]
+│   └── Subtrama: protagonista
+├── Cap IV  · Crisis        [<span class="hl2">✓</span>]
+└── Cap V-VIII · Resolución [<span class="hl3">pending</span>]</div>
+        </div>
+      </div>
+
+      <!-- Step 3: Draft -->
+      <div class="pipeline-step">
+        <div class="step-card">
+          <div class="step-phase c-blue">Fase 03 · Generación</div>
+          <div class="step-title">Redacción del Borrador</div>
+          <div class="step-desc">Generación capítulo a capítulo con contexto acumulativo. El agente mantiene coherencia de voz, consistencia de personajes y fidelidad al outline en cada iteración.</div>
+          <div class="step-tags">
+            <span class="step-tag">Contexto acumulativo</span>
+            <span class="step-tag">Voz consistente</span>
+            <span class="step-tag">Coherencia interna</span>
+            <span class="step-tag">~7,500 words/cap</span>
+          </div>
+          <div class="step-code">
+<span class="hl3">draft.chapter</span>(1) → <span class="hl2">7,284w</span> [<span class="hl2">✓</span>]
+<span class="hl3">draft.chapter</span>(2) → <span class="hl2">7,901w</span> [<span class="hl2">✓</span>]
+<span class="hl3">draft.chapter</span>(3) → <span class="hl2">6,840w</span> [<span class="hl2">✓</span>]
+<span class="hl">consistency_check</span>() → <span class="hl2">PASS</span>
+<span class="hl">voice_drift</span>()       → <span class="hl2">0.03</span> ɛ</div>
+        </div>
+        <div class="step-node">
+          <div class="node-circle nc-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="node-num">03</div>
+        </div>
+        <div class="step-empty"></div>
+      </div>
+
+      <!-- Step 4: Review -->
+      <div class="pipeline-step">
+        <div class="step-empty"></div>
+        <div class="step-node">
+          <div class="node-circle nc-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="node-num">04</div>
+        </div>
+        <div class="step-card">
+          <div class="step-phase c-amber">Fase 04 · Revisión</div>
+          <div class="step-title">Control de Calidad BSC</div>
+          <div class="step-desc">Análisis multidimensional del manuscrito completo: legibilidad, coherencia, densidad narrativa, ritmo y nivel de originalidad. Correcciones automáticas con informe editorial.</div>
+          <div class="step-tags">
+            <span class="step-tag">Legibilidad</span>
+            <span class="step-tag">Cohesión</span>
+            <span class="step-tag">Originalidad</span>
+            <span class="step-tag">Ritmo</span>
+          </div>
+          <div class="step-code">
+<span class="hl">BSC_SCORE</span>: <span class="hl2">94.2 / 100</span>
+  legibilidad  → <span class="hl2">96</span>
+  cohesión     → <span class="hl2">91</span>
+  originalidad → <span class="hl2">95</span>
+  ritmo        → <span class="hl2">93</span>
+<span class="hl">correcciones</span>: <span class="hl3">12</span> (aplicadas)</div>
+        </div>
+      </div>
+
+      <!-- Step 5: Export -->
+      <div class="pipeline-step">
+        <div class="step-card">
+          <div class="step-phase c-goldl">Fase 05 · Exportación</div>
+          <div class="step-title">Empaquetado y Firma DRM</div>
+          <div class="step-desc">El manuscrito se serializa en formato líquido TLF (Timeless Liquid Format), se encripta con AES-256 y se firma con el token de suscripción del usuario. Solo legible dentro de Timeless.</div>
+          <div class="step-tags">
+            <span class="step-tag">AES-256</span>
+            <span class="step-tag">Formato TLF</span>
+            <span class="step-tag">Token DRM</span>
+            <span class="step-tag">Offline 30d</span>
+          </div>
+          <div class="step-code">
+<span class="hl">export</span>.tlf(manuscript)
+  → <span class="hl2">encrypt</span>(AES-256, user_key)
+  → <span class="hl2">sign</span>(subscription_token)
+  → <span class="hl2">bundle</span>(metadata + chapters)
+<span class="hl">output</span>: obra_00142.tlf (<span class="hl3">3.2 MB</span>)
+<span class="hl">status</span>: <span class="hl2">READY · DRM_SIGNED</span></div>
+        </div>
+        <div class="step-node">
+          <div class="node-circle nc-gold2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="node-num">05</div>
+        </div>
+        <div class="step-empty"></div>
+      </div>
+
+    </div><!-- /pipeline-track -->
+  </section>
+
+  <!-- ============================================================
+       INTERACTIVE DEMO
+  ============================================================ -->
+  <section id="demo">
+    <div class="demo-inner">
+      <div style="margin-bottom:40px;" class="reveal">
+        <div class="hero-eyebrow">Demo Interactivo</div>
+        <h2 class="section-title">Prueba el Agente</h2>
+        <p class="section-sub" style="margin-top:8px;">Selecciona un género, escribe tu premisa y observa el pipeline en tiempo real.</p>
+      </div>
+
+      <!-- API Key Setup -->
+      <div id="api-key-panel" class="api-key-setup">
+        <div class="api-key-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="api-key-label" id="key-label-text">
+          Para generación <strong>real</strong>, configura tu <strong>Gemini API Key</strong>:
+        </div>
+        <div class="api-key-input-wrap" id="key-input-wrap">
+          <input type="password" class="api-key-field" id="api-key-field" placeholder="AIzaSy..." autocomplete="off" />
+          <button class="btn-save-key" id="btn-save-key">Guardar</button>
+        </div>
+      </div>
+
+      <!-- Genre tabs -->
+      <div class="demo-genre-tabs" id="genre-tabs">
+        <button class="genre-tab active" data-genre="ficcion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Ficción
+        </button>
+        <button class="genre-tab" data-genre="ensayo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Ensayo
+        </button>
+        <button class="genre-tab" data-genre="biografia">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Biografía
+        </button>
+        <button class="genre-tab" data-genre="tecnica">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Técnica
+        </button>
+      </div>
+
+      <!-- Phase Stepper -->
+      <div class="phase-stepper" id="phase-stepper">
+        <div class="phase-item active" data-phase="1">
+          <div class="phase-dot"></div>
+          <div class="phase-name">Concepto</div>
+        </div>
+        <div class="phase-connector"></div>
+        <div class="phase-item" data-phase="2">
+          <div class="phase-dot"></div>
+          <div class="phase-name">Estructura</div>
+        </div>
+        <div class="phase-connector"></div>
+        <div class="phase-item" data-phase="3">
+          <div class="phase-dot"></div>
+          <div class="phase-name">Redacción</div>
+        </div>
+        <div class="phase-connector"></div>
+        <div class="phase-item" data-phase="4">
+          <div class="phase-dot"></div>
+          <div class="phase-name">Calidad</div>
+        </div>
+        <div class="phase-connector"></div>
+        <div class="phase-item" data-phase="5">
+          <div class="phase-dot"></div>
+          <div class="phase-name">DRM</div>
+        </div>
+      </div>
+
+      <div class="demo-workspace">
+        <!-- Left: Input -->
+        <div class="panel glass-panel">
+          <div class="panel-header">
+            <span class="panel-title">Configuración</span>
+            <span class="panel-badge pb-gold" id="genre-badge">Ficción</span>
+          </div>
+          <div class="panel-body">
+            <textarea class="prompt-field" id="prompt-input" placeholder="Escribe tu premisa aquí... ej: 'Una historia sobre la última biblioteca del mundo en un futuro donde los libros están prohibidos'"></textarea>
+            <div class="prompt-options">
+              <div class="option-row">
+                <div class="option-label">Tono</div>
+                <select id="tone-select">
+                  <option value="contemplatif">Contemplativo</option>
+                  <option value="thriller">Thriller</option>
+                  <option value="lirico">Lírico</option>
+                  <option value="epico">Épico</option>
+                  <option value="ironico">Irónico</option>
+                </select>
+              </div>
+              <div class="option-row">
+                <div class="option-label">Extensión</div>
+                <select id="length-select">
+                  <option value="novela_corta">Novela corta · 30k</option>
+                  <option value="novela" selected>Novela · 60k</option>
+                  <option value="novela_larga">Novela larga · 100k</option>
+                </select>
+              </div>
+              <div class="option-row">
+                <div class="option-label">Capítulos</div>
+                <select id="chapters-select">
+                  <option value="5">5 capítulos</option>
+                  <option value="8" selected>8 capítulos</option>
+                  <option value="12">12 capítulos</option>
+                </select>
+              </div>
+              <div class="option-row">
+                <div class="option-label">Calidad</div>
+                <select id="quality-select">
+                  <option value="standard">Standard</option>
+                  <option value="bsc" selected>BSC Premium</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-generate" id="btn-generate" onclick="startGeneration()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Iniciar generación
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Dual Output Panel -->
+        <div class="panel glass-panel" id="workspace-right">
+          <div class="panel-header">
+            <div class="workspace-tabs">
+              <button class="w-tab active" id="tab-terminal" onclick="switchWorkspace('terminal')">Consola</button>
+              <button class="w-tab" id="tab-preview" onclick="switchWorkspace('preview')">Vista Previa</button>
+            </div>
+            <span class="panel-badge pb-green" id="status-badge">En espera</span>
+          </div>
+          <div class="panel-body panel-workspace-body">
+            <!-- Terminal View -->
+            <div id="view-terminal" class="workspace-view active">
+              <div class="output-area" id="output-area"><span class="out-dim">// Configura el agente y presiona "Iniciar generación"...</span></div>
+            </div>
+            <!-- Live Preview View -->
+            <div id="view-preview" class="workspace-view">
+              <div class="preview-canvas" id="preview-canvas">
+                <div class="preview-empty">La vista previa aparecerá durante la fase de redacción.</div>
+              </div>
+            </div>
+            
+            <div class="gen-progress" id="gen-progress" style="display:none;">
+              <div class="gen-progress-label">
+                <span id="progress-label">Inicializando...</span>
+                <span id="progress-pct">0%</span>
+              </div>
+              <div class="gen-progress-track">
+                <div class="gen-progress-fill" id="progress-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       BSC QUALITY
+  ============================================================ -->
+  <section id="quality">
+    <div class="section-header reveal">
+      <div class="hero-eyebrow">Estándar de calidad</div>
+      <h2 class="section-title">El Benchmark BSC</h2>
+      <p class="section-sub">Todas las obras generadas se evalúan contra tres métricas independientes antes de ser publicadas.</p>
+    </div>
+
+    <div class="bsc-grid">
+      <div class="bsc-card bsc-c-gold reveal d1">
+        <div class="bsc-icon bi-gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="bsc-metric" id="bm-1">0</div>
+        <div class="bsc-name">Coherencia Narrativa</div>
+        <div class="bsc-desc">Evaluación de la consistencia interna, arcos de personaje y lógica de trama a lo largo del manuscrito completo.</div>
+        <div class="sparkline" id="sp-1"></div>
+      </div>
+
+      <div class="bsc-card bsc-c-green reveal d2">
+        <div class="bsc-icon bi-green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="bsc-metric" id="bm-2">0</div>
+        <div class="bsc-name">Originalidad Léxica</div>
+        <div class="bsc-desc">Medición del vocabulario único, evitación de clichés y riqueza expresiva frente a corpus de referencia editorial.</div>
+        <div class="sparkline" id="sp-2"></div>
+      </div>
+
+      <div class="bsc-card bsc-c-blue reveal d3">
+        <div class="bsc-icon bi-blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="bsc-metric" id="bm-3">0</div>
+        <div class="bsc-name">Ritmo y Legibilidad</div>
+        <div class="bsc-desc">Análisis de densidad sintáctica, variación de longitud de frase y fluidez de lectura calibrada por el perfil del lector objetivo.</div>
+        <div class="sparkline" id="sp-3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <div class="footer-copy">© 2026 Timeless Editorial · Agente Escritor v3.2</div>
+    <nav class="footer-nav">
+      <a href="index.html">Inicio</a>
+      <a href="reader.html">Lector</a>
+      <a href="architecture.html">Arquitectura</a>
+    </nav>
+  </footer>
+
+  <!-- ============================================================
+       EXPORT MODAL
+  ============================================================ -->
+  <div id="export-modal">
+    <div class="modal-box">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div class="modal-title">Obra lista para exportar</div>
+      <div class="modal-desc">El manuscrito ha pasado el control de calidad BSC y está listo para empaquetarse en formato TLF con encriptación AES-256 y firma de suscripción.</div>
+      <div class="modal-specs" id="modal-specs">
+        <div class="spec-row"><span class="spec-key">Formato</span><span class="spec-val sv-gold">Timeless Liquid Format (.tlf)</span></div>
+        <div class="spec-row"><span class="spec-key">Encriptación</span><span class="spec-val">AES-256-GCM</span></div>
+        <div class="spec-row"><span class="spec-key">DRM</span><span class="spec-val sv-green">Token de suscripción activo</span></div>
+        <div class="spec-row"><span class="spec-key">Validez offline</span><span class="spec-val">30 días</span></div>
+        <div class="spec-row"><span class="spec-key">BSC Score</span><span class="spec-val sv-green" id="modal-bsc">—</span></div>
+        <div class="spec-row"><span class="spec-key">Palabras</span><span class="spec-val" id="modal-words">—</span></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeExport()">Cancelar</button>
+        <button class="btn-modal-export" onclick="simulateDownload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar obra.tlf
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI engine scripts (order matters) -->
+  <script src="prompts.js"></script>
+  <script type="module" src="agent_service.js"></script>
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script type="module" src="assets/js/agent.js"></script>
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('  ✦ [PWA] Service Worker registrado con éxito:', reg.scope))
+          .catch(err => console.error('  ✗ [PWA] Fallo al registrar Service Worker:', err));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+
+# Archivos de entorno y credenciales
+.env
+serviceAccountKey.json
+
+# Archivos de sistema operativo
+.DS_Store
+
+# Archivos de Firebase locales (opcional si usas Firebase CLI)
+.firebase/
+firebase-debug.log
+firebase-debug.*.log

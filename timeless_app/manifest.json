@@ -1,0 +1,23 @@
+{
+  "name": "Timeless Editorial",
+  "short_name": "Timeless",
+  "description": "Editorial digital de suscripción cerrada. Literatura que persiste en el tiempo.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#F7F3EE",
+  "theme_color": "#1A1A18",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/cover_memoria.png",
+      "sizes": "509x764",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/cover_contemplacion.png",
+      "sizes": "827x1241",
+      "type": "image/png"
+    }
+  ]
+}

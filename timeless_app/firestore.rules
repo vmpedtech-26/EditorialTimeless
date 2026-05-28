@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas base: denegar acceso por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Colección 'users': los usuarios autenticados solo pueden leer su propio documento
+    // (La escritura del estado "Premium" la hace el backend mediante firebase-admin)
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Colección 'obras': los usuarios autenticados solo pueden gestionar sus propios borradores
+    match /obras/{obraId} {
+      // Un autor puede gestionar sus obras, o un invitado puede leerla si tiene un regalo válido
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || 
+        exists(/databases/$(database)/documents/gifts/gift_$(obraId)_$(request.auth.uid))
+      );
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Colección 'gifts': permite la gestión de invitaciones de lectura
+    match /gifts/{giftId} {
+      allow read: if true; // Permite verificar el regalo antes de reclamarlo
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && resource.data.claimed == false;
+    }
+    
+    // Colección 'books': biblioteca pública para usuarios de Timeless
+    match /books/{bookId} {
+      allow read: if request.auth != null;
+    }
+  }
+}

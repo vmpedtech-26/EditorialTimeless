@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timeless — Arquitectura Offline</title>
+  <meta name="description" content="Timeless Editorial — Arquitectura técnica: Firebase, Flutter, encriptación AES-256, token handshake de 30 días y sincronización offline." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- PWA & Apple Web App Meta -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Timeless" />
+  <link class="apple-touch-icon" rel="apple-touch-icon" href="assets/cover_memoria.png" />
+  
+  <style>
+    :root {
+      --bg:      #0C0A08;
+      --bg2:     #141210;
+      --bg3:     #1A1815;
+      --bg4:     #201E1A;
+
+      --ink:     #1A1A18;
+      --cream:   #D8D0C8;
+      --muted:   #6A5E50;
+      --faint:   #3A3028;
+
+      --gold:    #C9A96E;
+      --gold-d:  #A07840;
+      --gold-l:  #E6C98A;
+
+      --green:   #5CB88A;
+      --blue:    #6098C8;
+      --purple:  #9878C8;
+      --red:     #C87870;
+      --amber:   #C8A05C;
+
+      --bd:      rgba(200,180,150,0.09);
+      --bd2:     rgba(200,180,150,0.05);
+
+      --serif:   'Playfair Display', Georgia, serif;
+      --sans:    'Inter', -apple-system, sans-serif;
+      --mono:    'Courier New', monospace;
+
+      --t:       0.28s cubic-bezier(0.4,0,0.2,1);
+      --ts:      0.5s  cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration:none; color:inherit; }
+    button { cursor:pointer; border:none; background:none; font-family:inherit; }
+
+    /* ── NAV ─────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top:0; left:0; right:0;
+      height: 60px;
+      background: rgba(12,10,8,0.92);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--bd);
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: #E8E0D5;
+      letter-spacing: 0.06em;
+    }
+    .nav-logo span {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    .nav-links { display:flex; gap:28px; list-style:none; }
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      transition: color var(--t);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+    /* ── LAYOUT ──────────────────────────────────────────────── */
+    .page { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    #hero {
+      padding: 110px 40px 80px;
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); }
+
+    .h1 {
+      font-family: var(--serif);
+      font-size: clamp(28px, 3.5vw, 48px);
+      font-weight: 600;
+      color: #EDE8E0;
+      line-height: 1.13;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+    .h1 em { font-style:italic; color:var(--gold); }
+
+    .lead {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 460px;
+      margin-bottom: 32px;
+    }
+
+    .badge-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .bg-gold   { color:var(--gold);   border-color:rgba(201,169,110,0.3); background:rgba(201,169,110,0.07); }
+    .bg-green  { color:var(--green);  border-color:rgba(92,184,138,0.3);  background:rgba(92,184,138,0.07); }
+    .bg-blue   { color:var(--blue);   border-color:rgba(96,152,200,0.3);  background:rgba(96,152,200,0.07); }
+    .bg-purple { color:var(--purple); border-color:rgba(152,120,200,0.3); background:rgba(152,120,200,0.07); }
+
+    /* ── ARCHITECTURE DIAGRAM ────────────────────────────────── */
+    #arch-diagram {
+      padding: 60px 40px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .section-header { text-align:center; margin-bottom:56px; }
+    .sh-title {
+      font-family: var(--serif);
+      font-size: clamp(22px, 3vw, 36px);
+      color: #EDE8E0;
+      margin-bottom: 10px;
+    }
+    .sh-sub { font-size:14px; color:var(--muted); line-height:1.7; max-width:480px; margin:0 auto; }
+
+    /* Diagram canvas */
+    .diagram {
+      background: var(--bg2);
+      border: 1px solid var(--bd);
+      border-radius: 18px;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diagram::before {
+      content:'';
+      position: absolute;
+      top:-100px; left:50%;
+      transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(201,169,110,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Three tier row */
+    .arch-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .arch-layer {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .layer-label {
+      width: 120px;
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--faint);
+      padding-right: 20px;
+    }
+
+    .layer-nodes {
+      flex: 1;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 16px 0;
+    }
+
+    .arch-node {
+      flex: 1;
+      min-width: 140px;
+      background: var(--bg3);
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      padding: 16px 18px;
+      position: relative;
+      cursor: default;
+      transition: border-color var(--t), transform var(--t), box-shadow var(--t);
+    }
+    .arch-node:hover {
+      border-color: rgba(201,169,110,0.25);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    /* Colored top border per layer */
+    .arch-node::before {
+      content:'';
+      position: absolute;
+      top:0; left:16px; right:16px;
+      height: 2px;
+      border-radius: 0 0 2px 2px;
+    }
+    .ln-gold   .arch-node::before { background: var(--gold); }
+    .ln-blue   .arch-node::before { background: var(--blue); }
+    .ln-green  .arch-node::before { background: var(--green); }
+    .ln-purple .arch-node::before { background: var(--purple); }
+
+    .an-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .an-icon svg { width:16px; height:16px; }
+    .ai-gold   { background:rgba(201,169,110,0.12); color:var(--gold); }
+    .ai-blue   { background:rgba(96,152,200,0.12);  color:var(--blue); }
+    .ai-green  { background:rgba(92,184,138,0.12);  color:var(--green);}
+    .ai-purple { background:rgba(152,120,200,0.12); color:var(--purple);}
+
+    .an-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #C8BEB2;
+      margin-bottom: 4px;
+    }
+    .an-tech {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* Connector arrows between layers */
+    .arch-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0 0 120px;
+      height: 40px;
+      position: relative;
+    }
+    .arch-connector::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.2), transparent);
+      transform: translateX(-50%);
+    }
+    .connector-label {
+      background: var(--bg2);
+      border: 1px solid var(--bd);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--faint);
+      z-index: 1;
+    }
+
+    /* ── TOKEN FLOW ───────────────────────────────────────────── */
+    #token-flow {
+      padding: 60px 40px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .flow-card {
+      background: var(--bg2);
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s var(--t), transform 0.6s var(--t);
+    }
+    .flow-card.in-view { opacity:1; transform:none; }
+    .flow-card:hover { border-color: rgba(201,169,110,0.2); }
+
+    .fc-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--bd);
+    }
+    .fc-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fc-icon svg { width:16px; height:16px; }
+
+    .fc-title { font-size:13px; font-weight:600; color:#C8BEB2; }
+    .fc-sub   { font-size:11px; color:var(--muted); margin-top:1px; }
+
+    .fc-body { padding: 20px; }
+
+    /* Timeline within a card */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .tl-item {
+      display: flex;
+      gap: 14px;
+      position: relative;
+    }
+    .tl-item:not(:last-child) .tl-dot-wrap::after {
+      content:'';
+      position: absolute;
+      left: 13px;
+      top: 28px;
+      bottom: -8px;
+      width: 1px;
+      background: var(--bd);
+    }
+
+    .tl-dot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .tl-dot {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .td-gold   { border-color:rgba(201,169,110,0.4); color:var(--gold); background:rgba(201,169,110,0.08); }
+    .td-green  { border-color:rgba(92,184,138,0.4);  color:var(--green); background:rgba(92,184,138,0.08); }
+    .td-blue   { border-color:rgba(96,152,200,0.4);  color:var(--blue); background:rgba(96,152,200,0.08); }
+    .td-amber  { border-color:rgba(200,160,92,0.4);  color:var(--amber); background:rgba(200,160,92,0.08); }
+    .td-purple { border-color:rgba(152,120,200,0.4); color:var(--purple); background:rgba(152,120,200,0.08); }
+
+    .tl-content { padding: 0 0 20px; flex:1; }
+    .tl-content-title { font-size:13px; font-weight:600; color:#C8BEB2; margin-bottom:3px; }
+    .tl-content-desc  { font-size:12px; color:var(--muted); line-height:1.6; }
+
+    /* ── DB SCHEMA ────────────────────────────────────────────── */
+    #db-schema {
+      padding: 60px 40px;
+      background: var(--bg2);
+      border-top: 1px solid var(--bd);
+      border-bottom: 1px solid var(--bd);
+    }
+
+    .schema-inner { max-width: 1240px; margin: 0 auto; }
+
+    .schema-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .collection-card {
+      background: var(--bg3);
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s var(--t), transform 0.6s var(--t);
+    }
+    .collection-card.in-view { opacity:1; transform:none; }
+
+    .cc-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--bd);
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cc-icon { font-size:15px; }
+    .cc-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--gold);
+    }
+    .cc-type {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .cc-fields { padding: 14px 18px; }
+
+    .field-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--bd2);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .field-row:last-child { border-bottom: none; }
+
+    .f-name { color: #A090A0; flex-shrink:0; }
+    .f-type { color: var(--blue); flex-shrink:0; }
+    .f-desc { color: var(--faint); font-size: 11px; flex: 1; text-align:right; }
+    .f-req  { color: var(--gold); font-size: 10px; }
+
+    /* ── ENCRYPTION SECTION ──────────────────────────────────── */
+    #encryption {
+      padding: 60px 40px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .enc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 48px;
+      align-items: start;
+    }
+
+    .enc-steps { display: flex; flex-direction: column; gap: 16px; }
+
+    .enc-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .enc-step.in-view { opacity:1; transform:none; }
+
+    .enc-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(201,169,110,0.3);
+      background: rgba(201,169,110,0.08);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .enc-body {}
+    .enc-title { font-size: 14px; font-weight: 600; color: #C8BEB2; margin-bottom: 4px; }
+    .enc-desc  { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+    /* Code panel */
+    .code-panel {
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .code-panel-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--bd);
+    }
+    .dot { width:10px; height:10px; border-radius:50%; }
+    .dr { background:#FF5F57; } .dy { background:#FEBC2E; } .dg { background:#28C840; }
+    .code-panel-title {
+      margin-left: 8px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(200,180,150,0.3);
+    }
+    pre {
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.8;
+      color: #8A7F72;
+      overflow-x: auto;
+    }
+    pre .hl  { color: var(--gold); }
+    pre .hl2 { color: var(--green); }
+    pre .hl3 { color: var(--blue); }
+    pre .hl4 { color: var(--purple); }
+    pre .cm  { color: var(--faint); }
+
+    /* ── SYNC FLOW ────────────────────────────────────────────── */
+    #sync-flow {
+      padding: 60px 40px;
+      background: var(--bg2);
+      border-top: 1px solid var(--bd);
+    }
+
+    .sync-inner { max-width: 1240px; margin: 0 auto; }
+
+    .sync-diagram {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 24px;
+      align-items: center;
+      margin-top: 48px;
+    }
+
+    .sync-device {
+      background: var(--bg3);
+      border: 1px solid var(--bd);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    .sync-device.from-left  { transform: translateX(-20px); }
+    .sync-device.from-right { transform: translateX(20px); }
+    .sync-device.in-view { opacity:1; transform:none; }
+
+    .sd-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 24px;
+    }
+    .sd-name { font-size: 16px; font-weight: 600; color: #C8BEB2; margin-bottom: 6px; }
+    .sd-tech { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+    .sd-status {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .sd-green { background: var(--green); }
+    .sd-gold  { background: var(--gold); }
+    .sd-blue  { background: var(--blue); }
+
+    .sync-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sync-hub {
+      width: 80px; height: 80px;
+      border-radius: 20px;
+      background: rgba(201,169,110,0.08);
+      border: 2px solid rgba(201,169,110,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      position: relative;
+    }
+
+    .sync-hub::before {
+      content:'';
+      position: absolute;
+      inset: -8px;
+      border-radius: 28px;
+      border: 1px solid rgba(201,169,110,0.08);
+      animation: pulse-ring 2s ease-in-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%,100% { transform:scale(1); opacity:1; }
+      50%      { transform:scale(1.1); opacity:0; }
+    }
+
+    .sync-hub-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .sync-arrows {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .sync-arrow-label {
+      font-size: 9px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .arrow-line {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.3;
+      position: relative;
+    }
+
+    /* Offline banner */
+    .offline-spec {
+      margin-top: 40px;
+      background: var(--bg3);
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      text-align: center;
+    }
+    .os-item {}
+    .os-num {
+      font-family: var(--serif);
+      font-size: 28px;
+      color: #EDE8E0;
+      margin-bottom: 4px;
+    }
+    .os-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    /* ── ROADMAP ─────────────────────────────────────────────── */
+    #roadmap {
+      padding: 60px 40px 80px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .roadmap-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .rm-card {
+      background: var(--bg2);
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      padding: 22px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s var(--t), transform 0.6s var(--t);
+    }
+    .rm-card.in-view { opacity:1; transform:none; }
+
+    .rm-phase {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 10px;
+    }
+
+    .rm-title {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: #C8BEB2;
+      margin-bottom: 8px;
+    }
+
+    .rm-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .rm-items li {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .rm-items li::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+
+    .rm-status {
+      position: absolute;
+      top: 14px; right: 14px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+    .rs-done   { color:var(--green);  background:rgba(92,184,138,0.12); }
+    .rs-active { color:var(--gold);   background:rgba(201,169,110,0.12); }
+    .rs-next   { color:var(--muted);  background:rgba(200,180,150,0.06); }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--bd);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy { font-size:12px; color:var(--faint); }
+    .footer-nav  { display:flex; gap:20px; }
+    .footer-nav a { font-size:12px; color:var(--faint); transition:color var(--t); }
+    .footer-nav a:hover { color:var(--gold); }
+
+    /* ── SCROLL REVEAL ────────────────────────────────────────── */
+    .reveal {
+      opacity:0;
+      transform: translateY(16px);
+      transition: opacity 0.6s var(--t), transform 0.6s var(--t);
+    }
+    .reveal.in-view { opacity:1; transform:none; }
+    .d1 { transition-delay:0.1s; } .d2 { transition-delay:0.2s; } .d3 { transition-delay:0.3s; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .schema-grid { grid-template-columns:1fr 1fr; }
+      .roadmap-row { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      #hero { grid-template-columns:1fr; }
+      .flow-grid { grid-template-columns:1fr; }
+      .enc-grid  { grid-template-columns:1fr; }
+      .sync-diagram { grid-template-columns:1fr; }
+      .sync-center { flex-direction:row; }
+      .offline-spec { grid-template-columns:1fr 1fr; }
+      .schema-grid  { grid-template-columns:1fr; }
+      .roadmap-row  { grid-template-columns:1fr; }
+      nav .nav-links { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">Timeless <span>Editorial</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="reader.html">Lector</a></li>
+      <li><a href="agent.html">Agente IA</a></li>
+      <li><a href="architecture.html" class="active">Arquitectura</a></li>
+    </ul>
+  </nav>
+
+  <!-- ============================================================
+       HERO
+  ============================================================ -->
+  <section id="hero">
+    <div>
+      <div class="eyebrow">Arquitectura Técnica · Fase 4</div>
+      <h1 class="h1">Offline-first.<br><em>Secure by design.</em></h1>
+      <p class="lead">
+        Una arquitectura de cuatro capas que garantiza lectura cifrada sin conexión, sincronización transparente entre dispositivos y validación periódica de suscripción sin comprometer la experiencia de usuario.
+      </p>
+      <div class="badge-row">
+        <span class="badge bg-gold">AES-256-GCM</span>
+        <span class="badge bg-blue">Firebase / Firestore</span>
+        <span class="badge bg-green">Flutter 3.x</span>
+        <span class="badge bg-purple">Token DRM · 30d</span>
+      </div>
+    </div>
+
+    <!-- Mini arch overview -->
+    <div class="code-panel reveal">
+      <div class="code-panel-bar">
+        <div class="dot dr"></div>
+        <div class="dot dy"></div>
+        <div class="dot dg"></div>
+        <span class="code-panel-title">architecture.yaml — Timeless v1.0</span>
+      </div>
+      <pre>
+<span class="cm"># ── Stack completo ─────────────────────</span>
+<span class="hl">frontend</span>:
+  framework:  <span class="hl2">Flutter 3.x</span>
+  targets:    <span class="hl3">[Android, iOS]</span>
+  state:      <span class="hl3">Riverpod</span>
+  local_db:   <span class="hl3">SQLite + Hive</span>
+
+<span class="hl">backend</span>:
+  platform:   <span class="hl2">Firebase</span>
+  auth:       <span class="hl3">FirebaseAuth (email + OAuth)</span>
+  database:   <span class="hl3">Firestore</span>
+  storage:    <span class="hl3">Cloud Storage</span>
+  functions:  <span class="hl3">Cloud Functions (Node 20)</span>
+
+<span class="hl">security</span>:
+  content_enc: <span class="hl2">AES-256-GCM</span>
+  drm_token:   <span class="hl3">JWT · RS256 · 30d exp</span>
+  offline_val: <span class="hl3">Handshake cada 30 días</span>
+  key_deriv:   <span class="hl3">PBKDF2 · 100k iter</span>
+
+<span class="hl">status</span>:     <span class="hl2">DISEÑO APROBADO</span></pre>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ARCHITECTURE DIAGRAM
+  ============================================================ -->
+  <section id="arch-diagram">
+    <div class="section-header reveal">
+      <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">Sistema completo</div>
+      <div class="sh-title">Diagrama de Arquitectura</div>
+      <div class="sh-sub">Cuatro capas independientes con interfaces bien definidas entre ellas.</div>
+    </div>
+
+    <div class="diagram reveal">
+      <div class="arch-layers">
+
+        <!-- Layer 1: Client -->
+        <div class="arch-layer ln-gold">
+          <div class="layer-label">Capa Cliente</div>
+          <div class="layer-nodes">
+            <div class="arch-node">
+              <div class="an-icon ai-gold">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              </div>
+              <div class="an-name">Flutter App</div>
+              <div class="an-tech">Android · iOS · Riverpod</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-gold">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <div class="an-name">Lector TLF</div>
+              <div class="an-tech">Parser · Renderer · Temas</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-gold">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              </div>
+              <div class="an-name">Cache Local</div>
+              <div class="an-tech">SQLite · Hive · AES-256</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-gold">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              <div class="an-name">DRM Manager</div>
+              <div class="an-tech">Token · Validación · Expiración</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow 1 -->
+        <div class="arch-connector"><span class="connector-label">HTTPS · JWT</span></div>
+
+        <!-- Layer 2: Firebase -->
+        <div class="arch-layer ln-blue">
+          <div class="layer-label">Firebase BaaS</div>
+          <div class="layer-nodes">
+            <div class="arch-node">
+              <div class="an-icon ai-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="an-name">Firebase Auth</div>
+              <div class="an-tech">Email · Google · Apple</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </div>
+              <div class="an-name">Firestore</div>
+              <div class="an-tech">users · obras · tokens</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="an-name">Cloud Storage</div>
+              <div class="an-tech">Archivos TLF cifrados</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <div class="an-name">Cloud Functions</div>
+              <div class="an-tech">Token-gen · Sync · DRM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow 2 -->
+        <div class="arch-connector"><span class="connector-label">Vertex AI SDK</span></div>
+
+        <!-- Layer 3: AI Engine -->
+        <div class="arch-layer ln-green">
+          <div class="layer-label">IA Generativa</div>
+          <div class="layer-nodes">
+            <div class="arch-node">
+              <div class="an-icon ai-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="an-name">Agente Escritor</div>
+              <div class="an-tech">Gemini 2.0 · Vertex AI</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="an-name">Content Pipeline</div>
+              <div class="an-tech">Outline → Draft → BSC</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div class="an-name">BSC Evaluator</div>
+              <div class="an-tech">Quality · Legibility · Score</div>
+            </div>
+            <div class="arch-node">
+              <div class="an-icon ai-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </div>
+              <div class="an-name">TLF Packager</div>
+              <div class="an-tech">Serialización · Cifrado</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TOKEN FLOW
+  ============================================================ -->
+  <section id="token-flow">
+    <div class="section-header reveal">
+      <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">Seguridad</div>
+      <div class="sh-title">Flujo de Token y Validación Offline</div>
+      <div class="sh-sub">Handshake de 30 días que garantiza acceso sin conexión sin comprometer el DRM.</div>
+    </div>
+
+    <div class="flow-grid">
+      <!-- Online Login -->
+      <div class="flow-card d1">
+        <div class="fc-header">
+          <div class="fc-icon" style="background:rgba(201,169,110,0.12); color:var(--gold);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="fc-title">Login y generación de token</div>
+            <div class="fc-sub">Requiere conexión · Una vez cada 30 días</div>
+          </div>
+        </div>
+        <div class="fc-body">
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-gold">1</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Autenticación Firebase</div>
+                <div class="tl-content-desc">Usuario ingresa credenciales. FirebaseAuth valida y emite idToken JWT.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-blue">2</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Verificación de suscripción</div>
+                <div class="tl-content-desc">Cloud Function consulta Firestore: estado de suscripción activa, fecha de expiración.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-green">3</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Emisión del DRM Token</div>
+                <div class="tl-content-desc">Se genera JWT firmado con RS256: contiene uid, device_id, contenido autorizado y exp: 30 días.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-amber">4</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Derivación de clave local</div>
+                <div class="tl-content-desc">App deriva clave AES-256 usando PBKDF2(token + device_salt). Clave almacenada en Keystore/Secure Enclave.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-purple">5</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Contenido descargado y cifrado</div>
+                <div class="tl-content-desc">Archivos TLF descifrados en servidor → re-cifrados con clave local → SQLite local.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Offline Reading -->
+      <div class="flow-card d2">
+        <div class="fc-header">
+          <div class="fc-icon" style="background:rgba(92,184,138,0.12); color:var(--green);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6s4-2 11-2 11 2 11 2v12s-4-2-11-2-11 2-11 2V6z"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+          </div>
+          <div>
+            <div class="fc-title">Lectura offline</div>
+            <div class="fc-sub">Sin conexión · Hasta 30 días</div>
+          </div>
+        </div>
+        <div class="fc-body">
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-gold">1</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Verificación local del token</div>
+                <div class="tl-content-desc">App verifica firma RS256 del JWT localmente. No requiere red. Comprueba exp timestamp.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-green">2</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Recuperación de clave</div>
+                <div class="tl-content-desc">Clave AES-256 recuperada desde Android Keystore o iOS Secure Enclave. Requiere biometría.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-blue">3</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Descifrado en memoria</div>
+                <div class="tl-content-desc">Capítulos descifrados chapter-by-chapter en RAM. Jamás se escriben en disco sin cifrar.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-amber">4</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Guardado de progreso local</div>
+                <div class="tl-content-desc">Posición de lectura, marcadores y notas en SQLite cifrado. Pendientes de sync.</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot-wrap"><div class="tl-dot td-purple">5</div></div>
+              <div class="tl-content">
+                <div class="tl-content-title">Handshake al reconectar</div>
+                <div class="tl-content-desc">Al recuperar conexión: refresh token si quedan &lt;7 días, sync de progreso, descarga nuevas obras.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DATABASE SCHEMA
+  ============================================================ -->
+  <section id="db-schema">
+    <div class="schema-inner">
+      <div class="section-header reveal">
+        <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">Firestore</div>
+        <div class="sh-title">Esquema de Base de Datos</div>
+        <div class="sh-sub">Colecciones principales con sus campos críticos y relaciones.</div>
+      </div>
+
+      <div class="schema-grid">
+
+        <!-- users -->
+        <div class="collection-card d1">
+          <div class="cc-header">
+            <span class="cc-icon">👤</span>
+            <span class="cc-name">users/{uid}</span>
+            <span class="cc-type">Collection</span>
+          </div>
+          <div class="cc-fields">
+            <div class="field-row"><span class="f-name">uid</span><span class="f-type">string</span><span class="f-req">PK</span><span class="f-desc">FirebaseAuth UID</span></div>
+            <div class="field-row"><span class="f-name">email</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc"></span></div>
+            <div class="field-row"><span class="f-name">subscription</span><span class="f-type">map</span><span class="f-req">*</span><span class="f-desc">plan, status, exp</span></div>
+            <div class="field-row"><span class="f-name">devices</span><span class="f-type">array</span><span class="f-req"></span><span class="f-desc">device_id registrados</span></div>
+            <div class="field-row"><span class="f-name">created_at</span><span class="f-type">timestamp</span><span class="f-req">*</span><span class="f-desc"></span></div>
+            <div class="field-row"><span class="f-name">last_sync</span><span class="f-type">timestamp</span><span class="f-req"></span><span class="f-desc"></span></div>
+          </div>
+        </div>
+
+        <!-- obras -->
+        <div class="collection-card d2">
+          <div class="cc-header">
+            <span class="cc-icon">📚</span>
+            <span class="cc-name">obras/{obra_id}</span>
+            <span class="cc-type">Collection</span>
+          </div>
+          <div class="cc-fields">
+            <div class="field-row"><span class="f-name">obra_id</span><span class="f-type">string</span><span class="f-req">PK</span><span class="f-desc">UUID v4</span></div>
+            <div class="field-row"><span class="f-name">title</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc"></span></div>
+            <div class="field-row"><span class="f-name">genre</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">enum</span></div>
+            <div class="field-row"><span class="f-name">bsc_score</span><span class="f-type">number</span><span class="f-req">*</span><span class="f-desc">0-100</span></div>
+            <div class="field-row"><span class="f-name">tlf_url</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">Cloud Storage ref</span></div>
+            <div class="field-row"><span class="f-name">encrypt_key_id</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">KMS referencia</span></div>
+            <div class="field-row"><span class="f-name">published_at</span><span class="f-type">timestamp</span><span class="f-req">*</span><span class="f-desc"></span></div>
+          </div>
+        </div>
+
+        <!-- tokens -->
+        <div class="collection-card d3">
+          <div class="cc-header">
+            <span class="cc-icon">🔑</span>
+            <span class="cc-name">tokens/{token_id}</span>
+            <span class="cc-type">SubCollection</span>
+          </div>
+          <div class="cc-fields">
+            <div class="field-row"><span class="f-name">token_id</span><span class="f-type">string</span><span class="f-req">PK</span><span class="f-desc">UUID v4</span></div>
+            <div class="field-row"><span class="f-name">uid</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">ref: users</span></div>
+            <div class="field-row"><span class="f-name">device_id</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">SHA-256 fingerprint</span></div>
+            <div class="field-row"><span class="f-name">issued_at</span><span class="f-type">timestamp</span><span class="f-req">*</span><span class="f-desc"></span></div>
+            <div class="field-row"><span class="f-name">expires_at</span><span class="f-type">timestamp</span><span class="f-req">*</span><span class="f-desc">+30 días</span></div>
+            <div class="field-row"><span class="f-name">revoked</span><span class="f-type">bool</span><span class="f-req"></span><span class="f-desc">default: false</span></div>
+          </div>
+        </div>
+
+        <!-- progress -->
+        <div class="collection-card d1">
+          <div class="cc-header">
+            <span class="cc-icon">📖</span>
+            <span class="cc-name">progress/{uid}/{obra_id}</span>
+            <span class="cc-type">SubCollection</span>
+          </div>
+          <div class="cc-fields">
+            <div class="field-row"><span class="f-name">chapter</span><span class="f-type">number</span><span class="f-req">*</span><span class="f-desc">índice actual</span></div>
+            <div class="field-row"><span class="f-name">scroll_pct</span><span class="f-type">number</span><span class="f-req">*</span><span class="f-desc">0.0 – 1.0</span></div>
+            <div class="field-row"><span class="f-name">bookmarks</span><span class="f-type">array</span><span class="f-req"></span><span class="f-desc">[{ch, pct, note}]</span></div>
+            <div class="field-row"><span class="f-name">is_synced</span><span class="f-type">bool</span><span class="f-req">*</span><span class="f-desc">offline flag</span></div>
+            <div class="field-row"><span class="f-name">updated_at</span><span class="f-type">timestamp</span><span class="f-req">*</span><span class="f-desc"></span></div>
+          </div>
+        </div>
+
+        <!-- subscriptions -->
+        <div class="collection-card d2">
+          <div class="cc-header">
+            <span class="cc-icon">💳</span>
+            <span class="cc-name">subscriptions/{sub_id}</span>
+            <span class="cc-type">Collection</span>
+          </div>
+          <div class="cc-fields">
+            <div class="field-row"><span class="f-name">sub_id</span><span class="f-type">string</span><span class="f-req">PK</span><span class="f-desc">UUID</span></div>
+            <div class="field-row"><span class="f-name">uid</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">ref: users</span></div>
+            <div class="field-row"><span class="f-name">plan</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">monthly | annual</span></div>
+            <div class="field-row"><span class="f-name">status</span><span class="f-type">string</span><span class="f-req">*</span><span class="f-desc">active|cancelled|trial</span></div>
+            <div class="field-row"><span class="f-name">current_period_end</span><span class="f-type">timestamp</span><span class="f-req">*</span><span class="f-desc"></span></div>
+            <div class="field-row"><span class="f-name">stripe_sub_id</span><span class="f-type">string</span><span class="f-req"></span><span class="f-desc">prod integration</span></div>
+          </div>
+        </div>
+
+        <!-- content_cache (local) -->
+        <div class="collection-card d3">
+          <div class="cc-header">
+            <span class="cc-icon">💾</span>
+            <span class="cc-name">local: content_cache</span>
+            <span class="cc-type">SQLite (dispositivo)</span>
+          </div>
+          <div class="cc-fields">
+            <div class="field-row"><span class="f-name">obra_id</span><span class="f-type">text</span><span class="f-req">PK</span><span class="f-desc"></span></div>
+            <div class="field-row"><span class="f-name">chapter_idx</span><span class="f-type">integer</span><span class="f-req">PK</span><span class="f-desc">composite PK</span></div>
+            <div class="field-row"><span class="f-name">content_enc</span><span class="f-type">blob</span><span class="f-req">*</span><span class="f-desc">AES-256 cifrado</span></div>
+            <div class="field-row"><span class="f-name">iv</span><span class="f-type">blob</span><span class="f-req">*</span><span class="f-desc">initialization vector</span></div>
+            <div class="field-row"><span class="f-name">cached_at</span><span class="f-type">integer</span><span class="f-req">*</span><span class="f-desc">Unix timestamp</span></div>
+            <div class="field-row"><span class="f-name">expires_at</span><span class="f-type">integer</span><span class="f-req">*</span><span class="f-desc">token expiry</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ENCRYPTION PIPELINE
+  ============================================================ -->
+  <section id="encryption">
+    <div class="section-header reveal">
+      <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">Criptografía</div>
+      <div class="sh-title">Pipeline de Encriptación</div>
+      <div class="sh-sub">Del archivo TLF en servidor a los bytes en la pantalla del usuario.</div>
+    </div>
+
+    <div class="enc-grid">
+      <div class="enc-steps">
+        <div class="enc-step d1">
+          <div class="enc-num">1</div>
+          <div class="enc-body">
+            <div class="enc-title">Servidor: Master Encryption</div>
+            <div class="enc-desc">El TLF del Agente se cifra en Cloud Functions con clave maestra AES-256 gestionada por Google Cloud KMS. Nunca sale de la infraestructura de Firebase.</div>
+          </div>
+        </div>
+        <div class="enc-step d2">
+          <div class="enc-num">2</div>
+          <div class="enc-body">
+            <div class="enc-title">Transmisión: HTTPS + Signed URL</div>
+            <div class="enc-desc">El cliente descarga el TLF cifrado via HTTPS con URL firmada de corta duración (15 min). Imposible redirigir o capturar la URL.</div>
+          </div>
+        </div>
+        <div class="enc-step d3">
+          <div class="enc-num">3</div>
+          <div class="enc-body">
+            <div class="enc-title">Cliente: Re-cifrado con clave de dispositivo</div>
+            <div class="enc-desc">App descifra con clave maestra (token DRM incluido), luego re-cifra inmediatamente con PBKDF2(DRM_token + device_salt). Resultado: AES-256-GCM en SQLite local.</div>
+          </div>
+        </div>
+        <div class="enc-step d1" style="transition-delay:0.3s">
+          <div class="enc-num">4</div>
+          <div class="enc-body">
+            <div class="enc-title">Lectura: Descifrado en memoria efímera</div>
+            <div class="enc-desc">Al abrir un capítulo, se descifra en RAM. Nunca se escribe al disco sin cifrar. Al cerrar el capítulo, la memoria se borra explícitamente (zeroing).</div>
+          </div>
+        </div>
+        <div class="enc-step d2" style="transition-delay:0.4s">
+          <div class="enc-num">5</div>
+          <div class="enc-body">
+            <div class="enc-title">Revocación: Token inválido → contenido inaccesible</div>
+            <div class="enc-desc">Al revocar la suscripción, el token DRM expira. Sin token válido, la clave PBKDF2 no puede derivarse. El contenido en disco se vuelve ilegible automáticamente.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-panel reveal d2">
+        <div class="code-panel-bar">
+          <div class="dot dr"></div>
+          <div class="dot dy"></div>
+          <div class="dot dg"></div>
+          <span class="code-panel-title">encryption_service.dart</span>
+        </div>
+        <pre>
+<span class="cm">// ── Derivar clave desde token DRM ──────</span>
+<span class="hl">Future</span>&lt;<span class="hl3">Uint8List</span>&gt; deriveKey(<span class="hl3">String</span> token) <span class="hl">async</span> {
+  final salt = <span class="hl">await</span> DeviceInfo.getSalt();
+  <span class="cm">// PBKDF2 · SHA-256 · 100k iteraciones</span>
+  <span class="hl">return</span> PBKDF2.derive(
+    password: token.codeUnits,
+    salt:     salt,
+    c:        <span class="hl4">100000</span>,
+    dkLen:    <span class="hl4">32</span>,
+  );
+}
+
+<span class="cm">// ── Cifrar capítulo para caché local ───</span>
+<span class="hl">Future</span>&lt;<span class="hl3">EncChapter</span>&gt; encryptChapter(
+  <span class="hl3">Uint8List</span> plaintext,
+  <span class="hl3">Uint8List</span> key,
+) <span class="hl">async</span> {
+  final iv = _randomBytes(<span class="hl4">12</span>); <span class="cm">// 96-bit GCM</span>
+  final cipher = AES256GCM(key, iv);
+  <span class="hl">return</span> EncChapter(
+    iv:          iv,
+    ciphertext:  cipher.encrypt(plaintext),
+    tag:         cipher.tag,
+  );
+}
+
+<span class="cm">// ── Descifrado efímero en lectura ──────</span>
+<span class="hl">Uint8List</span> readChapter(<span class="hl3">EncChapter</span> enc, <span class="hl3">Uint8List</span> key) {
+  final plain = AES256GCM(key, enc.iv).decrypt(enc);
+  addCleanupCallback(() => plain.fillRange(<span class="hl4">0</span>, plain.length, <span class="hl4">0</span>));
+  <span class="hl">return</span> plain; <span class="cm">// solo en RAM</span>
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SYNC FLOW
+  ============================================================ -->
+  <section id="sync-flow">
+    <div class="sync-inner">
+      <div class="section-header reveal">
+        <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">Sincronización</div>
+        <div class="sh-title">Flujo de Sincronización Multi-Dispositivo</div>
+        <div class="sh-sub">Sincronización bidireccional entre dispositivos a través de Firestore con resolución de conflictos por timestamp.</div>
+      </div>
+
+      <div class="sync-diagram">
+        <div class="sync-device from-left">
+          <div class="sd-icon" style="background:rgba(92,184,138,0.12);">🤖</div>
+          <div class="sd-name">Android</div>
+          <div class="sd-tech">Flutter · Keystore · SQLite</div>
+          <div class="sd-status">
+            <div class="status-item"><div class="status-dot sd-green"></div>Cache local activo</div>
+            <div class="status-item"><div class="status-dot sd-gold"></div>Token DRM válido</div>
+            <div class="status-item"><div class="status-dot sd-blue"></div>Sync pendiente: 3 items</div>
+          </div>
+        </div>
+
+        <div class="sync-center">
+          <div class="sync-hub">🔥</div>
+          <div class="sync-hub-label">Firestore</div>
+          <div class="sync-arrows">
+            <div class="sync-arrow-label">Real-time · Delta sync</div>
+          </div>
+        </div>
+
+        <div class="sync-device from-right">
+          <div class="sd-icon" style="background:rgba(96,152,200,0.12);">🍎</div>
+          <div class="sd-name">iOS</div>
+          <div class="sd-tech">Flutter · Secure Enclave · SQLite</div>
+          <div class="sd-status">
+            <div class="status-item"><div class="status-dot sd-green"></div>Cache local activo</div>
+            <div class="status-item"><div class="status-dot sd-gold"></div>Token DRM válido</div>
+            <div class="status-item"><div class="status-dot sd-green"></div>Sincronizado: hace 2 min</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="offline-spec reveal" style="margin-top:40px;">
+        <div class="os-item">
+          <div class="os-num">30</div>
+          <div class="os-label">Días offline máximos</div>
+        </div>
+        <div class="os-item">
+          <div class="os-num">2</div>
+          <div class="os-label">Dispositivos simultáneos (plan mensual)</div>
+        </div>
+        <div class="os-item">
+          <div class="os-num">AES</div>
+          <div class="os-label">256-GCM · Estándar militar</div>
+        </div>
+        <div class="os-item">
+          <div class="os-num">7d</div>
+          <div class="os-label">Aviso anticipado de expiración</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ROADMAP
+  ============================================================ -->
+  <section id="roadmap">
+    <div class="section-header reveal">
+      <div class="eyebrow" style="justify-content:center; margin-bottom:12px;">Roadmap</div>
+      <div class="sh-title">Plan de Implementación</div>
+      <div class="sh-sub">Fases de desarrollo desde el MVP web hasta la app nativa completa.</div>
+    </div>
+
+    <div class="roadmap-row">
+      <div class="rm-card d1">
+        <div class="rm-status rs-done">✓ Completo</div>
+        <div class="rm-phase">Fase 01</div>
+        <div class="rm-title">MVP Web</div>
+        <ul class="rm-items">
+          <li>Lector HTML5 (reader.html)</li>
+          <li>3 temas: Papel / Sepia / Noche</li>
+          <li>Marcadores en localStorage</li>
+          <li>Home Editorial (index.html)</li>
+          <li>4 portadas con IA generativa</li>
+        </ul>
+      </div>
+
+      <div class="rm-card d2">
+        <div class="rm-status rs-active">En curso</div>
+        <div class="rm-phase">Fase 02</div>
+        <div class="rm-title">Agente + Arquitectura</div>
+        <ul class="rm-items">
+          <li>Pipeline completo del Agente IA</li>
+          <li>Spec Firestore (este documento)</li>
+          <li>Cloud Functions prototipo</li>
+          <li>TLF format spec v1</li>
+          <li>DRM token flow validado</li>
+        </ul>
+      </div>
+
+      <div class="rm-card d3">
+        <div class="rm-status rs-next">Próximo</div>
+        <div class="rm-phase">Fase 03</div>
+        <div class="rm-title">Backend Firebase</div>
+        <ul class="rm-items">
+          <li>Firebase project setup</li>
+          <li>Firestore security rules</li>
+          <li>Cloud Functions deploy</li>
+          <li>Firebase Auth integración</li>
+          <li>KMS para claves maestras</li>
+        </ul>
+      </div>
+
+      <div class="rm-card d1" style="transition-delay:0.3s">
+        <div class="rm-status rs-next">Próximo</div>
+        <div class="rm-phase">Fase 04</div>
+        <div class="rm-title">App Flutter Nativa</div>
+        <ul class="rm-items">
+          <li>Flutter 3.x · Riverpod</li>
+          <li>Lector TLF nativo</li>
+          <li>Android Keystore + iOS SE</li>
+          <li>Sync bidireccional offline</li>
+          <li>App Store + Play Store</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <div class="footer-copy">© 2026 Timeless Editorial · Arquitectura Offline v1.0</div>
+    <nav class="footer-nav">
+      <a href="index.html">Inicio</a>
+      <a href="reader.html">Lector</a>
+      <a href="agent.html">Agente IA</a>
+    </nav>
+  </footer>
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+  (() => {
+    'use strict';
+
+    // Intersection Observer for all reveal elements
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+        }
+      });
+    }, { threshold: 0.10 });
+
+    document.querySelectorAll(
+      '.reveal, .flow-card, .collection-card, .enc-step, .rm-card, .sync-device, .bsc-card'
+    ).forEach(el => io.observe(el));
+
+  })();
+  </script>
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('  ✦ [PWA] Service Worker registrado con éxito:', reg.scope))
+          .catch(err => console.error('  ✗ [PWA] Fallo al registrar Service Worker:', err));
+      });
+    }
+  </script>
+</body>
+</html>
