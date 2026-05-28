@@ -7,13 +7,13 @@ import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where,
 // TODO: Replace the following with your app's Firebase project configuration
 // You can find this in your Firebase Console -> Project Settings
 const firebaseConfig = {
-  apiKey: "AIzaSyDXMMaUYwxTY6Fd877ZQl4ScttjnV4zhMI",
-  authDomain: "timeless-d4e62.firebaseapp.com",
-  projectId: "timeless-d4e62",
-  storageBucket: "timeless-d4e62.firebasestorage.app",
-  messagingSenderId: "1043414410486",
-  appId: "1:1043414410486:web:a255ba1c509fdfdc3a78d7",
-  measurementId: "G-8QMME0CS05"
+  apiKey: "AIzaSyBTKzPxyZCBW9GjAmUOjLMte_nBcLjvrJY",
+  authDomain: "timeless-5d27d.firebaseapp.com",
+  projectId: "timeless-5d27d",
+  storageBucket: "timeless-5d27d.firebasestorage.app",
+  messagingSenderId: "915230214709",
+  appId: "1:915230214709:web:345d0cd7267caec3553f7c",
+  measurementId: "G-T6HMS83GF5"
 };
 
 // Initialize Firebase
