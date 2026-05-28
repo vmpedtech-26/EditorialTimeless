@@ -25,14 +25,14 @@ function renderBooks(books) {
   }
 
   bookGrid.innerHTML = books.map((b, i) => `
-    <a class="book-card reveal reveal-delay-${(i % 4) + 1}" href="reader.html?id=${b.id}">
+    <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}" onclick="openBookModal('${b.id}')">
       <div class="book-card-cover">
         <div class="book-card-spine"></div>
         <img src="${b.cover || 'assets/cover.png'}" alt="${b.title}" loading="lazy" />
         <div class="book-card-overlay">
           <div class="book-card-read-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            Leer ahora
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Ver contraportada
           </div>
         </div>
         ${b.badge === 'excl' ? `<div class="book-excl">${b.badgeText || 'Exclusivo'}</div>` : ''}
@@ -41,10 +41,9 @@ function renderBooks(books) {
       <div class="book-card-genre">${b.genre}</div>
       <div class="book-card-title">${b.title}</div>
       <div class="book-card-author">${b.author || 'Timeless Agent'}</div>
-    </a>
+    </div>
   `).join('');
 
-  // Observe newly added books
   document.querySelectorAll('.book-card.reveal').forEach(el => observer.observe(el));
 }
 
@@ -69,22 +68,125 @@ async function fetchLibrary(category = 'all') {
       books = [...books, ...userBooks];
     }
 
-    if (books.length === 0) books = FALLBACK_BOOKS;
+    if (books.length === 0) {
+      books = [...FALLBACK_BOOKS, ...KIDS_FALLBACK_BOOKS];
+    } else {
+      books = [...books, ...KIDS_FALLBACK_BOOKS];
+    }
+    
+    BOOK_CATALOG = books;
 
-    const filtered = category === 'all' ? books : books.filter(b => b.cat === category || b.genre?.toLowerCase().includes(category));
+    const filtered = category === 'all' 
+      ? books.filter(b => b.cat !== 'kids') 
+      : books.filter(b => b.cat === category || b.genre?.toLowerCase().includes(category));
     renderBooks(filtered);
 
   } catch (error) {
     console.error("Error fetching library:", error);
+    BOOK_CATALOG = [...FALLBACK_BOOKS, ...KIDS_FALLBACK_BOOKS];
     renderBooks(FALLBACK_BOOKS);
   }
 }
 
 const FALLBACK_BOOKS = [
-  { id: 'fb1', cat: 'ensayo', title: 'El Arte de la Contemplación', author: 'Emilio Vargas', genre: 'Ensayo', cover: 'assets/cover_contemplacion.png', badge: 'excl', badgeText: 'Exclusivo' },
-  { id: 'fb2', cat: 'ficcion', title: 'La Memoria del Agua', author: 'Claudia Iriarte', genre: 'Ficción', cover: 'assets/cover_memoria.png', badge: 'new', badgeText: 'Nuevo' },
-  { id: 'fb3', cat: 'tecnica', title: 'El Arquitecto de Sombras', author: 'Marcos Delgado', genre: 'Técnica', cover: 'assets/cover_arquitecto.png' },
-  { id: 'fb4', cat: 'ficcion', title: 'En el Umbral', author: 'Isabel Noriega', genre: 'Ficción', cover: 'assets/cover_umbral.png', badge: 'excl', badgeText: 'Exclusivo' }
+  {
+    id: 'fb1', cat: 'ensayo',
+    title: 'El Arte de la Contemplación',
+    author: 'Emilio Vargas',
+    genre: 'Ensayo', cover: 'assets/cover_contemplacion.png',
+    badge: 'excl', badgeText: 'Exclusivo',
+    pages: 218, readTime: '5h 40min', chapters: 12,
+    tagline: 'En un mundo que corre, aprender a detenerse es el acto más radical.',
+    synopsis: 'Emilio Vargas propone en este ensayo una filosofía de la atención como forma de resistencia cultural. A través de doce meditaciones independientes — sobre el silencio, la lentitud, la luz de la tarde, los museos vacíos — construye un argumento que no se enuncia sino que se acumula, como la humedad antes de la lluvia. Una voz que no urge: espera.',
+    themes: ['Atención', 'Silencio', 'Cultura contemporánea'],
+    openingQuote: '«No se trata de no pensar. Se trata de pensar hacia abajo, en lugar de hacia adelante.»',
+  },
+  {
+    id: 'fb2', cat: 'ficcion',
+    title: 'La Memoria del Agua',
+    author: 'Claudia Iriarte',
+    genre: 'Ficción', cover: 'assets/cover_memoria.png',
+    badge: 'new', badgeText: 'Nuevo',
+    pages: 342, readTime: '8h 20min', chapters: 18,
+    tagline: 'Los muertos no se van. Se disuelven en el sistema de acueductos.',
+    synopsis: 'En una ciudad que comienza a olvidarse a sí misma, una archivista descubre que los recuerdos de los muertos persisten atrapados en el agua que bebe la gente. Cada vez que alguien llora, recuerda algo que no vivió. Claudia Iriarte teje una novela sobre el peso invisible de la memoria colectiva, la violencia silenciosa del olvido institucional y el amor que se filtra entre las grietas del concreto.',
+    themes: ['Memoria', 'Pérdida', 'Ciudad', 'Duelo colectivo'],
+    openingQuote: '«El agua tiene memoria. Es lo único que no podemos purificar del todo.»',
+  },
+  {
+    id: 'fb3', cat: 'tecnica',
+    title: 'El Arquitecto de Sombras',
+    author: 'Marcos Delgado',
+    genre: 'Técnica narrativa', cover: 'assets/cover_arquitecto.png',
+    pages: 280, readTime: '6h 55min', chapters: 15,
+    tagline: 'Un manual para construir mundos que el lector habite sin saberlo.',
+    synopsis: 'Marcos Delgado, arquitecto de profesionó y escritor por necesidad, expone en este volumen singular la gramática oculta detrás de los espacios narrativos que más nos han habitado. Cómo la luz entra en una escena. Cómo el silencio ocupa espacio en una página. Cómo construir una habitación que el lector recuerde aunque jamás la haya visto. Un libro técnico que se lee como una novela.',
+    themes: ['Escritura', 'Arquitectura narrativa', 'Espacio ficcional'],
+    openingQuote: '«Todo gran edificio tiene una sombra. Toda gran historia también.»',
+  },
+  {
+    id: 'fb4', cat: 'ficcion',
+    title: 'En el Umbral',
+    author: 'Isabel Noriega',
+    genre: 'Ficción', cover: 'assets/cover_umbral.png',
+    badge: 'excl', badgeText: 'Exclusivo',
+    pages: 390, readTime: '9h 45min', chapters: 22,
+    tagline: 'Entre los vivos y los muertos hay una habitación. Isabel Noriega vive allí.',
+    synopsis: 'Cuatro personajes convergen durante una sola noche en un hotel de frontera que no aparece en ningún mapa. Ninguno sabe exactamente cómo llegó. Ninguno recuerda bien su nombre. Isabel Noriega construye una novela donde el suspenso no viene de lo que pasa sino de lo que no termina de resolverse: esa sensación de estar a punto de comprender algo que se retira justo cuando uno se acerca.',
+    themes: ['Identidad', 'Límite', 'Lo no dicho', 'Suspenso existencial'],
+    openingQuote: '«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares que nos esperan.»',
+  }
+];
+
+const KIDS_FALLBACK_BOOKS = [
+  {
+    id: 'kid1', cat: 'kids',
+    title: 'El Unicornio de Hielo',
+    author: 'Alicia M. Gómez',
+    genre: 'Infantil (4-8 años)', cover: '🦄',
+    badge: 'kids', badgeText: 'Kids',
+    pages: 48, readTime: '15min', chapters: 3,
+    tagline: 'Una mágica aventura en las montañas celestes para derretir la soledad.',
+    synopsis: 'En la cima de la Montaña Azul vive un unicornio hecho enteramente de escarcha brillante. Aunque tiene el poder de congelar los riachuelos para jugar, se siente muy solo. Un día, una valiente niña llamada Sofía sube la montaña buscando una flor que nunca se marchita y le enseña que el calor más valioso es el del corazón y la amistad verdadera.',
+    themes: ['Amistad', 'Naturaleza', 'Sentimientos'],
+    openingQuote: '«El hielo brilla con la luna, pero un amigo brilla en cualquier oscuridad.»',
+  },
+  {
+    id: 'kid2', cat: 'kids',
+    title: 'El Secreto del Faro Austral',
+    author: 'Javier del Campo',
+    genre: 'Aventura (9-12 años)', cover: '🪐',
+    badge: 'kids', badgeText: 'Kids',
+    pages: 112, readTime: '45min', chapters: 8,
+    tagline: '¿Y si las estrellas usaran faros para no perderse en la noche?',
+    synopsis: 'Tomás pasa el verano en la isla del faro junto a su abuelo. Una noche de tormenta, descubre un engranaje dorado oculto bajo la escalera de caracol. Al hacerlo girar, el faro deja de proyectar luz blanca y empieza a emitir un haz de luz cósmico de colores que responde a las constelaciones. Tomás se embarca en un misterio estelar para descifrar el mensaje secreto de los navegantes del cielo.',
+    themes: ['Misterio', 'Astronomía', 'Familia'],
+    openingQuote: '«Los faros no solo miran al mar, a veces le sonríen a las estrellas.»',
+  },
+  {
+    id: 'kid3', cat: 'kids',
+    title: 'El Relojero de los Sueños',
+    author: 'Clara Domínguez',
+    genre: 'Realismo Mágico (6-10 años)', cover: '⏳',
+    badge: 'kids', badgeText: 'Kids',
+    pages: 76, readTime: '30min', chapters: 5,
+    tagline: 'El tiempo de soñar no se mide en minutos, sino en sonrisas.',
+    synopsis: 'Don Manuel es el relojero del pueblo, pero en su trastienda no repara relojes comunes. Repara relojes de arena que guardan las horas felices de la gente. Cuando el pequeño Bruno pierde las ganas de jugar porque el tiempo pasa muy rápido, Don Manuel le enseña cómo saborear cada segundo de juego y cómo los recuerdos alegres detienen las manecillas del reloj de la vida.',
+    themes: ['Felicidad', 'El tiempo', 'Sabiduría'],
+    openingQuote: '«Un minuto de risa dura más que una hora de aburrimiento.»',
+  },
+  {
+    id: 'kid4', cat: 'kids',
+    title: 'Las Huellas del Bosque Susurrante',
+    author: 'Hugo Silva',
+    genre: 'Misterio (8-12 años)', cover: '🐾',
+    badge: 'kids', badgeText: 'Kids',
+    pages: 94, readTime: '35min', chapters: 6,
+    tagline: 'Los animales del bosque tienen una historia que contarte, si sabes escuchar.',
+    synopsis: 'Marta y su perro Duque encuentran unas misteriosas huellas que brillan con luz verde al atardecer en el lindero del bosque. Siguiendo el rastro junto a su grupo de amigos, descubren que el bosque está tratando de alertarlos sobre la desaparición de un manantial sagrado. Una hermosa lección de ecología, trabajo en equipo y el maravilloso lenguaje secreto de la naturaleza.',
+    themes: ['Ecología', 'Aventura', 'Trabajo en equipo'],
+    openingQuote: '«El bosque no habla alto, pero susurra secretos a quienes saben guardar silencio.»',
+  }
 ];
 
 // ---- FILTERS ----
@@ -345,3 +447,101 @@ if (subCtaBtn) {
     }
   });
 }
+
+// ── BOOK CATALOG global lookup (fallback + Firestore books merge) ───────
+let BOOK_CATALOG = [...FALLBACK_BOOKS, ...KIDS_FALLBACK_BOOKS];
+
+// ── BACK-COVER MODAL ────────────────────────────────────────────────────
+window.openBookModal = function(bookId) {
+  const book = BOOK_CATALOG.find(b => b.id === bookId);
+  if (!book) return;
+
+  document.getElementById('backcover-modal')?.remove();
+
+  const isLoggedIn  = !!currentUser;
+  const readUrl     = `reader.html?id=${book.id}`;
+  const genreColors = { ficcion:'#C4884A', ensayo:'#6B8E6B', tecnica:'#7A7A9E', biografia:'#8E7BA8', kids:'#5B9E6B' };
+  const accent      = genreColors[book.cat] || '#C9A96E';
+
+  const themePills  = (book.themes || []).map(t => `<span class="bm-theme-pill">${t}</span>`).join('');
+
+  const modal = document.createElement('div');
+  modal.id = 'backcover-modal';
+  modal.innerHTML = `
+    <div class="bm-overlay" id="bm-overlay"></div>
+    <div class="bm-panel" id="bm-panel">
+      <button class="bm-close" id="bm-close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="bm-inner">
+        <div class="bm-cover-col">
+          <div class="bm-cover-wrap" style="--bm-accent:${accent}">
+            <div class="bm-cover-spine"></div>
+            ${book.cover.startsWith('assets') || book.cover.startsWith('http') || book.cover.includes('/')
+              ? `<img src="${book.cover}" alt="${book.title}" />`
+              : `<div class="kids-card-cover-placeholder" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #FFF9E6, #FFF0CC);">
+                  <div style="font-size: 72px; line-height: 1;">${book.cover}</div>
+                  <div style="font-family:var(--font-serif); font-size:14px; font-weight:600; color:#2D5A3D; text-align:center; padding: 10px;">${book.title}</div>
+                 </div>`
+            }
+            ${book.badge === 'excl' ? `<div class="bm-badge bm-badge-excl">${book.badgeText || 'Exclusivo'}</div>` : ''}
+            ${book.badge === 'new'  ? `<div class="bm-badge bm-badge-new">${book.badgeText || 'Nuevo'}</div>` : ''}
+            ${book.badge === 'kids' ? `<div class="bm-badge bm-badge-kids">${book.badgeText || 'Kids'}</div>` : ''}
+          </div>
+          <div class="bm-meta-pills">
+            ${book.pages    ? `<div class="bm-meta-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>${book.pages} págs.</div>` : ''}
+            ${book.readTime ? `<div class="bm-meta-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${book.readTime}</div>` : ''}
+            ${book.chapters ? `<div class="bm-meta-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>${book.chapters} caps.</div>` : ''}
+          </div>
+        </div>
+        <div class="bm-content-col">
+          <div class="bm-genre" style="color:${accent}">✦ ${book.genre}</div>
+          <h2 class="bm-title">${book.title}</h2>
+          <div class="bm-author">por ${book.author || 'Timeless Editorial'}</div>
+          ${book.openingQuote ? `<blockquote class="bm-quote" style="border-left-color:${accent}">${book.openingQuote}</blockquote>` : ''}
+          ${book.tagline  ? `<p class="bm-tagline">${book.tagline}</p>` : ''}
+          ${book.synopsis ? `<p class="bm-synopsis">${book.synopsis}</p>` : ''}
+          ${themePills    ? `<div class="bm-themes">${themePills}</div>` : ''}
+          <div class="bm-cta-row">
+            ${isLoggedIn
+              ? `<a class="bm-btn-primary" href="${readUrl}" style="background:${accent};border-color:${accent}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  Leer ahora
+                </a>`
+              : `<button class="bm-btn-primary" id="bm-cta-register" style="background:${accent};border-color:${accent}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  Acceder a esta obra
+                </button>`
+            }
+            <button class="bm-btn-ghost" id="bm-close-bottom">Volver al catálogo</button>
+          </div>
+          ${!isLoggedIn ? `<p class="bm-access-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            14 días gratis · Sin tarjeta de crédito · Cancela cuando quieras
+          </p>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => modal.classList.add('bm-visible'));
+
+  const closeModal = () => {
+    modal.classList.remove('bm-visible');
+    setTimeout(() => { modal.remove(); document.body.style.overflow = ''; }, 350);
+  };
+
+  document.getElementById('bm-overlay')?.addEventListener('click', closeModal);
+  document.getElementById('bm-close')?.addEventListener('click', closeModal);
+  document.getElementById('bm-close-bottom')?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', function onEsc(e) {
+    if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', onEsc); }
+  });
+
+  document.getElementById('bm-cta-register')?.addEventListener('click', () => {
+    closeModal();
+    setTimeout(() => document.getElementById('auth-modal')?.classList.add('visible'), 380);
+  });
+};

@@ -668,30 +668,58 @@
     .book-card-cover {
       position: relative;
       margin-bottom: 16px;
-      border-radius: 4px 10px 10px 4px;
+      border-radius: 4px 12px 12px 4px;
       overflow: hidden;
-      box-shadow: var(--shadow-book);
+      box-shadow: 
+        0 10px 30px rgba(0,0,0,0.18), 
+        -4px 4px 12px rgba(0,0,0,0.12),
+        inset -2px 0 3px rgba(255,255,255,0.06),
+        inset 2px 0 3px rgba(0,0,0,0.3);
       aspect-ratio: 2/3;
       background: var(--bg-alt);
-      transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+      transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.45s cubic-bezier(0.25, 1, 0.5, 1);
     }
     .book-card:hover .book-card-cover {
-      transform: translateY(-6px) rotate(-1deg);
-      box-shadow: -10px 14px 40px rgba(0,0,0,0.24);
+      transform: translateY(-8px) rotate(-1.5deg) scale(1.02);
+      box-shadow: 
+        -16px 24px 48px rgba(20,18,16,0.3), 
+        -6px 6px 16px rgba(20,18,16,0.18);
     }
 
     .book-card-cover img {
       width: 100%; height: 100%;
       object-fit: cover;
-      transition: transform 0.5s var(--ease);
+      transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .book-card:hover .book-card-cover img { transform: scale(1.03); }
+    .book-card:hover .book-card-cover img { transform: scale(1.04); }
 
+    /* Spine effect and right-edge 3D paper pages effect */
     .book-card-spine {
       position: absolute;
       top: 0; left: 0; bottom: 0;
-      width: 6px;
-      background: linear-gradient(90deg, rgba(0,0,0,0.20), transparent);
+      width: 10px;
+      background: linear-gradient(90deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.08) 35%, rgba(255,255,255,0.15) 85%, transparent 100%);
+      z-index: 2;
+    }
+    .book-card-cover::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 5px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.08) 50%, rgba(0,0,0,0.15) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .book-card-cover::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow: 
+        inset 1px 1px 0px rgba(255,255,255,0.12),
+        inset -1px -1px 0px rgba(0,0,0,0.3);
+      z-index: 3;
+      pointer-events: none;
+      border-radius: inherit;
     }
 
     /* Hover overlay */
@@ -963,7 +991,7 @@
 
     .sub-plans {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
       margin-bottom: 40px;
     }
@@ -1365,4 +1393,486 @@
     @media (max-width: 480px) {
       .book-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 10px; }
       .hero-cta-row { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ======================================================
+       BACK-COVER MODAL
+    ====================================================== */
+    #backcover-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    #backcover-modal.bm-visible {
+      pointer-events: all;
+      opacity: 1;
+    }
+    .bm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 18, 16, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .bm-panel {
+      position: relative;
+      background: var(--bg);
+      border-radius: 20px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.10);
+      max-width: 860px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(24px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      border: 1px solid var(--border);
+    }
+    #backcover-modal.bm-visible .bm-panel {
+      transform: translateY(0) scale(1);
+    }
+    .bm-panel::-webkit-scrollbar { width: 4px; }
+    .bm-panel::-webkit-scrollbar-track { background: transparent; }
+    .bm-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .bm-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+      transition: all 0.2s;
+    }
+    .bm-close:hover { background: var(--ink); }
+    .bm-close svg { width: 14px; height: 14px; stroke: var(--ink-muted); transition: stroke 0.2s; }
+    .bm-close:hover svg { stroke: var(--paper); }
+    .bm-inner {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 48px;
+      padding: 48px;
+    }
+    .bm-cover-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .bm-cover-wrap {
+      position: relative;
+      width: 100%;
+      border-radius: 4px 12px 12px 4px;
+      box-shadow: var(--shadow-book);
+      overflow: hidden;
+      aspect-ratio: 2/3;
+      background: var(--bg-alt);
+    }
+    .bm-cover-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .bm-cover-spine {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 8px;
+      background: linear-gradient(90deg, rgba(0,0,0,0.28), transparent);
+    }
+    .bm-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: var(--paper);
+    }
+    .bm-badge-excl { background: var(--gold-dark); }
+    .bm-badge-new  { background: var(--ink); }
+    .bm-badge-kids { background: #5B9E6B; }
+    .bm-meta-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .bm-meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--ink-muted);
+      padding: 7px 10px;
+      background: var(--bg-alt);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .bm-meta-pill svg { width: 13px; height: 13px; color: var(--gold); flex-shrink: 0; }
+    .bm-content-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .bm-genre {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .bm-title {
+      font-family: var(--font-serif);
+      font-size: clamp(22px, 3vw, 34px);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .bm-author {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-style: italic;
+      color: var(--ink-muted);
+      margin-bottom: 24px;
+    }
+    .bm-quote {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--ink);
+      border-left: 3px solid var(--gold);
+      padding: 12px 18px;
+      margin: 0 0 20px;
+      background: rgba(201,169,110,0.06);
+      border-radius: 0 8px 8px 0;
+    }
+    .bm-tagline {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .bm-synopsis {
+      font-size: 15px;
+      line-height: 1.78;
+      color: var(--ink-muted);
+      margin-bottom: 20px;
+    }
+    .bm-themes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .bm-theme-pill {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      color: var(--ink-muted);
+      letter-spacing: 0.04em;
+    }
+    .bm-cta-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .bm-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--paper) !important;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1.5px solid;
+      letter-spacing: 0.03em;
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .bm-btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .bm-btn-primary svg { width: 15px; height: 15px; }
+    .bm-btn-ghost {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-muted);
+      padding: 11px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .bm-btn-ghost:hover { background: var(--bg-alt); color: var(--ink); }
+    .bm-access-note {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+    .bm-access-note svg { width: 12px; height: 12px; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      .bm-inner { grid-template-columns: 1fr; padding: 28px 20px; gap: 24px; }
+      .bm-cover-wrap { max-width: 180px; margin: 0 auto; }
+      .bm-meta-pills { flex-direction: row; flex-wrap: wrap; }
+      .bm-meta-pill { flex: 0 0 auto; }
+    }
+
+    /* ======================================================
+       KIDS SECTION & FAMILY PLAN
+    ====================================================== */
+    #kids-section {
+      padding: 100px 0;
+      background: linear-gradient(135deg, #F0F7F2 0%, #EDF4F8 50%, #F5F0F8 100%);
+      border-top: 1px solid rgba(91,158,107,0.15);
+      border-bottom: 1px solid rgba(91,158,107,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    #kids-section::before {
+      content: '⭐ 🌙 ✨ 🦋 🌈 ⭐ 🌙';
+      position: absolute;
+      top: 20px; left: 0; right: 0;
+      text-align: center;
+      font-size: 20px;
+      letter-spacing: 24px;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+    .kids-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .kids-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #5B9E6B;
+      margin-bottom: 16px;
+    }
+    .kids-title {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .kids-subtitle {
+      font-size: 16px;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .kids-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px 20px;
+    }
+    .kids-card {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .kids-card:hover { transform: translateY(-4px); }
+    .kids-card-cover {
+      position: relative;
+      border-radius: 12px 16px 16px 12px;
+      overflow: hidden;
+      aspect-ratio: 2/3;
+      background: linear-gradient(135deg, #E8F4EC, #E8EEF8);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.12), -3px 3px 8px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
+      transition: box-shadow 0.3s;
+    }
+    .kids-card:hover .kids-card-cover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18), -4px 4px 12px rgba(0,0,0,0.10);
+    }
+    .kids-card-cover img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .kids-card-cover-placeholder {
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+    }
+    .kids-cover-emoji {
+      font-size: 52px;
+      line-height: 1;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    }
+    .kids-cover-title {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      font-weight: 600;
+      color: #2D5A3D;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .kids-age-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: white;
+      background: #5B9E6B;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .kids-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(45,90,61,0.80) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+    }
+    .kids-card:hover .kids-card-overlay { opacity: 1; }
+    .kids-card-read-btn {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .kids-card-read-btn svg { width: 12px; height: 12px; }
+    .kids-card-age {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5B9E6B;
+      margin-bottom: 4px;
+    }
+    .kids-card-title {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .kids-card-author {
+      font-size: 12px;
+      color: var(--ink-muted);
+      font-style: italic;
+      font-family: var(--font-serif);
+    }
+    .kids-cta-row {
+      text-align: center;
+      margin-top: 52px;
+    }
+    .btn-kids-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 10px;
+      background: #5B9E6B;
+      border: 1.5px solid #5B9E6B;
+      letter-spacing: 0.02em;
+      transition: all 0.2s;
+    }
+    .btn-kids-cta:hover { background: #4A8A5A; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(91,158,107,0.35); }
+    .btn-kids-cta svg { width: 16px; height: 16px; }
+    .kids-plan-note {
+      font-size: 13px;
+      color: var(--ink-faint);
+      margin-top: 12px;
+    }
+
+    /* ======================================================
+       FAMILY PLAN CARD  
+    ====================================================== */
+    .plan-card-family {
+      background: linear-gradient(135deg, #2D5A3D 0%, #1E4A30 100%);
+      border: 1.5px solid rgba(91,158,107,0.4);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .plan-card-family::before {
+      content: '👨‍👩‍👧‍👦';
+      position: absolute;
+      top: -10px; right: 20px;
+      font-size: 64px;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+    .plan-card-family .plan-name { color: rgba(255,255,255,0.7); }
+    .plan-card-family .plan-price { color: white; }
+    .plan-card-family .plan-period { color: rgba(255,255,255,0.5); }
+    .plan-card-family .plan-features li { color: rgba(255,255,255,0.85); }
+    .plan-card-family .plan-features svg { stroke: #7FD19E; }
+    .plan-btn-family {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      background: rgba(127,209,158,0.2);
+      border: 1.5px solid rgba(127,209,158,0.4);
+      color: #7FD19E;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-align: center;
+      margin-top: 28px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .plan-btn-family:hover {
+      background: rgba(127,209,158,0.35);
+      border-color: #7FD19E;
+    }
+
+    /* Kids badge on book cards */
+    .book-kids {
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: white;
+      background: #5B9E6B;
+      padding: 3px 8px;
+      border-radius: 4px;
     }
