@@ -79,6 +79,59 @@ document.querySelectorAll('.genre-tab').forEach(btn => {
   });
 });
 
+// ── WRITER SELECTOR ──────────────────────────────────────────────────
+function initWriterSelector() {
+  const grid    = document.getElementById('writer-grid');
+  const preview = document.getElementById('writer-preview');
+  const select  = document.getElementById('writer-select');
+  if (!grid || !window.TIMELESS_WRITERS) return;
+
+  window.TIMELESS_WRITERS.forEach(writer => {
+    // Build hidden option
+    const opt = document.createElement('option');
+    opt.value = writer.id;
+    opt.textContent = writer.name;
+    select.appendChild(opt);
+
+    // Shorten name to last surname for display
+    const shortName = writer.id === 'libre'
+      ? 'Timeless'
+      : writer.name.split(' ').slice(-1)[0];
+
+    // Build visual chip
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'writer-chip' + (writer.id === 'libre' ? ' selected' : '');
+    chip.dataset.writerId = writer.id;
+    chip.style.setProperty('--chip-color', writer.color);
+    chip.innerHTML = `
+      <span class="writer-chip-flag">${writer.nationality}</span>
+      <span class="writer-chip-name">${shortName}</span>
+      <span class="writer-chip-era">${writer.era}</span>
+    `;
+    chip.addEventListener('click', () => {
+      grid.querySelectorAll('.writer-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      select.value = writer.id;
+      preview.textContent = writer.signature;
+      preview.style.borderLeftColor = writer.color;
+    });
+    grid.appendChild(chip);
+  });
+
+  // Set initial preview
+  if (preview) {
+    preview.style.borderLeftColor = window.TIMELESS_WRITERS[0].color;
+  }
+}
+
+// TIMELESS_WRITERS is defined in prompts.js (loaded before this module)
+if (typeof window.TIMELESS_WRITERS !== 'undefined') {
+  initWriterSelector();
+} else {
+  window.addEventListener('load', initWriterSelector);
+}
+
 // ── STATE ─────────────────────────────────────────────────────
 let generating = false;
 let currentObra = null;
@@ -182,6 +235,7 @@ window.startGeneration = async function() {
     genre:    currentGenre,
     chapters: document.getElementById('chapters-select').value,
     tone:     document.getElementById('tone-select').value,
+    writerId: document.getElementById('writer-select')?.value || 'libre',
   };
 
   try {
@@ -191,7 +245,14 @@ window.startGeneration = async function() {
     log(`<span class="out-dim">// timeless.agent &mdash; g&eacute;nero: ${params.genre} &middot; tono: ${params.tone}</span>`);
     log(`<span class="out-gold">agent.init</span><span class="out-dim"> --model=gemini-2.0-flash --quality=bsc</span>`);
     await sleep(300);
-    log(`<span class="out-green">✓</span> Motor literario v3.2 conectado &middot; Gemini API activa`);
+    log(`<span class="out-green">✓</span> Motor literario v4.0 conectado &middot; Gemini API activa`);
+    // Show selected writer voice in terminal
+    const writerInfo = window.TIMELESS_WRITERS?.find(w => w.id === params.writerId);
+    if (writerInfo && writerInfo.id !== 'libre') {
+      log(`<span class="out-blue">&rarr;</span> Voz literaria: <span class="out-cream">${writerInfo.nationality} ${writerInfo.name}</span> <span class="out-dim">&mdash; ${writerInfo.signature.split('.')[0]}</span>`);
+    } else {
+      log(`<span class="out-blue">&rarr;</span> Voz literaria: <span class="out-cream">Timeless Editorial</span> <span class="out-dim">&mdash; identidad original</span>`);
+    }
     logBlank();
 
     setProgress(10, 'Generando outline…');

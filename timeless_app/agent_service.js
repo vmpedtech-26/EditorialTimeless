@@ -108,10 +108,12 @@ window.AgentService = class AgentService {
 
   // ── Pipeline: generate outline ───────────────────────────────────
   async generateOutline(params) {
+    const writerId = params.writerId || 'libre';
+    const systemPrompt = window.TIMELESS_PROMPTS.buildSystem(writerId);
     const userPrompt = window.TIMELESS_PROMPTS.buildOutline(
-      params.prompt, params.genre, params.chapters, params.tone
+      params.prompt, params.genre, params.chapters, params.tone, writerId
     );
-    const raw = await this.generate(window.TIMELESS_PROMPTS.SYSTEM, userPrompt, {
+    const raw = await this.generate(systemPrompt, userPrompt, {
       temperature: 0.80,
       maxTokens:   2048,
     });
@@ -123,8 +125,10 @@ window.AgentService = class AgentService {
 
   // ── Pipeline: stream chapter ─────────────────────────────────────
   streamChapter(outline, chapterIndex, params) {
+    const writerId = params.writerId || 'libre';
+    const systemPrompt = window.TIMELESS_PROMPTS.buildSystem(writerId);
     const userPrompt = window.TIMELESS_PROMPTS.buildChapter(outline, chapterIndex, params);
-    return this.stream(window.TIMELESS_PROMPTS.SYSTEM, userPrompt, {
+    return this.stream(systemPrompt, userPrompt, {
       temperature: 0.92,
       maxTokens:   2500,
     });

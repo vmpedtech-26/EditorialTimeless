@@ -10,6 +10,97 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/css/agent.css" />
+  <style>
+    /* ── WRITER SELECTOR ──────────────────────────────────── */
+    .writer-section {
+      margin-bottom: 20px;
+    }
+    .writer-section .option-label {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .writer-section .option-label svg {
+      width: 14px; height: 14px;
+      stroke: var(--gold-d, #C9A96E);
+      flex-shrink: 0;
+    }
+    .writer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .writer-grid::-webkit-scrollbar { width: 4px; }
+    .writer-grid::-webkit-scrollbar-track { background: transparent; }
+    .writer-grid::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.3); border-radius: 2px; }
+    .writer-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .writer-chip::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--chip-color, #C9A96E);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .writer-chip:hover::before { opacity: 0.06; }
+    .writer-chip.selected {
+      border-color: var(--chip-color, #C9A96E);
+      background: rgba(201,169,110,0.08);
+      box-shadow: 0 0 0 1px var(--chip-color, #C9A96E);
+    }
+    .writer-chip.selected::before { opacity: 0.06; }
+    .writer-chip-flag {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .writer-chip-name {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+    .writer-chip-era {
+      font-size: 8.5px;
+      color: rgba(255,255,255,0.35);
+      line-height: 1;
+    }
+    .writer-chip.selected .writer-chip-name {
+      color: var(--chip-color, #C9A96E);
+    }
+    .writer-card-preview {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-left: 2px solid var(--preview-accent, #C9A96E);
+      border-radius: 0 8px 8px 0;
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+      font-style: italic;
+      transition: all 0.3s ease;
+      min-height: 36px;
+    }
+  </style>
   
   <!-- PWA & Apple Web App Meta -->
   <link rel="manifest" href="manifest.json" />
@@ -333,17 +424,28 @@
           </div>
           <div class="panel-body">
             <textarea class="prompt-field" id="prompt-input" placeholder="Escribe tu premisa aquí... ej: 'Una historia sobre la última biblioteca del mundo en un futuro donde los libros están prohibidos'"></textarea>
-            <div class="prompt-options">
-              <div class="option-row">
-                <div class="option-label">Tono</div>
-                <select id="tone-select">
-                  <option value="contemplatif">Contemplativo</option>
-                  <option value="thriller">Thriller</option>
-                  <option value="lirico">Lírico</option>
-                  <option value="epico">Épico</option>
-                  <option value="ironico">Irónico</option>
-                </select>
+            <!-- Writer Selector -->
+            <div class="option-row writer-section">
+              <div class="option-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Voz Literaria
               </div>
+              <div class="writer-grid" id="writer-grid"></div>
+              <div class="writer-card-preview" id="writer-preview">Prosa contemplativa latinoamericana. Identidad editorial original.</div>
+              <!-- Hidden select for form value -->
+              <select id="writer-select" style="display:none;"></select>
+            </div>
+
+            <div class="option-row">
+              <div class="option-label">Tono</div>
+              <select id="tone-select">
+                <option value="contemplatif">Contemplativo</option>
+                <option value="thriller">Thriller</option>
+                <option value="lirico">Lírico</option>
+                <option value="epico">Épico</option>
+                <option value="ironico">Irónico</option>
+              </select>
+            </div>
               <div class="option-row">
                 <div class="option-label">Extensión</div>
                 <select id="length-select">
