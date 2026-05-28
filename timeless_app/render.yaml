@@ -3,6 +3,7 @@ services:
     name: timeless-editorial
     env: node
     plan: free
+    rootDir: timeless_app
     buildCommand: npm install
     startCommand: npm start
     envVars:
