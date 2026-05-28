@@ -362,12 +362,183 @@ function renderNotesPanel() {
     list.innerHTML = '<div style="color:var(--ink-faint); font-size:13px; text-align:center;">Aún no tienes notas. Selecciona texto en el lector para destacar.</div>';
     return;
   }
+  
   list.innerHTML = state.highlights.map(h => `
     <div class="note-item">
-      "${h.text}"
-      <div class="note-meta">Capítulo ${h.chapter + 1} &bull; ${new Date(h.createdAt?.toMillis() || Date.now()).toLocaleDateString()}</div>
+      <div style="font-family:var(--font-serif); font-style:italic; font-size:15px; margin-bottom:8px; line-height:1.4;">&ldquo;${h.text}&rdquo;</div>
+      <div class="note-footer">
+        <div class="note-meta">Capítulo ${h.chapter + 1}</div>
+        <button class="btn-share-quote" data-id="${h.id}">Compartir</button>
+      </div>
     </div>
   `).join('');
+  
+  // Vincular click en botones de compartir
+  list.querySelectorAll('.btn-share-quote').forEach(btn => {
+    btn.onclick = () => {
+      const hlId = btn.dataset.id;
+      const hl = state.highlights.find(x => x.id === hlId);
+      if (hl) {
+        shareQuoteCard(hl);
+      }
+    };
+  });
+}
+
+// ── Quote Sharing Card (Canvas & Native Share) ────────────────────────────────
+function drawQuoteCard(canvas, text, bookTitle, chapterNum) {
+  const ctx = canvas.getContext('2d');
+  
+  // 1. Fondo de papel premium
+  ctx.fillStyle = '#F5F1EB'; 
+  ctx.fillRect(0, 0, 1080, 1920);
+  
+  // 2. Bordes ornamentales de lujo
+  ctx.strokeStyle = '#C9A96E'; // Borde dorado
+  ctx.lineWidth = 4;
+  ctx.strokeRect(40, 40, 1080 - 80, 1920 - 80);
+  
+  ctx.strokeStyle = '#1C1C1A'; // Delgada línea oscura interna
+  ctx.lineWidth = 1;
+  ctx.strokeRect(55, 55, 1080 - 110, 1920 - 110);
+  
+  // 3. Encabezado de Marca
+  ctx.fillStyle = '#1C1C1A';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  ctx.font = "28px 'Inter', sans-serif";
+  const headerText = "T I M E L E S S   E D I T O R I A L";
+  ctx.fillText(headerText, 1080 / 2, 160);
+  
+  ctx.fillStyle = '#C9A96E';
+  ctx.font = "24px 'EB Garamond', serif";
+  ctx.fillText("♦   ♦   ♦", 1080 / 2, 210);
+  
+  // 4. Comilla gigante dorada translúcida detrás de la cita
+  ctx.fillStyle = 'rgba(201, 169, 110, 0.1)';
+  ctx.font = "360px 'Playfair Display', 'EB Garamond', serif";
+  ctx.fillText("“", 1080 / 2, 600);
+  
+  // 5. Ajuste y renderizado del texto (WrapText centrado)
+  ctx.fillStyle = '#1C1C1A';
+  ctx.font = "italic 44px 'Lora', 'EB Garamond', Georgia, serif";
+  
+  const words = text.split(' ');
+  const lines = [];
+  let currentLine = '';
+  const maxWidth = 800; // Margen amplio para móviles
+  
+  for (let n = 0; n < words.length; n++) {
+    const testLine = currentLine + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+    if (testWidth > maxWidth && n > 0) {
+      lines.push(currentLine.trim());
+      currentLine = words[n] + ' ';
+    } else {
+      currentLine = testLine;
+    }
+  }
+  lines.push(currentLine.trim());
+  
+  const lineHeight = 65;
+  const totalTextHeight = lines.length * lineHeight;
+  let startY = 960 - (totalTextHeight / 2); // Centrado vertical absoluto
+  
+  ctx.font = "italic 44px 'Lora', 'EB Garamond', Georgia, serif";
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(`“${lines[i]}”`, 1080 / 2, startY + (i * lineHeight));
+  }
+  
+  // 6. Pie de Página Literario
+  ctx.fillStyle = '#C9A96E';
+  ctx.font = "20px 'EB Garamond', serif";
+  ctx.fillText("♦", 1080 / 2, startY + totalTextHeight + 100);
+  
+  ctx.fillStyle = '#1C1C1A';
+  ctx.font = "bold 32px 'Playfair Display', 'EB Garamond', serif";
+  ctx.fillText(bookTitle.toUpperCase(), 1080 / 2, startY + totalTextHeight + 160);
+  
+  ctx.fillStyle = '#C9A96E';
+  ctx.font = "italic 26px 'EB Garamond', Georgia, serif";
+  ctx.fillText(`Capítulo ${chapterNum}`, 1080 / 2, startY + totalTextHeight + 210);
+  
+  // Enlace Web discreto de ultra lujo
+  ctx.fillStyle = 'rgba(28, 28, 26, 0.4)';
+  ctx.font = "22px 'Inter', sans-serif";
+  ctx.fillText("timeless-editorial.onrender.com", 1080 / 2, 1780);
+}
+
+function shareQuoteCard(hl) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1920;
+  
+  // Esperar a que las fuentes estén listas antes de dibujar
+  document.fonts.ready.then(() => {
+    drawQuoteCard(canvas, hl.text, state.book.title, hl.chapter + 1);
+    
+    const dataUrl = canvas.toDataURL('image/png');
+    
+    // Crear y mostrar modal
+    const modal = document.createElement('div');
+    modal.id = 'share-modal';
+    modal.className = 'modal-overlay visible';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 420px; padding: 25px;">
+        <h3 style="font-family: var(--font-serif); font-size: 20px; margin-bottom: 5px;">Comparte tu frase favorita</h3>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 15px;">Guarda la imagen premium para subirla a tu Historia de Instagram.</p>
+        
+        <img src="${dataUrl}" class="share-preview-img" style="max-height: 48vh; border: 1px solid var(--border); box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
+        
+        <div class="share-actions" style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+          <button id="btn-share-native" class="btn-gift-premium" style="margin: 0; padding: 10px 20px; font-size: 13px; border-radius: 8px;">Compartir</button>
+          <a href="${dataUrl}" download="Timeless_Frase_${hl.id}.png" id="btn-download-img" class="btn-nav" style="margin: 0; padding: 10px 20px; font-size: 13px; border-radius: 8px; text-decoration: none; display: inline-block; line-height: 1.4; border: 1px solid var(--border); color: var(--text-primary);">Descargar</a>
+        </div>
+        
+        <button class="btn-close-modal" id="btn-close-share" style="margin-top: 15px; font-size: 12px; opacity: 0.6; background: none; border: none; cursor: pointer; color: var(--text-primary);">Cerrar</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Acción de compartir nativa (iOS/Android)
+    $('btn-share-native').onclick = async () => {
+      try {
+        const file = dataURLtoFile(dataUrl, `Timeless_Frase_${hl.id}.png`);
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Timeless Frase Compartida',
+            text: `"${hl.text}" — Leído en Timeless Editorial`
+          });
+        } else {
+          // Fallback si no admite compartir archivos directamente
+          await navigator.share({
+            title: 'Timeless Frase Compartida',
+            text: `"${hl.text}" — Leído en Timeless Editorial: ${window.location.origin}`,
+            url: window.location.origin
+          });
+        }
+      } catch (err) {
+        // Si el usuario cancela o no se admite
+        console.warn("Fallo al compartir:", err);
+      }
+    };
+    
+    $('btn-close-share').onclick = () => {
+      modal.remove();
+    };
+  });
+}
+
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+  bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+  while(n--){
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, {type:mime});
 }
 
 function applyHighlightsToDOM() {} // TODO: Regex highlighting logic for advanced view

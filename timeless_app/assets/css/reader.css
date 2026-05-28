@@ -726,9 +726,44 @@ svg { width: 22px; height: 22px; vertical-align: middle; }
 .note-meta {
   font-size: 11px;
   color: var(--ink-faint);
-  margin-top: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+.note-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+.btn-share-quote {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+.btn-share-quote:hover {
+  background: rgba(201, 169, 110, 0.1);
+}
+.share-preview-img {
+  max-width: 100%;
+  max-height: 55vh;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.2);
+  margin: 20px 0;
+  border: 1px solid var(--border);
+}
+.share-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
 }
 .highlighted-text {
   background-color: rgba(212, 175, 55, 0.2); /* faint gold */
