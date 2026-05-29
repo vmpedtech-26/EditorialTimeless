@@ -652,7 +652,7 @@ function initKidsCovers() {
     const dataUri = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
     
     // 1. Inyectar en cards estáticos de index.html
-    const imgEl = document.getElementById(`kid-cover-\${id.replace('kid', '')}`);
+    const imgEl = document.getElementById(`kid-cover-${id.replace('kid', '')}`);
     if (imgEl) imgEl.src = dataUri;
 
     // 2. Inyectar en KIDS_FALLBACK_BOOKS en tiempo de ejecución
