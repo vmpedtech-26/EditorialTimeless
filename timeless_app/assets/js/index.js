@@ -410,7 +410,7 @@ onAuthStateChanged(auth, (user) => {
     if(authBtns) authBtns.style.display = 'flex';
     if(userProf) userProf.classList.remove('visible');
     if (btnAdmin) btnAdmin.style.display = 'none';
-  }
+  initKidsCovers();
   fetchLibrary(currentCat);
 });
 
@@ -545,3 +545,117 @@ window.openBookModal = function(bookId) {
     setTimeout(() => document.getElementById('auth-modal')?.classList.add('visible'), 380);
   });
 };
+
+function initKidsCovers() {
+  const coverTemplates = {
+    kid1: {
+      bg: "https://images.unsplash.com/photo-1553284965-83fd3e82fa52?auto=format&fit=crop&q=80&w=600",
+      accent: "#d5e3f0",
+      accentMuted: "#a4c2db",
+      titleLine1: "El Unicornio",
+      titleLine2: "de Hielo",
+      collection: "COLECCIÓN FANTASÍA",
+      author: "ALICIA M. GÓMEZ",
+      gradient: `
+        <linearGradient id="overlayGrad1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0a121a" stop-opacity="0.5"/>
+          <stop offset="50%" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#080e15" stop-opacity="0.8"/>
+        </linearGradient>
+      `,
+      gradientId: "overlayGrad1"
+    },
+    kid2: {
+      bg: "https://images.unsplash.com/photo-1482862549707-f63cb32c5fd9?auto=format&fit=crop&q=80&w=600",
+      accent: "#f6d365",
+      accentMuted: "#fda085",
+      titleLine1: "El Secreto del",
+      titleLine2: "Faro Austral",
+      collection: "COLECCIÓN AVENTURA",
+      author: "JAVIER DEL CAMPO",
+      gradient: `
+        <linearGradient id="overlayGrad2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#050a12" stop-opacity="0.6"/>
+          <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#03060c" stop-opacity="0.85"/>
+        </linearGradient>
+      `,
+      gradientId: "overlayGrad2"
+    },
+    kid3: {
+      bg: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=600",
+      accent: "#e0a96d",
+      accentMuted: "#e0a96d",
+      titleLine1: "El Relojero",
+      titleLine2: "de los Sueños",
+      collection: "REALISMO MÁGICO",
+      author: "CLARA DOMÍNGUEZ",
+      gradient: `
+        <linearGradient id="overlayGrad3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#140a05" stop-opacity="0.6"/>
+          <stop offset="50%" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#0f0502" stop-opacity="0.85"/>
+        </linearGradient>
+      `,
+      gradientId: "overlayGrad3"
+    },
+    kid4: {
+      bg: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=600",
+      accent: "#84a98c",
+      accentMuted: "#a3b18a",
+      titleLine1: "Las Huellas",
+      titleLine2: "del Bosque",
+      collection: "COLECCIÓN MISTERIO",
+      author: "HUGO SILVA",
+      gradient: `
+        <linearGradient id="overlayGrad4" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#020805" stop-opacity="0.6"/>
+          <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#010603" stop-opacity="0.85"/>
+        </linearGradient>
+      `,
+      gradientId: "overlayGrad4"
+    }
+  };
+
+  Object.keys(coverTemplates).forEach(id => {
+    const t = coverTemplates[id];
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="100%" height="100%">
+        <defs>
+          ${t.gradient}
+        </defs>
+        <image href="${t.bg}" x="0" y="0" width="400" height="600" preserveAspectRatio="xMidYMid slice" />
+        <rect width="400" height="600" fill="url(#${t.gradientId})" />
+        <rect x="20" y="20" width="360" height="560" fill="none" stroke="${t.accent}" stroke-width="2.5" opacity="0.8" />
+        <rect x="26" y="26" width="348" height="548" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.3" />
+        
+        <text x="200" y="70" font-family="'Inter', sans-serif" font-size="9" font-weight="800" fill="${t.accent}" letter-spacing="4.5" text-anchor="middle" opacity="0.9">TIMELESS EDITORIAL</text>
+        <line x1="160" y1="80" x2="240" y2="80" stroke="${t.accent}" stroke-width="0.5" opacity="0.5" />
+
+        <text x="200" y="445" font-family="'Playfair Display', 'Georgia', serif" font-size="28" font-weight="700" fill="#ffffff" text-anchor="middle" font-style="italic" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          ${t.titleLine1}
+        </text>
+        <text x="200" y="482" font-family="'Playfair Display', 'Georgia', serif" font-size="28" font-weight="700" fill="#ffffff" text-anchor="middle" font-style="italic" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          ${t.titleLine2}
+        </text>
+        
+        <text x="200" y="520" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600" fill="${t.accentMuted}" letter-spacing="2.5" text-anchor="middle">
+          ${t.collection}
+        </text>
+        <text x="200" y="550" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#ffffff" letter-spacing="1.5" text-anchor="middle" opacity="0.9">
+          ${t.author}
+        </text>
+      </svg>
+    `;
+    const dataUri = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+    
+    // 1. Inyectar en cards estáticos de index.html
+    const imgEl = document.getElementById(`kid-cover-\${id.replace('kid', '')}`);
+    if (imgEl) imgEl.src = dataUri;
+
+    // 2. Inyectar en KIDS_FALLBACK_BOOKS en tiempo de ejecución
+    const book = KIDS_FALLBACK_BOOKS.find(b => b.id === id);
+    if (book) book.cover = dataUri;
+  });
+}
