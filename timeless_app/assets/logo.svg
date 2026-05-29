@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Premium Gold Gradients -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2D096" />
+      <stop offset="30%" stop-color="#C9A96E" />
+      <stop offset="70%" stop-color="#A07840" />
+      <stop offset="100%" stop-color="#735123" />
+    </linearGradient>
+    
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#C9A96E" stop-opacity="0.1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Group for Logo Mark -->
+  <g id="logo-mark" transform="translate(0, 10)">
+    
+    <!-- Outer Astral Ring -->
+    <circle cx="250" cy="180" r="110" fill="none" stroke="url(#goldGrad)" stroke-width="0.75" opacity="0.3" stroke-dasharray="4 8" />
+    
+    <!-- Secondary Thin Ring -->
+    <circle cx="250" cy="180" r="98" fill="none" stroke="url(#goldGrad)" stroke-width="1.25" opacity="0.65" />
+    
+    <!-- Core Hourglass & Book Monogram -->
+    <!-- Represents an open book whose pages form the chambers of an hourglass -->
+    <path d="M 200 120 
+             L 300 120 
+             Q 280 180 250 180 
+             Q 220 180 200 120 Z" 
+          fill="none" 
+          stroke="url(#goldGrad)" 
+          stroke-width="3.5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+          
+    <path d="M 200 240 
+             L 300 240 
+             Q 280 180 250 180 
+             Q 220 180 200 240 Z" 
+          fill="none" 
+          stroke="url(#goldGrad)" 
+          stroke-width="3.5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+
+    <!-- Stylized Book Spine/Axis (Vertical Line) -->
+    <line x1="250" y1="100" x2="250" y2="260" stroke="url(#goldGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+
+    <!-- Horizontal Hourglass Bases -->
+    <line x1="185" y1="120" x2="315" y2="120" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round" />
+    <line x1="185" y1="240" x2="315" y2="240" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round" />
+    
+    <!-- Falling Starry Sand Droplets -->
+    <!-- Representing ideas flowing through time to become literature -->
+    <circle cx="250" cy="155" r="3" fill="#ffffff" opacity="0.9" />
+    <circle cx="250" cy="180" r="2.5" fill="url(#goldGrad)" />
+    <circle cx="250" cy="205" r="3.5" fill="#ffffff" opacity="0.9" />
+    
+    <!-- Micro Constellation Particles -->
+    <circle cx="230" cy="140" r="1.5" fill="#ffffff" opacity="0.4" />
+    <circle cx="270" cy="140" r="1.5" fill="#ffffff" opacity="0.4" />
+    <circle cx="235" cy="220" r="1.5" fill="#ffffff" opacity="0.5" />
+    <circle cx="265" cy="220" r="2" fill="url(#goldGrad)" opacity="0.7" />
+    
+  </g>
+
+  <!-- Typography Group -->
+  <g id="logo-text">
+    
+    <!-- Primary Brand Name -->
+    <text x="250" y="345" 
+          font-family="'Playfair Display', 'Georgia', serif" 
+          font-size="36" 
+          font-weight="500" 
+          font-style="italic" 
+          fill="#E8E0D5" 
+          letter-spacing="2.5" 
+          text-anchor="middle">
+      Timeless
+    </text>
+    
+    <!-- Secondary Category Ribbon -->
+    <text x="250" y="385" 
+          font-family="'Inter', sans-serif" 
+          font-size="11.5" 
+          font-weight="700" 
+          fill="url(#goldGrad)" 
+          letter-spacing="7" 
+          text-anchor="middle">
+      EDITORIAL
+    </text>
+    
+    <!-- Gold Separator Ribbon -->
+    <line x1="200" y1="410" x2="300" y2="410" stroke="url(#goldGrad)" stroke-width="0.75" opacity="0.5" />
+    
+    <!-- Slogan / Sub-brand -->
+    <text x="250" y="435" 
+          font-family="'Inter', sans-serif" 
+          font-size="8.5" 
+          font-weight="500" 
+          fill="#9A8E7E" 
+          letter-spacing="3" 
+          text-anchor="middle" 
+          opacity="0.8">
+      LITERATURA QUE PERSISTE
+    </text>
+    
+  </g>
+</svg>

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 150" width="100%" height="100%">
+  <defs>
+    <!-- Premium Gold Gradients -->
+    <linearGradient id="goldGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2D096" />
+      <stop offset="30%" stop-color="#C9A96E" />
+      <stop offset="70%" stop-color="#A07840" />
+      <stop offset="100%" stop-color="#735123" />
+    </linearGradient>
+  </defs>
+
+  <!-- Horizontal Layout: Emblem on the left, Typography on the right -->
+  
+  <!-- Emblem Group (Translated to Left) -->
+  <g id="logo-emblem" transform="translate(10, -5)">
+    <!-- Thin Ring -->
+    <circle cx="80" cy="80" r="55" fill="none" stroke="url(#goldGradH)" stroke-width="0.75" opacity="0.4" stroke-dasharray="2 4" />
+    <circle cx="80" cy="80" r="49" fill="none" stroke="url(#goldGradH)" stroke-width="1.25" opacity="0.7" />
+    
+    <!-- Hourglass & Book Monogram -->
+    <path d="M 55 50 
+             L 105 50 
+             Q 95 80 80 80 
+             Q 65 80 55 50 Z" 
+          fill="none" 
+          stroke="url(#goldGradH)" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+          
+    <path d="M 55 110 
+             L 105 110 
+             Q 95 80 80 80 
+             Q 65 80 55 110 Z" 
+          fill="none" 
+          stroke="url(#goldGradH)" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+
+    <!-- Spine/Axis -->
+    <line x1="80" y1="40" x2="80" y2="120" stroke="url(#goldGradH)" stroke-width="1" stroke-linecap="round" opacity="0.8" />
+
+    <!-- Bases -->
+    <line x1="48" y1="50" x2="112" y2="50" stroke="url(#goldGradH)" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="48" y1="110" x2="112" y2="110" stroke="url(#goldGradH)" stroke-width="2.5" stroke-linecap="round" />
+    
+    <!-- Sand particles -->
+    <circle cx="80" cy="68" r="1.5" fill="#ffffff" opacity="0.9" />
+    <circle cx="80" cy="80" r="1" fill="url(#goldGradH)" />
+    <circle cx="80" cy="92" r="2" fill="#ffffff" opacity="0.9" />
+  </g>
+
+  <!-- Typography Group (Translated to Right) -->
+  <g id="logo-branding" transform="translate(160, 0)">
+    <!-- Primary Brand Name -->
+    <text x="0" y="72" 
+          font-family="'Playfair Display', 'Georgia', serif" 
+          font-size="44" 
+          font-weight="500" 
+          font-style="italic" 
+          fill="#E8E0D5" 
+          letter-spacing="2">
+      Timeless
+    </text>
+    
+    <!-- Secondary Category Ribbon -->
+    <text x="5" y="108" 
+          font-family="'Inter', sans-serif" 
+          font-size="13" 
+          font-weight="700" 
+          fill="url(#goldGradH)" 
+          letter-spacing="9">
+      EDITORIAL
+    </text>
+    
+    <!-- Gold Vertical Separator Line -->
+    <line x1="-20" y1="40" x2="-20" y2="110" stroke="url(#goldGradH)" stroke-width="0.75" opacity="0.5" />
+    
+    <!-- Slogan / Sub-brand -->
+    <text x="180" y="106" 
+          font-family="'Inter', sans-serif" 
+          font-size="8.5" 
+          font-weight="500" 
+          fill="#9A8E7E" 
+          letter-spacing="3" 
+          opacity="0.8">
+      LITERATURA QUE PERSISTE
+    </text>
+  </g>
+</svg>
