@@ -410,6 +410,7 @@ onAuthStateChanged(auth, (user) => {
     if(authBtns) authBtns.style.display = 'flex';
     if(userProf) userProf.classList.remove('visible');
     if (btnAdmin) btnAdmin.style.display = 'none';
+  }
   initKidsCovers();
   fetchLibrary(currentCat);
 });
