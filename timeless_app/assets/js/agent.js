@@ -260,10 +260,14 @@ window.startGeneration = async function() {
     log(`<span class="out-gold">outline.generate</span><span class="out-dim"> --theme="${esc(preview)}"</span>`);
 
     const outline = await agent.generateOutline(params);
+    const authorName = window.TIMELESS_WRITERS?.find(w => w.id === params.writerId)?.name || 'Timeless Agent';
+    const coverSVG = agent.generateCover(outline.title, authorName, params.genre, params.tone);
+    
     currentObra = { 
       title: outline.title, 
       genre: params.genre, 
       outline, 
+      cover: coverSVG,
       chapters: [],
       userId: auth.currentUser?.uid,
       createdAt: new Date().toISOString()
@@ -367,6 +371,10 @@ window.startGeneration = async function() {
     updateBSCMetrics(bsc);
 
     await sleep(800);
+    const modalCoverImg = document.getElementById('modal-cover-img');
+    if (modalCoverImg && currentObra && currentObra.cover) {
+      modalCoverImg.src = currentObra.cover;
+    }
     document.getElementById('modal-bsc').textContent   = `${overall} / 100`;
     document.getElementById('modal-words').textContent = `${totalWordCount.toLocaleString('es')} palabras (Obra completa)`;
     document.getElementById('export-modal').classList.add('visible');
@@ -427,6 +435,14 @@ function runSimulation(prompt) {
       generating = false;
       document.getElementById('btn-generate').disabled = false;
       setTimeout(() => {
+        // Generate simulated cover
+        const mockTitle = "El Sendero Invisible";
+        const coverSVG = agent.generateCover(mockTitle, "Timeless Agent", currentGenre, document.getElementById('tone-select').value);
+        const modalCoverImg = document.getElementById('modal-cover-img');
+        if (modalCoverImg) {
+          modalCoverImg.src = coverSVG;
+        }
+
         document.getElementById('modal-bsc').textContent   = '94.0 / 100';
         document.getElementById('modal-words').textContent = `${(parseInt(ch)*7200).toLocaleString('es')} palabras aprox.`;
         document.getElementById('export-modal').classList.add('visible');

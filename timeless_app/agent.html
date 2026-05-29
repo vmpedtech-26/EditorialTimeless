@@ -573,25 +573,35 @@
   ============================================================ -->
   <div id="export-modal">
     <div class="modal-box">
-      <div class="modal-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <!-- Left Column: Cover Preview -->
+      <div class="modal-left-col">
+        <div class="modal-cover-preview-wrap">
+          <div class="modal-cover-spine"></div>
+          <img id="modal-cover-img" src="" alt="Portada de la Obra" />
+        </div>
       </div>
-      <div class="modal-title">Obra lista para exportar</div>
-      <div class="modal-desc">El manuscrito ha pasado el control de calidad BSC y está listo para empaquetarse en formato TLF con encriptación AES-256 y firma de suscripción.</div>
-      <div class="modal-specs" id="modal-specs">
-        <div class="spec-row"><span class="spec-key">Formato</span><span class="spec-val sv-gold">Timeless Liquid Format (.tlf)</span></div>
-        <div class="spec-row"><span class="spec-key">Encriptación</span><span class="spec-val">AES-256-GCM</span></div>
-        <div class="spec-row"><span class="spec-key">DRM</span><span class="spec-val sv-green">Token de suscripción activo</span></div>
-        <div class="spec-row"><span class="spec-key">Validez offline</span><span class="spec-val">30 días</span></div>
-        <div class="spec-row"><span class="spec-key">BSC Score</span><span class="spec-val sv-green" id="modal-bsc">—</span></div>
-        <div class="spec-row"><span class="spec-key">Palabras</span><span class="spec-val" id="modal-words">—</span></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-modal-cancel" onclick="closeExport()">Cancelar</button>
-        <button class="btn-modal-export" onclick="simulateDownload()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Exportar obra.tlf
-        </button>
+      
+      <!-- Right Column: Specs and Actions -->
+      <div class="modal-right-col">
+        <div>
+          <div class="modal-title">Obra lista para exportar</div>
+          <div class="modal-desc">El manuscrito ha pasado el control de calidad BSC y está listo para empaquetarse en formato TLF con encriptación AES-256 y firma de suscripción.</div>
+          <div class="modal-specs" id="modal-specs">
+            <div class="spec-row"><span class="spec-key">Formato</span><span class="spec-val sv-gold">Timeless Liquid Format (.tlf)</span></div>
+            <div class="spec-row"><span class="spec-key">Encriptación</span><span class="spec-val">AES-256-GCM</span></div>
+            <div class="spec-row"><span class="spec-key">DRM</span><span class="spec-val sv-green">Suscripción Premium</span></div>
+            <div class="spec-row"><span class="spec-key">Validez offline</span><span class="spec-val">30 días</span></div>
+            <div class="spec-row"><span class="spec-key">BSC Score</span><span class="spec-val sv-green" id="modal-bsc">—</span></div>
+            <div class="spec-row"><span class="spec-key">Palabras</span><span class="spec-val" id="modal-words">—</span></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" onclick="closeExport()">Cancelar</button>
+          <button class="btn-modal-export" onclick="simulateDownload()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar obra.tlf
+          </button>
+        </div>
       </div>
     </div>
   </div>

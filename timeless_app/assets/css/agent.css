@@ -133,3 +133,191 @@ nav {
 
 /* Remove Oracle Pulse leftovers */
 .oracle-container, .oracle-pulse { display: none; }
+
+/* ── EXPORT MODAL (PREMIUM GLASSMORPHISM & 3D COVER) ──────────────── */
+#export-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 6, 0.75);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+}
+#export-modal.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal-box {
+  background: rgba(23, 20, 16, 0.9);
+  border: 1px solid rgba(201, 169, 110, 0.15);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  padding: 40px;
+  box-shadow: 
+    0 30px 70px rgba(0, 0, 0, 0.6), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(30px) scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+#export-modal.visible .modal-box {
+  transform: translateY(0) scale(1);
+}
+.modal-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-style: italic;
+  text-align: left;
+}
+.modal-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+  text-align: left;
+}
+.modal-specs {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+}
+.spec-row:last-child {
+  border-bottom: none;
+}
+.spec-key {
+  color: var(--text-secondary);
+}
+.spec-val {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.spec-val.sv-gold {
+  color: var(--gold);
+  font-weight: 600;
+}
+.spec-val.sv-green {
+  color: #5CB88A;
+  font-weight: 600;
+}
+.modal-footer {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.btn-modal-cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+.btn-modal-export {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  color: #12100E;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.btn-modal-export:hover {
+  background: var(--gold-dark);
+  border-color: var(--gold-dark);
+  transform: translateY(-1px);
+}
+.btn-modal-export svg {
+  width: 16px; height: 16px;
+}
+
+@media (min-width: 650px) {
+  .modal-box {
+    max-width: 720px;
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 30px;
+    text-align: left;
+    height: auto;
+  }
+  .modal-left-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-right-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+
+.modal-cover-preview-wrap {
+  width: 200px;
+  height: 300px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 
+    0 15px 35px rgba(0,0,0,0.5), 
+    0 5px 15px rgba(201,169,110,0.15);
+  transform: perspective(1000px) rotateY(-12deg);
+  transition: transform 0.5s ease;
+  background: #151311;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.modal-cover-preview-wrap:hover {
+  transform: perspective(1000px) rotateY(-3deg);
+}
+.modal-cover-spine {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 10px;
+  background: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(255,255,255,0.08) 50%, rgba(0,0,0,0.2) 100%);
+  z-index: 5;
+}
+#modal-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: none;
+}
+
