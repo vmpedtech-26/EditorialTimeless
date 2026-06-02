@@ -128,6 +128,19 @@ async function authMiddleware(req, res, next) {
       return res.status(403).json({ error: { message: "Requiere suscripción activa para usar Timeless Agent" }});
     }
     
+    // Verificar si ha excedido su límite de palabras mensual (Evitar abusos de costos en Gemini API)
+    const currentMonth = new Date().toISOString().slice(0, 7); // e.g. "2026-06"
+    const usageDoc = await admin.firestore().collection('users').doc(uid).collection('usage').doc(currentMonth).get();
+    let wordsUsed = 0;
+    if (usageDoc.exists) {
+      wordsUsed = usageDoc.data().wordsUsed || 0;
+    }
+    
+    const LIMIT = 500000; // Límite mensual: 500k palabras
+    if (wordsUsed >= LIMIT && uid !== 'matiaseorejas@gmail.com') {
+      return res.status(429).json({ error: { message: `Has alcanzado el límite mensual de generación de IA (${LIMIT.toLocaleString()} palabras). Tu límite se renovará el próximo mes.` }});
+    }
+    
     req.user = decodedToken;
     next();
   } catch (err) {
@@ -150,6 +163,21 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
     if (!upstream.ok) {
       return res.status(upstream.status).json(data);
     }
+    
+    // Contar y registrar palabras de la respuesta
+    const textGenerated = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const wordsCount = textGenerated.split(/\s+/).filter(Boolean).length;
+    
+    if (wordsCount > 0 && req.user) {
+      const uid = req.user.uid;
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const usageRef = admin.firestore().collection('users').doc(uid).collection('usage').doc(currentMonth);
+      await usageRef.set({
+        wordsUsed: admin.firestore.FieldValue.increment(wordsCount),
+        lastRequestAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).catch(err => console.error("Error al registrar palabras en generate:", err));
+    }
+    
     res.json(data);
 
   } catch (err) {
@@ -183,11 +211,43 @@ app.post('/api/stream', authMiddleware, async (req, res) => {
     // Pipe transparente: Gemini SSE → cliente SSE
     const reader  = upstream.body.getReader();
     const decoder = new TextDecoder();
+    let accumulatedText = "";
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      res.write(decoder.decode(value, { stream: true }));
+      const chunkStr = decoder.decode(value, { stream: true });
+      accumulatedText += chunkStr;
+      res.write(chunkStr);
+    }
+    
+    // Contar y registrar palabras del streaming al finalizar
+    let wordsCount = 0;
+    try {
+      const lines = accumulatedText.split('\n');
+      let textBuffer = "";
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const parsed = JSON.parse(line.slice(6));
+            const txt = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (txt) textBuffer += txt;
+          } catch(e) {}
+        }
+      }
+      wordsCount = textBuffer.split(/\s+/).filter(Boolean).length;
+    } catch (e) {
+      console.warn("No se pudo parsear texto acumulado para contar palabras en stream:", e.message);
+    }
+
+    if (wordsCount > 0 && req.user) {
+      const uid = req.user.uid;
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const usageRef = admin.firestore().collection('users').doc(uid).collection('usage').doc(currentMonth);
+      await usageRef.set({
+        wordsUsed: admin.firestore.FieldValue.increment(wordsCount),
+        lastRequestAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).catch(err => console.error("Error al registrar palabras en stream:", err));
     }
 
   } catch (err) {

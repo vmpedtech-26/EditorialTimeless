@@ -769,4 +769,8 @@ svg { width: 22px; height: 22px; vertical-align: middle; }
   background-color: rgba(212, 175, 55, 0.2); /* faint gold */
   border-bottom: 1px dashed var(--gold);
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+.highlighted-text:hover {
+  background-color: rgba(212, 175, 55, 0.38); /* slightly stronger gold */
 }

@@ -11,6 +11,16 @@ service cloud.firestore {
     // (La escritura del estado "Premium" la hace el backend mediante firebase-admin)
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Avance de lectura individual
+      match /progress/{bookId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Subrayados y notas individuales
+      match /highlights/{highlightId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Colección 'obras': los usuarios autenticados solo pueden gestionar sus propios borradores
@@ -31,9 +41,11 @@ service cloud.firestore {
       allow update: if request.auth != null && resource.data.claimed == false;
     }
     
-    // Colección 'books': biblioteca pública para usuarios de Timeless
+    // Colección 'books': biblioteca pública para usuarios de Timeless.
+    // Solo el Editor Principal puede subir y modificar obras en el catálogo oficial.
     match /books/{bookId} {
       allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.email == 'matiaseorejas@gmail.com';
     }
   }
 }

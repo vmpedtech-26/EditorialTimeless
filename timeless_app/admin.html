@@ -340,7 +340,7 @@
     <p id="auth-message" style="font-family: var(--font-serif); font-style: italic; color: var(--gold); letter-spacing: 1px;">Verificando credenciales editoriales...</p>
   </div>
 
-  <div class="container">
+  <div class="container" id="main-admin-container" style="display: none;">
     <header>
       <div class="editorial-logo">Timeless</div>
       <div class="console-title">Consola de Carga Editorial</div>
@@ -372,6 +372,7 @@
                 <option value="ensayo">Ensayo</option>
                 <option value="biografia">Biografía</option>
                 <option value="tecnica">Técnica</option>
+                <option value="kids">Kids / Infantil</option>
               </select>
             </div>
             
@@ -383,15 +384,15 @@
 
           <div class="grid-2">
             <div class="form-group">
-              <label for="book-cover">Portada Premium (Ruta de Imagen)</label>
+              <label for="book-cover">Portada Premium (Ruta de Imagen / Emoji)</label>
               <select id="book-cover" required>
                 <option value="assets/cover_memoria.png">La Memoria del Agua (Azul profundo)</option>
                 <option value="assets/cover_umbral.png">En el Umbral (Rojo atardecer)</option>
                 <option value="assets/cover_arquitecto.png">El Arquitecto de Sombras (Gris ceniza)</option>
                 <option value="assets/cover_contemplacion.png">El Arte de la Contemplación (Marrón cuero)</option>
-                <option value="custom">-- Usar URL personalizada --</option>
+                <option value="custom">-- Usar URL / Emoji personalizado --</option>
               </select>
-              <input type="text" id="book-cover-custom" placeholder="Ej: assets/mi_portada.png" style="display:none; margin-top:8px;" />
+              <input type="text" id="book-cover-custom" placeholder="Ej: assets/mi_portada.png o 🦄" style="display:none; margin-top:8px;" />
             </div>
             
             <div class="form-group">
@@ -420,6 +421,31 @@
           <div class="form-group">
             <label for="book-desc">Sinopsis / Descripción Literaria</label>
             <textarea id="book-desc" placeholder="Escribe la sinopsis con el tono poético y minimalista de la editorial..." required></textarea>
+          </div>
+        </div>
+
+        <!-- SECCIÓN EXTRA: METADATOS KIDS (Dinamica) -->
+        <div id="kids-extra-fields" class="form-card" style="display: none; border-color: #84a98c;">
+          <h3 class="form-section-title" style="color: #84a98c;">Detalles Mágicos (Infantil)</h3>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="kids-age-badge">Rango de Edad Recomendado</label>
+              <input type="text" id="kids-age-badge" placeholder="Ej: 4-8 años" />
+            </div>
+            <div class="form-group">
+              <label for="kids-collection-title">Nombre de la Colección</label>
+              <input type="text" id="kids-collection-title" placeholder="Ej: COLECCIÓN FANTASÍA" />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="kids-cover-accent">Color de Acento Primario (Hex)</label>
+              <input type="color" id="kids-cover-accent" value="#d5e3f0" style="height: 45px; padding: 2px;" />
+            </div>
+            <div class="form-group">
+              <label for="kids-cover-accent-muted">Color de Acento Secundario (Hex)</label>
+              <input type="color" id="kids-cover-accent-muted" value="#a4c2db" style="height: 45px; padding: 2px;" />
+            </div>
           </div>
         </div>
 

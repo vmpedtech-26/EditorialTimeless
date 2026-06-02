@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidad — Timeless Editorial</title>
+  <link rel="stylesheet" href="assets/css/index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #141210;
+      color: #EDE8E0;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+    }
+    .legal-container {
+      max-width: 800px;
+      margin: 100px auto;
+      padding: 0 30px;
+    }
+    .legal-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .logo-link {
+      font-family: var(--font-serif);
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 32px;
+      letter-spacing: 4px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: 40px;
+      color: #EDE8E0;
+      margin-bottom: 10px;
+      font-weight: 400;
+    }
+    .update-date {
+      color: var(--ink-faint);
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      color: var(--gold);
+      margin-top: 40px;
+      margin-bottom: 15px;
+      font-weight: 500;
+      border-bottom: 1px solid var(--border-dark);
+      padding-bottom: 8px;
+    }
+    p {
+      margin-bottom: 20px;
+      color: #EDE8E0;
+      opacity: 0.85;
+      font-size: 16px;
+    }
+    ul {
+      margin-left: 20px;
+      margin-bottom: 20px;
+      color: #EDE8E0;
+      opacity: 0.85;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    .footer-nav {
+      text-align: center;
+      margin-top: 80px;
+      border-top: 1px solid var(--border-dark);
+      padding-top: 30px;
+    }
+    .btn-back-home {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 12px 30px;
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.3s var(--ease);
+      background: transparent;
+      border-radius: 4px;
+    }
+    .btn-back-home:hover {
+      background: var(--gold);
+      color: #141210;
+    }
+  </style>
+</head>
+<body>
+  <div class="legal-container">
+    <div class="legal-header">
+      <a href="index.html" class="logo-link">TIMELESS</a>
+      <h1>Política de Privacidad</h1>
+      <span class="update-date">Última actualización: Junio de 2026</span>
+    </div>
+
+    <h2>1. Información que Recopilamos</h2>
+    <p>En <strong>Timeless Editorial</strong>, nos tomamos la privacidad de nuestros lectores de forma extremadamente seria. Únicamente recopilamos los datos estrictamente necesarios para prestar el servicio literario:</p>
+    <ul>
+      <li><strong>Datos de Cuenta</strong>: Su dirección de correo electrónico, contraseña (encriptada mediante Firebase Auth) e información de perfil básica.</li>
+      <li><strong>Progreso y Marcadores</strong>: Almacenamos en Firestore su capítulo activo, porcentaje de lectura y posición de desplazamiento en pantalla para permitir la lectura fluida en múltiples dispositivos.</li>
+      <li><strong>Subrayados y Notas</strong>: Las frases destacadas y comentarios redactados por usted en la trastienda del manuscrito son estrictamente privados y solo accesibles desde su cuenta de usuario.</li>
+      <li><strong>Datos de Facturación</strong>: Los pagos son procesados externamente por Stripe. Timeless no almacena su número de tarjeta ni información bancaria detallada, solo el identificador de transacción y el estado de la suscripción.</li>
+    </ul>
+
+    <h2>2. Uso de la Información</h2>
+    <p>Utilizamos su información únicamente para:</p>
+    <ul>
+      <li>Proveer el lector inmersivo y sincronizar su progreso de lectura.</li>
+      <li>Verificar su estado de suscripción de pago activo para habilitar las obras exclusivas.</li>
+      <li>Permitir el uso del Agente AI Escritor y rastrear su uso de palabras mensual contra fraudes o abusos de cuota.</li>
+      <li>Gestionar invitaciones y links de regalo de obras compartidos por usted.</li>
+    </ul>
+
+    <h2>3. Cookies y Almacenamiento Local</h2>
+    <p>Timeless utiliza cookies técnicas de sesión y almacenamiento local (LocalStorage/SessionStorage) con los siguientes fines:</p>
+    <ul>
+      <li>Mantener su sesión de Firebase abierta de forma segura.</li>
+      <li>Recordar sus preferencias tipográficas y de diseño en el Lector (e.g. tamaño de letra, interlineado, ancho de columna y tema visual).</li>
+      <li>Permitir el funcionamiento fuera de línea (PWA) de la aplicación almacenando temporalmente metadatos locales de biblioteca.</li>
+    </ul>
+
+    <h2>4. Seguridad de sus Datos</h2>
+    <p>Implementamos las medidas de seguridad más robustas del sector tecnológico:</p>
+    <ul>
+      <li>Toda la transferencia de información viaja cifrada bajo protocolo seguro HTTPS (SSL/TLS).</li>
+      <li>Aislamos los datos de progreso y subrayados de cada lector mediante reglas de seguridad de base de datos a nivel de servidor (Firestore Security Rules).</li>
+      <li>Los archivos de libros protegidos descargados (.tlf) incorporan metadatos de encriptación vinculados a su identificador único de usuario.</li>
+    </ul>
+
+    <h2>5. Sus Derechos de Control</h2>
+    <p>De conformidad con las normativas internacionales de protección de datos (como el GDPR y la CCPA), usted tiene derecho en cualquier momento a acceder, rectificar, portar o solicitar la eliminación total y definitiva de su cuenta de usuario y de todos sus datos personales (incluyendo notas y progreso) de nuestros servidores, enviando un correo electrónico a nuestro departamento de privacidad.</p>
+
+    <div class="footer-nav">
+      <a href="index.html" class="btn-back-home">Volver al Inicio</a>
+    </div>
+  </div>
+</body>
+</html>

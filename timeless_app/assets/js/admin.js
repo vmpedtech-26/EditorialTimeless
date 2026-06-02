@@ -14,6 +14,8 @@ onAuthStateChanged(auth, user => {
     // Authorized! Hide lock screen with transitions
     const overlay = $('auth-check-overlay');
     overlay.style.opacity = '0';
+    const mainContainer = $('main-admin-container');
+    if (mainContainer) mainContainer.style.display = 'block';
     setTimeout(() => overlay.remove(), 400);
   }
 });
@@ -39,6 +41,13 @@ $('book-cover').onchange = () => {
     customInput.style.display = 'none';
     customInput.required = false;
   }
+};
+
+// ── Dynamic Kids fields toggle logic ──────────────────────────────────────────
+$('book-cat').onchange = () => {
+  const isKids = $('book-cat').value === 'kids';
+  const kidsFields = $('kids-extra-fields');
+  if (kidsFields) kidsFields.style.display = isKids ? 'block' : 'none';
 };
 
 // ── Dynamic Chapters Management ──────────────────────────────────────────────
@@ -163,6 +172,16 @@ $('book-upload-form').onsubmit = async (e) => {
       .trim()
       .replace(/\s+/g, "-"); // reemplazar espacios con guiones
 
+    let kidsData = {};
+    if (cat === 'kids') {
+      kidsData = {
+        ageBadge: $('kids-age-badge').value.trim() || '4-8 años',
+        collectionTitle: ($('kids-collection-title').value.trim() || 'COLECCIÓN INFANTIL').toUpperCase(),
+        coverAccent: $('kids-cover-accent').value,
+        coverAccentMuted: $('kids-cover-accent-muted').value
+      };
+    }
+
     // 3. Escribir documento en la colección 'books' de Firestore
     const bookData = {
       title,
@@ -180,7 +199,8 @@ $('book-upload-form').onsubmit = async (e) => {
         title,
         chapters: chapters.map(c => ({ title: c.title, arc: c.desc }))
       },
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      ...kidsData
     };
 
     await setDoc(doc(db, "books", bookId), bookData);
