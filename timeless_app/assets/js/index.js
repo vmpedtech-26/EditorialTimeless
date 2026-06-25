@@ -18,6 +18,132 @@ const observer = new IntersectionObserver((entries) => {
 // Initialize reveal on static elements
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+// ---- DYNAMIC COVER GENERATOR (Gobernanza / Ciberdefensa) ----
+function createUniqueBookCover(b) {
+  const title = b.title || 'Untitled';
+  const author = b.author || 'Timeless';
+  const genre = b.genre || 'General';
+  
+  // Deterministic hash based on title
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = title.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  // Custom hue mapping based on genre for visual coherence
+  let baseHue = Math.abs(hash % 360);
+  const genreLower = genre.toLowerCase();
+  if (genreLower.includes('thriller')) {
+    baseHue = Math.abs(hash % 40); // 0-40 (warm dark reds/oranges)
+  } else if (genreLower.includes('neuro') || genreLower.includes('ciencia')) {
+    baseHue = 240 + Math.abs(hash % 60); // 240-300 (indigo/violet/purple)
+  } else if (genreLower.includes('finan') || genreLower.includes('eco') || genreLower.includes('capital')) {
+    baseHue = 120 + Math.abs(hash % 65); // 120-185 (emerald/teal/green)
+  } else if (genreLower.includes('comed') || genreLower.includes('humor') || genreLower.includes('ocio')) {
+    baseHue = 35 + Math.abs(hash % 40); // 35-75 (warm gold/amber/orange)
+  } else if (genreLower.includes('novel') || genreLower.includes('sombra') || genreLower.includes('sastre')) {
+    baseHue = 320 + Math.abs(hash % 50); // 320-360, 0-10 (pink/ruby/deep red)
+  }
+  
+  const hue1 = baseHue;
+  const hue2 = (baseHue + 40) % 360;
+  
+  // High-end premium gradient (dark tones)
+  const bgGradient = `linear-gradient(135deg, hsl(${hue1}, 24%, 15%), hsl(${hue2}, 28%, 7%))`;
+  const accentColor = `hsl(${hue1}, 50%, 70%)`;
+  
+  // Select shape/pattern deterministically
+  const patternType = Math.abs((hash >> 4) % 5);
+  let patternHtml = '';
+  
+  if (patternType === 0) {
+    // Concentric rings
+    patternHtml = `
+      <circle cx="100" cy="140" r="65" fill="none" stroke="${accentColor}" stroke-width="0.75" opacity="0.15"/>
+      <circle cx="100" cy="140" r="45" fill="none" stroke="${accentColor}" stroke-width="0.5" opacity="0.1"/>
+      <circle cx="100" cy="140" r="25" fill="none" stroke="${accentColor}" stroke-width="0.5" opacity="0.08"/>
+      <circle cx="100" cy="140" r="5" fill="${accentColor}" opacity="0.2"/>
+    `;
+  } else if (patternType === 1) {
+    // Diamond lattice
+    patternHtml = `
+      <path d="M100 60 L160 140 L100 220 L40 140 Z" fill="none" stroke="${accentColor}" stroke-width="0.75" opacity="0.18"/>
+      <path d="M100 80 L140 140 L100 200 L60 140 Z" fill="none" stroke="${accentColor}" stroke-width="0.5" opacity="0.1"/>
+      <line x1="100" y1="60" x2="100" y2="220" stroke="${accentColor}" stroke-width="0.5" opacity="0.08"/>
+      <line x1="40" y1="140" x2="160" y2="140" stroke="${accentColor}" stroke-width="0.5" opacity="0.08"/>
+    `;
+  } else if (patternType === 2) {
+    // Orbits
+    patternHtml = `
+      <ellipse cx="100" cy="140" rx="75" ry="30" fill="none" stroke="${accentColor}" stroke-width="0.75" transform="rotate(30 100 140)" opacity="0.12"/>
+      <ellipse cx="100" cy="140" rx="75" ry="30" fill="none" stroke="${accentColor}" stroke-width="0.75" transform="rotate(-30 100 140)" opacity="0.12"/>
+      <circle cx="100" cy="140" r="10" fill="none" stroke="${accentColor}" stroke-width="0.75" opacity="0.2"/>
+    `;
+  } else if (patternType === 3) {
+    // Minimalist lines
+    patternHtml = `
+      <g opacity="0.12" stroke="${accentColor}" stroke-width="0.75">
+        <line x1="30" y1="110" x2="170" y2="110" />
+        <line x1="30" y1="120" x2="170" y2="120" />
+        <line x1="30" y1="130" x2="170" y2="130" />
+        <line x1="30" y1="140" x2="170" y2="140" stroke-width="1.5" />
+        <line x1="30" y1="150" x2="170" y2="150" />
+        <line x1="30" y1="160" x2="170" y2="160" />
+        <line x1="30" y1="170" x2="170" y2="170" />
+      </g>
+    `;
+  } else {
+    // Intersecting triangles
+    patternHtml = `
+      <polygon points="100,75 155,170 45,170" fill="none" stroke="${accentColor}" stroke-width="0.75" opacity="0.15"/>
+      <polygon points="100,195 155,100 45,100" fill="none" stroke="${accentColor}" stroke-width="0.75" opacity="0.15"/>
+      <circle cx="100" cy="135" r="40" fill="none" stroke="${accentColor}" stroke-width="0.5" opacity="0.08"/>
+    `;
+  }
+  
+  // Title wrap
+  let titleLines = [];
+  const words = title.split(' ');
+  let currentLine = '';
+  words.forEach(w => {
+    if ((currentLine + w).length > 14) {
+      titleLines.push(currentLine.trim());
+      currentLine = w + ' ';
+    } else {
+      currentLine += w + ' ';
+    }
+  });
+  if (currentLine) titleLines.push(currentLine.trim());
+  titleLines = titleLines.slice(0, 3);
+  
+  let textYStart = 72;
+  if (titleLines.length === 1) textYStart = 85;
+  else if (titleLines.length === 2) textYStart = 78;
+  
+  const titleSvgHtml = titleLines.map((line, idx) => 
+    `<text x="50%" y="${textYStart + idx * 18}" text-anchor="middle" fill="#F4F0EA" font-family="'Playfair Display', Georgia, serif" font-size="12" font-weight="600" letter-spacing="0.25">${line}</text>`
+  ).join('');
+
+  return `
+    <div class="dynamic-book-cover" style="width:100%; height:100%; position:relative; background:${bgGradient}; border: 1px solid rgba(255,255,255,0.08); box-sizing:border-box; overflow:hidden; border-radius:6px; user-select:none;">
+      <div style="position:absolute; left:0; top:0; bottom:0; width:10px; background:linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 100%); z-index:5;"></div>
+      <div style="position:absolute; inset:8px; border:1px solid ${accentColor}; opacity:0.12; z-index:3;"></div>
+      
+      <svg style="position:absolute; inset:0; width:100%; height:100%; z-index:2;" viewBox="0 0 200 280">
+        ${patternHtml}
+        <text x="50%" y="32" text-anchor="middle" fill="${accentColor}" font-family="'Inter', sans-serif" font-size="7.5" font-weight="600" letter-spacing="3" opacity="0.8">T I M E L E S S</text>
+        <line x1="35" y1="40" x2="165" y2="40" stroke="${accentColor}" stroke-width="0.5" opacity="0.25"/>
+        
+        ${titleSvgHtml}
+        
+        <line x1="60" y1="210" x2="140" y2="210" stroke="${accentColor}" stroke-width="0.5" opacity="0.25"/>
+        <text x="50%" y="228" text-anchor="middle" fill="#D4AF37" font-family="'Lora', serif" font-size="8.5" font-style="italic" font-weight="500">${author}</text>
+        <text x="50%" y="252" text-anchor="middle" fill="${accentColor}" font-family="'Inter', sans-serif" font-size="6" font-weight="600" letter-spacing="1.5" opacity="0.75">${genre.toUpperCase()}</text>
+      </svg>
+    </div>
+  `;
+}
+
 // ---- RENDER BOOKS ----
 function renderBooks(books, offlineIds = new Set()) {
   if (!books.length) {
@@ -27,13 +153,7 @@ function renderBooks(books, offlineIds = new Set()) {
 
   bookGrid.innerHTML = books.map((b, i) => {
     const isDownloaded = offlineIds.has(b.id);
-    const isEmoji = b.cover && !b.cover.startsWith('assets') && !b.cover.startsWith('http') && !b.cover.includes('/');
-    const coverHtml = isEmoji
-      ? `<div class="book-cover-placeholder-emoji" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #1E1B18, #141210); border: 1px solid var(--border-dark);">
-          <div style="font-size: 56px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">${b.cover}</div>
-          <div style="font-family:var(--font-serif); font-size:12px; font-weight:600; color:var(--gold); text-align:center; padding:10px; margin-top:10px; opacity:0.85; max-width:90%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${b.title}</div>
-         </div>`
-      : `<img src="${b.cover || 'assets/cover.png'}" alt="${b.title}" loading="lazy" />`;
+    const coverHtml = createUniqueBookCover(b);
 
     return `
       <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}" onclick="openBookModal('${b.id}')">
@@ -707,12 +827,14 @@ window.openBookModal = function(bookId) {
         <div class="bm-cover-col">
           <div class="bm-cover-wrap" style="--bm-accent:${accent}">
             <div class="bm-cover-spine"></div>
-            ${book.cover.startsWith('assets') || book.cover.startsWith('http') || book.cover.includes('/')
-              ? `<img src="${book.cover}" alt="${book.title}" />`
-              : `<div class="kids-card-cover-placeholder" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #FFF9E6, #FFF0CC);">
-                  <div style="font-size: 72px; line-height: 1;">${book.cover}</div>
-                  <div style="font-family:var(--font-serif); font-size:14px; font-weight:600; color:#2D5A3D; text-align:center; padding: 10px;">${book.title}</div>
-                 </div>`
+            ${book.cat === 'kids' || book.genre.toLowerCase().includes('kids')
+              ? (book.cover && !book.cover.startsWith('assets') && !book.cover.startsWith('http') && !book.cover.includes('/')
+                ? `<div class="kids-card-cover-placeholder" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, ${accent}, ${accent}CC);">
+                    <div style="font-size: 72px; line-height: 1;">${book.cover}</div>
+                   </div>`
+                : `<img src="${book.cover}" alt="${book.title}" />`
+              )
+              : createUniqueBookCover(book)
             }
             ${book.badge === 'excl' ? `<div class="bm-badge bm-badge-excl">${book.badgeText || 'Exclusivo'}</div>` : ''}
             ${book.badge === 'new'  ? `<div class="bm-badge bm-badge-new">${book.badgeText || 'Nuevo'}</div>` : ''}
