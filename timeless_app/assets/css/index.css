@@ -2373,7 +2373,75 @@
       text-shadow: 0 2px 5px rgba(0,0,0,0.4);
     }
     
-    /* Email Gate Large Centered Layout */
+    /* ======================================================
+       TOPNAV GUEST OVERRIDES (Netflix Transparent Style)
+       ====================================================== */
+    body.auth-guest #topnav {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+      border-bottom: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    body.auth-guest #topnav .logo-wordmark {
+      color: #FFF;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    body.auth-guest #topnav .btn-ghost {
+      color: #FFF;
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.4);
+    }
+    body.auth-guest #topnav .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #FFF;
+    }
+
+    /* LANGUAGE SELECTOR (Guest Only) */
+    .lang-selector-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      padding: 0 8px;
+      margin-right: 8px;
+      height: 32px;
+      color: #ede8e0;
+      transition: border-color 0.2s ease;
+    }
+    .lang-selector-container:hover {
+      border-color: var(--gold);
+    }
+    .lang-selector-container select {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: 13px;
+      padding: 4px 18px 4px 16px;
+      cursor: pointer;
+      outline: none;
+      font-family: var(--font-sans);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .lang-selector-container .globe-icon {
+      position: absolute;
+      left: 6px;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+    }
+    .lang-selector-container .chevron-icon {
+      position: absolute;
+      right: 6px;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    /* FLOATING LABEL EMAIL GATES */
     .hero-centered-content .hero-email-gate {
       margin: 0 auto;
       max-width: 680px;
@@ -2381,23 +2449,325 @@
       border: 1.5px solid rgba(201, 169, 110, 0.22);
       border-left: 4px solid var(--gold);
       padding: 28px;
+      box-sizing: border-box;
     }
     .hero-centered-content .email-gate-text {
       font-size: 15px;
       margin-bottom: 16px;
     }
-    .hero-centered-content .email-gate-form {
+    .email-gate-form {
+      display: flex;
       gap: 14px;
+      align-items: center;
+      width: 100%;
     }
-    .hero-centered-content .email-gate-form input {
-      font-size: 15px;
-      padding: 15px 20px;
+    .floating-label-container {
+      position: relative;
+      flex-grow: 1;
+      width: 100%;
     }
-    .hero-centered-content .btn-gate-submit {
+    .floating-label-container input {
+      width: 100%;
+      height: 56px;
+      padding: 22px 16px 6px 16px;
+      background: rgba(0, 0, 0, 0.4) !important;
+      border: 1px solid rgba(200, 180, 150, 0.3) !important;
+      border-radius: 4px;
+      color: #ede8e0 !important;
       font-size: 16px;
-      padding: 15px 32px;
-      font-weight: 700;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-family: var(--font-sans);
     }
+    .floating-label-container input:focus {
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 1px var(--gold);
+    }
+    .floating-label-container label {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(237, 232, 224, 0.5);
+      font-size: 16px;
+      font-family: var(--font-sans);
+      pointer-events: none;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .floating-label-container input:focus ~ label,
+    .floating-label-container input:not(:placeholder-shown) ~ label {
+      top: 14px;
+      font-size: 11px;
+      color: var(--gold);
+      transform: translateY(-50%);
+    }
+    .btn-gate-submit {
+      font-size: 16px;
+      padding: 0 32px;
+      height: 56px;
+      font-weight: 700;
+      background: var(--gold);
+      color: #141210;
+      border: none;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-gate-submit:hover {
+      background: #dfbc82;
+    }
+    .btn-gate-submit svg {
+      width: 18px;
+      height: 18px;
+    }
+    @media (max-width: 600px) {
+      .email-gate-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn-gate-submit {
+        justify-content: center;
+      }
+    }
+
+    /* ======================================================
+       PANEL 2: DOWNLOAD OFFLINE MOCKUPS & ANIMATIONS
+       ====================================================== */
+    .mobile-mockup-3d {
+      width: 220px;
+      height: 380px;
+      background: rgba(30, 27, 24, 0.45);
+      border: 4px solid rgba(251, 248, 244, 0.15);
+      border-radius: 28px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+      padding: 8px;
+      box-sizing: border-box;
+      position: relative;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .mobile-screen {
+      width: 100%;
+      height: 100%;
+      background: #1c1815;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+    .mobile-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .download-overlay-card {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateZ(30px);
+      width: 82%;
+      background: #090807;
+      border: 1.5px solid rgba(200, 180, 150, 0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 10;
+      box-sizing: border-box;
+    }
+    .download-card-thumb {
+      width: 32px;
+      height: 44px;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    .download-card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .download-card-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: left;
+    }
+    .download-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #FFF;
+      line-height: 1.2;
+    }
+    .download-status {
+      font-size: 9px;
+      color: #5CB88A;
+      font-weight: 500;
+    }
+    .download-animation-container {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .download-progress-circle {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .circle-fill {
+      transition: stroke-dasharray 0.1s linear;
+    }
+    .download-icon-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .down-arrow-svg {
+      width: 12px;
+      height: 12px;
+    }
+    .down-arrow-svg.animating {
+      animation: bounceArrow 1.5s infinite;
+    }
+    @keyframes bounceArrow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(2px); }
+    }
+
+    /* ======================================================
+       PANEL 3: MULTI-DEVICE OVERLAPPING STACK
+       ====================================================== */
+    .multi-device-stack {
+      position: relative;
+      width: 320px;
+      height: 260px;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .device-laptop {
+      width: 220px;
+      height: 140px;
+      background: rgba(30, 27, 24, 0.4);
+      border: 3px solid rgba(251, 248, 244, 0.12);
+      border-radius: 12px 12px 0 0;
+      position: absolute;
+      left: 10px;
+      top: 30px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+      z-index: 1;
+      transform: translateZ(-20px);
+    }
+    .device-laptop::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: -20px;
+      right: -20px;
+      height: 8px;
+      background: #1c1815;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+    .device-tablet {
+      width: 130px;
+      height: 180px;
+      background: rgba(30, 27, 24, 0.5);
+      border: 3.5px solid rgba(251, 248, 244, 0.15);
+      border-radius: 14px;
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      z-index: 3;
+      transform: translateZ(10px);
+    }
+    .device-phone {
+      width: 76px;
+      height: 140px;
+      background: rgba(30, 27, 24, 0.6);
+      border: 2.5px solid rgba(251, 248, 244, 0.18);
+      border-radius: 10px;
+      position: absolute;
+      left: 50px;
+      bottom: -10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      z-index: 5;
+      transform: translateZ(40px);
+    }
+    .device-screen-content {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #1c1815 0%, #110e0c 100%);
+      border-radius: inherit;
+      padding: 12px 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+      font-size: 8px;
+      color: #ede8e0;
+      opacity: 0.85;
+      font-family: var(--font-serif);
+      line-height: 1.4;
+      text-align: left;
+    }
+    .device-screen-content h4 {
+      font-size: 9px;
+      color: var(--gold);
+      margin-bottom: 4px;
+      border-bottom: 0.5px solid rgba(200, 180, 150, 0.15);
+      padding-bottom: 2px;
+      font-weight: 500;
+      font-family: var(--font-serif);
+    }
+    .device-screen-content p {
+      margin: 0;
+      font-size: 7.5px;
+      opacity: 0.8;
+    }
+
+    /* ======================================================
+       FAQ EMAIL GATE & ACCORDION BOTTOM
+       ====================================================== */
+    .faq-email-gate {
+      margin: 55px auto 0 auto;
+      max-width: 720px;
+      background: rgba(22, 20, 18, 0.65);
+      border: 1.5px solid rgba(201, 169, 110, 0.22);
+      border-left: 4px solid var(--gold);
+      padding: 28px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .faq-email-gate .email-gate-text {
+      font-size: 15px;
+      margin-bottom: 16px;
+      color: #ede8e0;
+    }
+    .faq-email-gate .email-gate-form {
+      display: flex;
+      flex-direction: row;
+      gap: 14px;
+      align-items: center;
+      width: 100%;
+    }
+
 
     /* ======================================================
        NETFLIX ALTERNATING FEATURE PANELS

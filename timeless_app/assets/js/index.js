@@ -1215,12 +1215,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Hero Email Gate Form Handler (Netflix Experience)
-  const emailGateForm = document.getElementById('email-gate-form');
-  if (emailGateForm) {
-    emailGateForm.addEventListener('submit', (e) => {
+  // Email Gate Form Handlers (All forms with class .email-gate-form)
+  const emailGateForms = document.querySelectorAll('.email-gate-form');
+  emailGateForms.forEach(form => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const emailInput = document.getElementById('gate-email');
+      const emailInput = form.querySelector('.gate-email-input');
       const emailVal = emailInput ? emailInput.value.trim() : '';
       if (emailVal) {
         // Pre-fill email field in authentication modal
@@ -1242,6 +1242,48 @@ window.addEventListener('DOMContentLoaded', () => {
         if (authModal) authModal.classList.add('visible');
       }
     });
+  });
+
+  // Dynamic Offline Download Mockup Progress Animation
+  function initDownloadAnimation() {
+    const statusText = document.getElementById('download-status-text');
+    const progressFill = document.getElementById('download-progress-fill');
+    
+    if (!statusText || !progressFill) return;
+    
+    let progress = 0;
+    let stage = 0; // 0 = downloading, 1 = completed, 2 = reset wait, 3 = waiting
+
+    setInterval(() => {
+      if (stage === 0) {
+        progress += Math.floor(Math.random() * 8) + 4;
+        if (progress >= 100) {
+          progress = 100;
+          stage = 1;
+        }
+        statusText.textContent = `Descargando... ${progress}%`;
+        progressFill.setAttribute('stroke-dasharray', `${progress}, 100`);
+      } else if (stage === 1) {
+        statusText.textContent = '✓ Descargado';
+        const container = document.getElementById('download-icon-state');
+        if (container) {
+          container.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#5CB88A" stroke-width="3" style="width:12px;height:12px;"><polyline points="20 6 9 17 4 12"/></svg>`;
+        }
+        stage = 2;
+      } else if (stage === 2) {
+        stage = 3;
+        setTimeout(() => {
+          progress = 0;
+          statusText.textContent = 'Descargando... 0%';
+          progressFill.setAttribute('stroke-dasharray', '0, 100');
+          const container = document.getElementById('download-icon-state');
+          if (container) {
+            container.innerHTML = `<svg class="down-arrow-svg animating" id="down-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+          }
+          stage = 0;
+        }, 5000);
+      }
+    }, 400);
   }
 
   // Initialize new 3D and Netflix animations
@@ -1249,6 +1291,7 @@ window.addEventListener('DOMContentLoaded', () => {
   init3DTilt();
   initFaqAccordion();
   populateHeroCurtain();
+  initDownloadAnimation();
 
   // Ejecutar verificación inicial después de un breve delay para permitir el setup de auth
   setTimeout(updateOnlineStatus, 500);

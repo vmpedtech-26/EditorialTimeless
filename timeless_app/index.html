@@ -113,8 +113,17 @@
 
       <div class="nav-actions">
         <div class="auth-buttons" id="auth-btns">
+          <!-- Language Select (Guest Only) -->
+          <div class="lang-selector-container guest-only">
+            <svg viewBox="0 0 24 24" class="globe-icon"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm7.62 7h-3.32a15.7 15.7 0 0 0-1.42-4.57A8 8 0 0 1 19.62 9zm-7.62-5a13.3 13.3 0 0 1 2.37 5H10A13.3 13.3 0 0 1 12 4zm-4.88.43A15.7 15.7 0 0 0 5.7 9H2.38a8 8 0 0 1 4.74-4.57zM2.38 11h3.32a16.2 16.2 0 0 0 .15 2H2.38a8.07 8.07 0 0 1 0-2zm3.47 4h3.32a15.7 15.7 0 0 0 1.42 4.57A8 8 0 0 1 4.38 15zm6.24 5a13.3 13.3 0 0 1-2.37-5h4.74a13.3 13.3 0 0 1-2.37 5zm4.88-.43a15.7 15.7 0 0 0 1.42-4.57h3.32a8 8 0 0 1-4.74 4.57zm3.14-4.57h-3.32a16.2 16.2 0 0 0-.15-2h3.32a8.07 8.07 0 0 1 0 2zm-5.74-2a14.25 14.25 0 0 1-.15-2h3v2zm-4.74-2h3v2h-3a14.25 14.25 0 0 1-.15-2z" fill="currentColor"/></svg>
+            <select id="lang-select" aria-label="Seleccionar idioma">
+              <option value="es">Español</option>
+              <option value="en">English</option>
+            </select>
+            <svg viewBox="0 0 24 24" class="chevron-icon"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </div>
           <button class="btn-ghost" id="btn-login">Iniciar sesión</button>
-          <button class="btn-primary" id="btn-join">Unirse</button>
+          <button class="btn-primary member-only" id="btn-join">Unirse</button>
         </div>
 
         <div class="user-profile" id="user-prof">
@@ -133,7 +142,7 @@
               Biblioteca
             </a>
             <a href="#" class="menu-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2-2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               Ajustes
             </a>
             <div style="height: 1px; background: var(--border); margin: 4px 0;"></div>
@@ -163,20 +172,23 @@
     </div>
 
     <div class="hero-centered-content">
-      <div class="hero-kicker">Editorial Digital · Acceso cerrado</div>
+      <div class="hero-kicker">Editorial Digital · Suscripción Premium</div>
 
       <h1 class="hero-title">
-        Literatura exclusiva, ensayos profundos y lecturas eternas.
+        Libros, novelas y ensayos ilimitados y mucho más
       </h1>
 
       <p class="hero-subtitle">
-        Lee en cualquier dispositivo. Cancela cuando quieras.
+        Lee donde quieras. Cancela en cualquier momento.
       </p>
 
       <div class="hero-email-gate">
-        <p class="email-gate-text">¿Listo para sumergirte en literatura de autor? Ingresa tu correo para unirte como miembro.</p>
-        <form class="email-gate-form" id="email-gate-form">
-          <input type="email" id="gate-email" placeholder="tu@email.com" required autocomplete="email" />
+        <p class="email-gate-text">¿Quieres leer? Ingresa tu email para crear o reiniciar tu membresía.</p>
+        <form class="email-gate-form">
+          <div class="floating-label-container">
+            <input type="email" class="gate-email-input" placeholder=" " required autocomplete="email" />
+            <label>Email</label>
+          </div>
           <button type="submit" class="btn-gate-submit">
             <span>Comenzar</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -189,12 +201,13 @@
   <!-- ============================================================
        NETFLIX ALTERNATING FEATURE PANELS (Guest Only)
   ============================================================ -->
+  <!-- Panel 1: Tablet Mockup -->
   <section class="guest-only netflix-feature-panel">
     <div class="container">
       <div class="feature-panel-inner">
         <div class="feature-text-block">
           <div class="feature-eyebrow">Lectura líquida</div>
-          <h2 class="feature-title">Disfruta en cualquier pantalla.</h2>
+          <h2 class="feature-title">Disfruta en tu pantalla.</h2>
           <p class="feature-desc">
             Nuestra tecnología de formato líquido adapta los textos con precisión milimétrica a tu tablet, móvil o computadora. Lee con comodidad absoluta, modo noche premium y tipografías diseñadas para descansar la vista.
           </p>
@@ -213,31 +226,41 @@
     </div>
   </section>
 
+  <!-- Panel 2: Offline Download Animation -->
   <section class="guest-only netflix-feature-panel">
     <div class="container">
       <div class="feature-panel-inner reversed">
         <div class="feature-text-block">
           <div class="feature-eyebrow">Soporte Offline</div>
-          <h2 class="feature-title">Descarga tus obras y lee sin conexión.</h2>
+          <h2 class="feature-title">Descarga tus libros para leer offline.</h2>
           <p class="feature-desc">
-            Lleva tu biblioteca contigo. Con nuestra tecnología PWA de vanguardia, descarga manuscritos completos de forma encriptada en tu dispositivo y disfruta de la lectura durante tus viajes, vuelos o zonas sin cobertura durante 30 días.
+            Guarda tus obras favoritas para tener siempre algo que leer, sin consumir tus datos ni depender de la señal, estés donde estés.
           </p>
         </div>
         <div class="feature-visual-block">
-          <div class="bookshelf-scene-3d tilt-card-3d">
-            <div class="bookshelf-spine-mockup bs-mock-1">
-              <div style="background: linear-gradient(135deg, #1e293b, #0f172a); width:100%; height:100%; border-radius:4px; border-left:5px solid #C9A96E; padding:15px; box-sizing:border-box;">
-                <div style="font-size:7px; color:#C9A96E; font-weight:700; letter-spacing:1px; margin-bottom:15px;">TIMELESS</div>
-                <div style="font-size:12px; color:#FFF; font-family:var(--font-serif); font-weight:600;">En el Umbral</div>
-                <div style="font-size:8px; color:#A07840; margin-top:20px; font-style:italic;">H. Silva</div>
-              </div>
+          <div class="mobile-mockup-3d tilt-card-3d">
+            <div class="mobile-screen">
+              <img src="assets/cover_arquitecto.png" alt="El Arquitecto de Sombras" />
             </div>
-            <div class="bookshelf-spine-mockup bs-mock-2">
-              <div style="background: linear-gradient(135deg, #2e1065, #1e1b4b); width:100%; height:100%; border-radius:4px; border-left:5px solid #d4af37; padding:15px; box-sizing:border-box; position:relative;">
-                <div style="font-size:7px; color:#d4af37; font-weight:700; letter-spacing:1px; margin-bottom:15px;">TIMELESS</div>
-                <div style="font-size:12px; color:#FFF; font-family:var(--font-serif); font-weight:600;">El Arquitecto de Sombras</div>
-                <div style="font-size:8px; color:#A07840; margin-top:20px; font-style:italic;">C. Domínguez</div>
-                <div class="book-offline-badge" style="position:absolute; bottom:12px; right:12px; background:#5CB88A; padding:3px 6px; font-size:8px; border-radius:10px; color:#fff; display:flex; align-items:center; gap:2px; font-weight:600;">✓ Offline</div>
+            <!-- Stranger Things Style Download Overlay Card -->
+            <div class="download-overlay-card">
+              <div class="download-card-thumb">
+                <img src="assets/cover_arquitecto.png" alt="Miniatura" />
+              </div>
+              <div class="download-card-info">
+                <div class="download-title">El Arquitecto de Sombras</div>
+                <div class="download-status">
+                  <span id="download-status-text">Descargando... 0%</span>
+                </div>
+              </div>
+              <div class="download-animation-container">
+                <svg class="download-progress-circle" viewBox="0 0 36 36">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+                  <path class="circle-fill" id="download-progress-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#C9A96E" stroke-width="3"/>
+                </svg>
+                <div class="download-icon-state" id="download-icon-state">
+                  <svg class="down-arrow-svg" id="down-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                </div>
               </div>
             </div>
           </div>
@@ -246,14 +269,55 @@
     </div>
   </section>
 
+  <!-- Panel 3: Multi-device Overlapping Stack -->
   <section class="guest-only netflix-feature-panel">
     <div class="container">
       <div class="feature-panel-inner">
         <div class="feature-text-block">
-          <div class="feature-eyebrow">Timeless Kids</div>
-          <h2 class="feature-title">Un espacio seguro para los niños.</h2>
+          <div class="feature-eyebrow">Multi-dispositivo</div>
+          <h2 class="feature-title">Lee donde quieras.</h2>
           <p class="feature-desc">
-            Descubre nuestra colección familiar e infantil. Cuentos mágicos y novelas de aventuras seleccionadas para fomentar valores profundos y la imaginación, sin distracciones de pantallas estimulantes ni anuncios.
+            Acceso ilimitado a miles de libros, novelas y ensayos en tu teléfono, tablet, computadora o e-reader sin cargos adicionales.
+          </p>
+        </div>
+        <div class="feature-visual-block">
+          <div class="multi-device-stack tilt-card-3d">
+            <!-- Laptop Frame -->
+            <div class="device-laptop">
+              <div class="device-screen-content">
+                <h4>Capítulo IV: Pensar la Niebla</h4>
+                <p>La ontología de lo imperceptible nos obliga a reconsiderar el espacio que separa las palabras de las intenciones. La niebla no es solo ausencia de luz, sino saturación de misterio...</p>
+              </div>
+            </div>
+            <!-- Tablet Frame -->
+            <div class="device-tablet">
+              <div class="device-screen-content">
+                <h4>Ensayo: La Estructura del Olvido</h4>
+                <p>¿Qué recordamos cuando afirmamos haber olvidado? El olvido no borra el objeto, sino el camino que conduce a él. Como una biblioteca cuyas puertas han sido selladas...</p>
+              </div>
+            </div>
+            <!-- Phone Frame -->
+            <div class="device-phone">
+              <div class="device-screen-content">
+                <h4>La Memoria del Agua</h4>
+                <p>El agua guarda las voces de quienes cruzaron el río antes del amanecer. La archivista sabía que cada gota era un registro...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Panel 4: Kids Section -->
+  <section class="guest-only netflix-feature-panel">
+    <div class="container">
+      <div class="feature-panel-inner reversed">
+        <div class="feature-text-block">
+          <div class="feature-eyebrow">Timeless Kids</div>
+          <h2 class="feature-title">Un espacio exclusivo para niños.</h2>
+          <p class="feature-desc">
+            Los niños pueden sumergirse en cuentos mágicos y novelas de aventuras en un espacio diseñado especialmente para ellos, gratis con tu membresía.
           </p>
         </div>
         <div class="feature-visual-block">
@@ -280,12 +344,12 @@
       <div class="faq-accordion">
         <div class="faq-row">
           <button class="faq-trigger">
-            <span>¿Qué es Timeless Editorial?</span>
+            <span>¿Qué es Timeless?</span>
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-content">
             <div class="faq-content-inner">
-              Timeless es una editorial digital de suscripción cerrada que ofrece acceso exclusivo a obras selectas, ensayos filosóficos y literatura de autor. Diseñada para amantes de las buenas historias que buscan una experiencia de lectura fluida, libre de ruidos y publicidad.
+              Timeless es una editorial digital de suscripción cerrada que ofrece acceso exclusivo a obras selectas, novelas inéditas, ensayos filosóficos y poesía. Está diseñada para amantes de la buena literatura que buscan una experiencia de lectura inmersiva, libre de ruidos y publicidad.
             </div>
           </div>
         </div>
@@ -297,46 +361,73 @@
           </button>
           <div class="faq-content">
             <div class="faq-content-inner">
-              Ofrecemos tres planes adaptados a tus necesidades: un Plan Mensual por $12, un Plan Anual por $89 (que ahorra un 38%), y un Plan Familiar por $18 al mes que permite hasta 6 cuentas activas con control parental y la colección infantil Kids incluida.
+              Ofrecemos planes flexibles para adaptarnos a tus hábitos de lectura: el Plan Mensual por $12, el Plan Anual por $89 (que ahorra un 38%), y el Plan Familiar por $18 al mes que permite hasta 6 cuentas activas para compartir lecturas y acceder a la sección Kids.
             </div>
           </div>
         </div>
 
         <div class="faq-row">
           <button class="faq-trigger">
-            <span>¿En qué dispositivos puedo leer?</span>
+            <span>¿Dónde puedo leer?</span>
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-content">
             <div class="faq-content-inner">
-              Puedes leer en cualquier smartphone, tablet o computadora con acceso a internet. Nuestra tecnología de formato líquido adapta el tamaño, tipografías y contraste al tamaño de tu pantalla para una legibilidad ideal en modo noche, tarde o día.
+              Puedes leer en cualquier smartphone, tablet, computadora o e-reader. Nuestra tecnología de lectura líquida adapta tipografías, márgenes y modos de lectura al tamaño de tu pantalla para una legibilidad ideal en modo noche, tarde o día.
             </div>
           </div>
         </div>
 
         <div class="faq-row">
           <button class="faq-trigger">
-            <span>¿Cómo funciona el soporte sin conexión?</span>
+            <span>¿Cómo cancelo mi suscripción?</span>
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-content">
             <div class="faq-content-inner">
-              Si tienes una suscripción activa, puedes presionar el botón "Descargar offline" en los detalles de cualquier obra. Los capítulos se descargarán de forma cifrada en la base de datos de tu navegador. Podrás acceder a ellos y leerlos de principio a fin incluso si estás sin internet durante un período de hasta 30 días.
+              Timeless es totalmente flexible. No hay contratos de permanencia ni cargos por cancelación. Puedes dar de baja tu membresía online con un solo clic desde tu panel de ajustes en cualquier momento. Mantendrás el acceso hasta el final del periodo facturado.
             </div>
           </div>
         </div>
 
         <div class="faq-row">
           <button class="faq-trigger">
-            <span>¿Puedo cancelar mi cuenta cuando quiera?</span>
+            <span>¿Qué puedo leer en Timeless?</span>
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-content">
             <div class="faq-content-inner">
-              Sí, absolutamente. No hay contratos de permanencia ni compromisos. Puedes cancelar tu membresía en cualquier momento desde tu panel de ajustes con un solo clic. Si cancelas, mantendrás acceso completo a la colección hasta la fecha de finalización del período de facturación actual.
+              Nuestra biblioteca cuenta con una curaduría exquisita que abarca desde novelas contemporáneas, clásicos restaurados con traducción exclusiva, ensayos de filosofía e historia, hasta colecciones de poesía. Actualizamos el catálogo constantemente con nuevas publicaciones exclusivas.
             </div>
           </div>
         </div>
+
+        <div class="faq-row">
+          <button class="faq-trigger">
+            <span>¿Es adecuado para los niños?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              Sí. El Plan Familiar incluye acceso a Timeless Kids: un espacio seguro diseñado para fomentar el amor por la lectura en niños de 4 a 12 años, con cuentos mágicos e ilustrados, libre de anuncios y contenido inapropiado.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Email Gate Form (Netflix Style) -->
+      <div class="faq-email-gate">
+        <p class="email-gate-text">¿Quieres leer? Ingresa tu email para crear o reiniciar tu membresía.</p>
+        <form class="email-gate-form">
+          <div class="floating-label-container">
+            <input type="email" class="gate-email-input" placeholder=" " required autocomplete="email" />
+            <label>Email</label>
+          </div>
+          <button type="submit" class="btn-gate-submit">
+            <span>Comenzar</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </form>
       </div>
     </div>
   </section>

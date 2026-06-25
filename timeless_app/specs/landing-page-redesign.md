@@ -1,60 +1,80 @@
 # Spec: Timeless Premium Netflix-Style Landing Page Redesign
 
 ## 1. Objective
-Redesign the public Landing Page (Guest View) of Timeless Editorial to mimic the high-conversion, visually striking layout of Netflix's portal (netflix.com/ar/), adapted to a luxury editorial brand. The page will feature a darkened backdrop curtain showing a grid of book covers, alternating feature panels explaining the platform's value, a polished FAQ accordion, 3D mouse tilt effects on mockups and book covers, and global parallax scrolling of golden dust particles.
+Redesign the public Landing Page (Guest View) of Timeless Editorial to replicate the high-conversion layout, copywriting structure, and user experience of Netflix's portal (netflix.com/ar/), adapted to a luxury editorial brand. The design will combine Netflix's structure (transparent overlapping header, 4 alternating features, FAQ accordion, top/bottom email gates) with Timeless's premium aesthetics (dark marble backdrop, floating golden dust particles, gold highlights `#C9A96E`, and 3D mouse tilt effects).
 
 ---
 
 ## 2. Requirements & Must-Haves
-- [ ] **REQ-1: Hero Billboard & Book Poster Curtain**
-  - The background of the Hero section must contain a tiled grid of book covers (a poster curtain) tilted slightly in 3D, dimmed, and vignette-masked to create depth.
-  - Centered typography:
-    - Main Title: "Obras exclusivas, ensayos profundos y lecturas eternas."
-    - Subtitle: "Lee en cualquier pantalla. Cancela cuando quieras."
-    - Action text: "¿Listo para sumergirte en literatura exclusiva? Ingresa tu email para iniciar tu suscripción."
-  - Integrated Email Gate form (Input + Big Golden button with a Chevron arrow `Comenzar >`).
-- [ ] **REQ-2: Top Navigation Realignment**
-  - Minimalistic navbar: Logo on the left, "Iniciar sesión" button on the right. Links are hidden to avoid distraction.
-- [ ] **REQ-3: Alternating Feature Sections (Netflix-Style Rows)**
-  - Divided by clean, solid border lines. Alternate layouts (text left / visual right, then vice-versa):
-    - **Row 1: Read Anywhere (Multi-device)**. Visual: Glassmorphic tablet/mobile mockup rendering a mock page of the reader with a 3D mouse tilt hover effect.
-    - **Row 2: Secure Offline Access**. Visual: A luxurious bookshelves scene showing dynamic covers descending into an offline-ready state, highlighting the offline badge.
-    - **Row 3: Dedicated Kids Space**. Visual: Cozy children bookshelf visual showcasing the Kids collection.
-- [ ] **REQ-4: FAQ Accordion Component**
-  - Standardized Netflix-style accordion rows: wide columns, clicking a question expands the answer smoothly using max-height transitions.
-  - Questions to cover: What is Timeless?, How much does it cost?, Where can I read?, Can I cancel?, How does the offline download work?
-- [ ] **REQ-5: 3D Mouse Tilt & Hover Effects**
-  - Implement a clean Vanilla JS 3D tilt effect on book cards and device mockups.
-  - When the user hovers over these elements, they tilt dynamically following the coordinates of the cursor, with realistic shadow shifts.
-- [ ] **REQ-6: Parallax Background & Floating Particles**
-  - Create a canvas overlay generating floating golden dust particles that move slowly according to page scroll and mouse cursor movements.
-  - High-end dark marble background with golden veins applied to the body.
+
+### REQ-1: Copywriting Aligning with Netflix
+All public guest-facing marketing text must match the Netflix structure exactly, adapted for books:
+- **Hero Title**: "Libros, novelas y ensayos ilimitados y mucho más"
+- **Hero Subtitle**: "Lee donde quieras. Cancela en cualquier momento."
+- **Email Gate Text (Top & Bottom)**: "¿Quieres leer? Ingresa tu email para crear o reiniciar tu membresía."
+
+### REQ-2: Top Navigation with Language Selector
+- **Minimalist Header**: Show the brand logo on the left.
+- **Language Dropdown Selector**: Add a select dropdown on the right, next to the "Iniciar sesión" button. It must feature:
+  - A globe icon on the left of the select.
+  - Options: "Español" and "English".
+  - Sleek dark border, gold/grey hover states, and transparent background.
+- **Hiding Unirse Button**: The "Unirse" button must be hidden for guest users to match Netflix's header layout.
+
+### REQ-3: Floating Label Email Inputs
+- The email gate inputs (both in the Hero and under the FAQs) must use a floating label effect.
+- When empty and unfocused, the label is centered and looks like placeholder text.
+- When focused or filled, the label scales down and slides to the top, leaving space for the typed email address.
+- Must be implemented using pure CSS selectors (`:placeholder-shown` and sibling selectors) for hardware-accelerated rendering.
+
+### REQ-4: 4 Alternating Feature Sections (Netflix Rows)
+Divided by solid, luxury borders. Layouts alternate (left-to-right) and feature:
+- **Row 1: Disfruta en tu pantalla**
+  - *Content*: "Disfruta en tu pantalla. Lee en smart TVs, tablets, móviles, computadoras y e-readers con total comodidad y sincronización."
+  - *Visual (Right)*: Glassmorphic tablet screen displaying a book page with 3D mouse tilt.
+- **Row 2: Descarga tus libros para leer offline** (Reversed)
+  - *Content*: "Descarga tus libros para leer offline. Guarda tus obras favoritas y ten siempre algo que leer."
+  - *Visual (Left)*: Mobile phone mockup displaying a book. Inside the phone, an overlay card simulates a download progress state (Stranger Things style):
+    - Book thumbnail on the left, text in the center ("El Arquitecto de Sombras" / "Descargando..."), and an animated circular progress indicator on the right that counts up to 100% and displays a checkmark.
+- **Row 3: Lee donde quieras**
+  - *Content*: "Lee donde quieras. Acceso ilimitado a miles de libros en tu teléfono, tablet, computadora o e-reader sin cargos adicionales."
+  - *Visual (Right)*: A 3D layered device stack (overlapping Laptop, Tablet, and Mobile phone screens) displaying active book pages.
+- **Row 4: Un espacio exclusivo para niños** (Reversed)
+  - *Content*: "Un espacio exclusivo para niños. Los niños viven aventuras con sus personajes favoritos en un espacio diseñado especialmente para ellos, gratis con tu membresía."
+  - *Visual (Left)*: Cozy kids collection bookshelf showing playful premium book designs.
+
+### REQ-5: Bottom Email Gate
+- Beneath the FAQ accordion, add a secondary, identical Email Gate form with the copy: "¿Quieres leer? Ingresa tu email para crear o reiniciar tu membresía."
+- Submitting either the top or bottom gate pre-fills the registration email and opens the authentication modal.
+
+### REQ-6: FAQ Accordion Component
+- Standardized Netflix-style accordion with 6 questions:
+  1. ¿Qué es Timeless?
+  2. ¿Cuánto cuesta la membresía?
+  3. ¿Dónde puedo leer?
+  4. ¿Cómo cancelo mi suscripción?
+  5. ¿Qué puedo leer en Timeless?
+  6. ¿Es adecuado para los niños?
+- Expanding an answer collapses any other open answers smoothly using height transitions. The plus (`+`) icon must rotate 45 degrees into an (`x`) icon when active.
+
+### REQ-7: 3D Mouse Tilt & Floating Particles
+- The 3D mouse tilt effect must remain active on device mockups and feature cards.
+- The canvas overlay rendering floating golden dust particles must stay active.
+- High-end dark marble background with golden veins applied to the body.
 
 ---
 
 ## 3. Constraints & Design Guidelines
-- **Tech Stack**: Vanilla HTML5, CSS3, ES6 JS. No external heavy frameworks (like React or Tailwind) to maintain optimal Largest Contentful Paint (LCP) performance.
-- **Color Palette & Aesthetics**:
-  - Dark luxurious marble backdrop (`#0d0c0a` to `#161411`) with subtle gold accents (`#C9A96E`).
-  - Font pairings: Playfair Display (Serif) for headings, Lora for body copy, and Inter (Sans-serif) for actionable inputs and buttons.
-- **Responsive Layout**:
-  - The book curtain grid must wrap and adjust column counts on mobile.
-  - Tilt effects disabled on touch devices to conserve battery and CPU.
+- **Tech Stack**: Vanilla HTML5, CSS3, ES6 JS. No heavy external frameworks.
+- **Color Palette & Aesthetics**: Dark luxury theme (`#0d0c0a` to `#161411`) with subtle gold accents (`#C9A96E`).
+- **Responsive Layout**: Tilt effects automatically bypassed on touch screens using pointer media query `(pointer: coarse)`.
 
 ---
 
-## 4. Edge Cases & Error States
-- [ ] **EDGE-1: Heavy CSS Animation Lag**
-  - Ensure the floating particles and 3D tilt utilize hardware-accelerated properties (`transform: translate3d`, `will-change`) to prevent lag on lower-end devices.
-- [ ] **EDGE-2: Email Field Empty Submission**
-  - Enforce standard HTML5 validation on the hero email gate input.
-
----
-
-## 5. Definition of Done (DoD)
-- [ ] **DoD-1**: Core redesign specification is written and version-controlled.
-- [ ] **DoD-2**: High-resolution luxury dark marble texture is generated or imported as background.
-- [ ] **DoD-3**: Netflix-style alternating panels are implemented in HTML and styled in CSS.
-- [ ] **DoD-4**: Smooth FAQ accordion is active and fully interactive.
-- [ ] **DoD-5**: 3D mouse tilt script is added and verified on desktop browsers.
-- [ ] **DoD-6**: Floating golden dust parallax canvas is created and rendering smoothly.
+## 4. Definition of Done (DoD)
+- **DoD-1**: Floating label inputs are functional and styled in CSS.
+- **DoD-2**: Language selector is added to the header.
+- **DoD-3**: 4 alternating rows with custom download animation and multi-device stack are fully coded.
+- **DoD-4**: FAQ accordion features the 6 correct questions and smooth rotation of icons.
+- **DoD-5**: Bottom email gate is functional and triggers the Auth modal.
+- **DoD-6**: No JS errors are present on guest page load.
