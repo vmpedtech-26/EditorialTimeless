@@ -56,6 +56,33 @@ const GENRES = {
     { genre: "Manual de Estilo", prefix: "CUADERNO DE TALLER" },
     { genre: "Crítica Teórica", prefix: "MÁQUINAS DE HABITAR" }
   ],
+  comedia: [
+    { genre: "Comedia Absurda", prefix: "SÁTIRA Y ABSURDO" },
+    { genre: "Sátira Literaria", prefix: "BIBLIOTECA DEL HUMOR" },
+    { genre: "Comedia Surrealista", prefix: "CRÓNICAS DEL DELIRIO" }
+  ],
+  novela: [
+    { genre: "Novela Histórica", prefix: "CRÓNICAS DEL TIEMPO" },
+    { genre: "Novela de Formación", prefix: "NARRATIVAS DEL SUR" },
+    { genre: "Realismo Mágico", prefix: "REALISMO MÁGICO" },
+    { genre: "Novela Psicológica", prefix: "CALEIDOSCOPIO" }
+  ],
+  thriller: [
+    { genre: "Thriller Político", prefix: "INTRIGA Y PODER" },
+    { genre: "Tecno-Thriller", prefix: "CÓDIGO OCULTO" },
+    { genre: "Thriller Arqueológico", prefix: "ARQUEOLOGÍAS MUDAS" },
+    { genre: "Thriller Psicológico", prefix: "LABERINTOS MENTALES" }
+  ],
+  neurociencia: [
+    { genre: "Neurociencia Divulgativa", prefix: "CEREBRO Y CONDUCTA" },
+    { genre: "Neurociencia Cognitiva", prefix: "MÁQUINA DE PENSAR" },
+    { genre: "Neurobiología", prefix: "BIOLOGÍA DE LA MENTE" }
+  ],
+  finanzas: [
+    { genre: "Finanzas Personales", prefix: "RIQUEZA TEMPORAL" },
+    { genre: "Economía Conductual", prefix: "MANTRA FINANCIERO" },
+    { genre: "Estrategia Financiera", prefix: "CÓDIGO DE RIQUEZA" }
+  ],
   kids: [
     { genre: "Fantasía Infantil", prefix: "COLECCIÓN FANTASÍA" },
     { genre: "Misterio Familiar", prefix: "COLECCIÓN MISTERIO" },
@@ -204,6 +231,41 @@ const PROSE_POOL = {
     "El ritmo de la prosa no depende de la métrica, sino de la distribución de las respiraciones. Alternar frases cortas como latidos con períodos largos y sinuosos como corrientes de agua genera una hipnosis que atrapa al lector en el fluir del texto. La partitura tipográfica debe ser tan cuidada como la musical.",
     "El suspenso existencial no nace de saber quién cometió el crimen, sino de comprender por qué el personaje continúa caminando hacia la sombra. La tensión en la alta literatura es de carácter ético y estético; una vibración sutil que ocurre en la frontera de lo indecible, entre la palabra y el abismo."
   ],
+  comedia: [
+    "El primer paraguas en marcharse fue un ejemplar de color negro mango de madera, propiedad del juez de paz. Salió volando sin viento, directo hacia el este, cansado de la humedad y la ingratitud de sus dueños.",
+    "En el cóctel de la editorial, Ernesto sostuvo una copa de jerez con la melancolía de quien comprende el peso de la elipsis en el siglo de oro español, haciéndose pasar por un autor consagrado sin haber leído un solo libro en su vida.",
+    "El señor Péndulo pesaba ochenta kilos los lunes por la mañana mientras ordenaba sus facturas. Pero a las tres de la tarde, frente al balance contable del municipio, su cuerpo comenzó a flotar suavemente hasta rozar el techo.",
+    "La siesta llamada 'del rayo' debe durar exactamente seis minutos. Cualquier exceso nos expone a despertar en un siglo distinto, o peor aún, a las siete de la tarde de un domingo creyendo que es lunes por la mañana.",
+    "El tratado comercial estuvo a punto de colapsar cuando Sofía tradujo 'tasa arancelaria' como 'un pequeño impuesto sobre los sombreros ridículos', desatando un desopilante debate lingüístico internacional."
+  ],
+  novela: [
+    "El telar de madera sonaba con la regularidad de un corazón cansado. En la penumbra de la cabaña, Keiko deslizaba los hilos de seda blanca, ocultando entre las hebras un poema que su abuela le había hecho jurar memorizar.",
+    "La Patagonia no se abre a los hombres; se les resiste con un viento de ceniza que borra los caminos antes de terminarlos de recorrer, desafiando los intentos del cartógrafo por trazar fronteras estables.",
+    "Elena apoyó la oreja en la pared de adobe del patio principal. Al principio solo escuchó el paso del viento por el tejado de tejas musgosas, pero luego escuchó las risas de quienes habitaron la hacienda hace un siglo.",
+    "El olor a ácido acético y sales de plata devolvió a Irene a los años del sótano y la luz roja, ampliando un negativo donde aparecía el rostro de alguien que la historia daba por desaparecido.",
+    "Julia apretó el cuello de su tapado de lana verde, mirando la vieja calesita tapada con lonas grises frente a la costa inglesa, esperando el tren que traería de vuelta los recuerdos de 1968."
+  ],
+  thriller: [
+    "El cuerpo del maestro relojero yacía en el interior de la torre del reloj astronómico, rodeado de resortes. El inspector Jan no buscó heridas; sabía que en Praga las intrigas se cobraban vidas en silencio.",
+    "Un archivo EPUB de 'La Divina Comedia' contenía un payload inusual en los metadatos. Elena analizó el código hexadecimal y encontró una estructura de encriptado militar de alta seguridad oculta en la prosa.",
+    "Sarah ingresó al sitio de excavación clandestinamente a medianoche, deslizando sus manos por el cilindro de terracota sumerio que contenía las frecuencias musicales capaces de alterar el cerebro.",
+    "El profesor Daniel Varga sostenía la novela barata con un temblor inocultable: cada capítulo de la ficción coincidía con precisión aterradora con los atentados perpetrados la víspera en la ciudad.",
+    "Samuel sonrió con suavidad desde el rincón de su celda de máxima seguridad: 'Yo no les quité la vida, doctora; simplemente les mostré su reverso en el espejo hasta que decidieron irse'."
+  ],
+  neurociencia: [
+    "Cuando observamos a un pianista mover sus dedos sobre el teclado, nuestra corteza motora se activa como si estuviéramos tocando la sonata nosotros mismos, demostrando la magia oculta de las neuronas espejo.",
+    "El cerebro no fue diseñado evolutivamente para leer, pero la lectura profunda recluta y recicla áreas diseñadas originalmente para reconocer rostros y huellas en el bosque primigenio.",
+    "El hipocampo es el archivista plástico de nuestra existencia. Cada recuerdo nuevo requiere la creación de nuevas conexiones y la síntesis activa de proteínas en las neuronas correspondientes.",
+    "Mantener la atención consciente en una sola tarea durante más de diez minutos constituye un acto de resistencia biológica y metabólica en la ruidosa era de las notificaciones digitales.",
+    "Durante el sueño REM, el cerebro consume tanta energía como cuando estamos resolviendo problemas matemáticos complejos, limpiando toxinas emocionales mientras el cuerpo permanece inmóvil."
+  ],
+  finanzas: [
+    "El interés compuesto es la octava maravilla del mundo financiero: un pequeño ahorro mensual del diez por ciento se duplica cada década, acumulando una riqueza silenciosa pero inquebrantable a través del tiempo.",
+    "Las decisiones de gasto rara vez son racionales; solemos comprar lo que no necesitamos con dinero que no tenemos para impresionar a personas que no nos importan, buscando llenar vacíos afectivos.",
+    "El arquitecto de la libertad financiera no vende su tiempo laboral por un sueldo; construye un portafolio de activos generadores de flujo de caja que financien su independencia absoluta.",
+    "La mentalidad de abundancia ve oportunidades y valor donde la mentalidad de escasez y miedo solo detecta crisis y contracción, permitiendo invertir a largo plazo de forma racional y serena.",
+    "El precio de mercado fluctúa de acuerdo con los caprichos del algoritmo comercial, pero el valor intrínseco de un activo reside en su flujo de caja futuro y su margen de seguridad."
+  ],
   kids: [
     "En la cima de la Montaña Azul vivía un unicornio cuyas crines estaban tejidas con hilos de escarcha brillante. Aunque a veces se sentía solo, los pájaros del viento le traían cuentos de barcos de papel dorado que navegaban por ríos de nubes, llevándole saludos de niños que sabían soñar despiertos con los ojos abiertos.",
     "El pequeño faro de la isla no usaba aceite ni carbón para encender su haz. Se alimentaba cada noche con las sonrisas alegres de las estrellas de mar, proyectando un rayo mágico de colores sobre las olas espumosas para que ningún pez se perdiera durante las tormentas del invierno.",
@@ -307,6 +369,41 @@ const TITLES_POOL = [
   { cat: "tecnica", title: "La partitura del diálogo implícito" },
   { cat: "tecnica", title: "La alquimia del adjetivo preciso" },
   { cat: "tecnica", title: "La estructura invisible de la novela" },
+
+  // Comedia (5 titles)
+  { cat: "comedia", title: "La rebelión de los paraguas extraviados" },
+  { cat: "comedia", title: "Manual del perfecto impostor literario" },
+  { cat: "comedia", title: "La insólita gravedad del señor Péndulo" },
+  { cat: "comedia", title: "Tratado sobre la siesta perfecta" },
+  { cat: "comedia", title: "El club de los malos traductores" },
+
+  // Novela (5 titles)
+  { cat: "novela", title: "La sombra del cerezo en otoño" },
+  { cat: "novela", title: "Donde el viento da la vuelta" },
+  { cat: "novela", title: "El rumor de las piedras tibias" },
+  { cat: "novela", title: "Los cuadernos de la luz oblicua" },
+  { cat: "novela", title: "La última estación de Brighton" },
+
+  // Thriller (5 titles)
+  { cat: "thriller", title: "El enigma del relojero de Praga" },
+  { cat: "thriller", title: "Sombras en la red de seda" },
+  { cat: "thriller", title: "La novena sinfonía de la arena" },
+  { cat: "thriller", title: "El manuscrito del conspirador" },
+  { cat: "thriller", title: "La conspiración del silencio cóncavo" },
+
+  // Neurociencia (5 titles)
+  { cat: "neurociencia", title: "La sinfonía de las neuronas espejo" },
+  { cat: "neurociencia", title: "El cerebro del lector" },
+  { cat: "neurociencia", title: "Los laberintos de la memoria plástica" },
+  { cat: "neurociencia", title: "La física de la atención consciente" },
+  { cat: "neurociencia", title: "El misterio del sueño REM" },
+
+  // Finanzas (5 titles)
+  { cat: "finanzas", title: "La alquimia del interés compuesto" },
+  { cat: "finanzas", title: "La psicología del dinero y el deseo" },
+  { cat: "finanzas", title: "El arquitecto de la libertad financiera" },
+  { cat: "finanzas", title: "Mentalidad de abundancia en tiempos de escasez" },
+  { cat: "finanzas", title: "El código del valor intrínseco" },
 
   // Kids (15 titles)
   { cat: "kids", title: "El Dragón que perdió su Fuego" },

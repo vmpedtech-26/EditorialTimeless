@@ -225,6 +225,18 @@ window.startGeneration = async function() {
   currentObra  = null;
   logLines     = [];
   chapterText  = '';
+  
+  const auditEmpty = document.getElementById('audit-empty');
+  if (auditEmpty) {
+    auditEmpty.innerHTML = `
+      <div class="state-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <p>No hay ninguna obra generada en la sesión actual. Inicia la generación en el panel izquierdo para poder auditarla.</p>
+    `;
+  }
+  const auditResults = document.getElementById('audit-results');
+  if (auditResults) auditResults.style.display = 'none';
   document.getElementById('btn-generate').disabled = true;
   document.getElementById('gen-progress').style.display = 'block';
   setStatus('Generando…', 'pb-blue');
@@ -379,6 +391,16 @@ window.startGeneration = async function() {
     document.getElementById('modal-words').textContent = `${totalWordCount.toLocaleString('es')} palabras (Obra completa)`;
     document.getElementById('export-modal').classList.add('visible');
 
+    const auditEmpty = document.getElementById('audit-empty');
+    if (auditEmpty && currentObra) {
+      auditEmpty.innerHTML = `
+        <div class="state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <p>La obra <strong>"${esc(currentObra.title)}"</strong> ha sido generada correctamente y está lista para auditar. Haz clic en "Auditar Manuscrito" arriba.</p>
+      `;
+    }
+
   } catch (err) {
     const msg = err.message || 'Error desconocido';
     log(`<span style="color:#C87870;">✗ Error: ${esc(msg)}</span>`);
@@ -397,6 +419,18 @@ function runSimulation(prompt) {
   document.getElementById('btn-generate').disabled = true;
   document.getElementById('gen-progress').style.display = 'block';
   setStatus('Simulando…', 'pb-blue');
+  
+  const auditEmpty = document.getElementById('audit-empty');
+  if (auditEmpty) {
+    auditEmpty.innerHTML = `
+      <div class="state-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <p>No hay ninguna obra generada en la sesión actual. Inicia la generación en el panel izquierdo para poder auditarla.</p>
+    `;
+  }
+  const auditResults = document.getElementById('audit-results');
+  if (auditResults) auditResults.style.display = 'none';
 
   const ch = document.getElementById('chapters-select').value;
   const steps = [
@@ -446,6 +480,23 @@ function runSimulation(prompt) {
         document.getElementById('modal-bsc').textContent   = '94.0 / 100';
         document.getElementById('modal-words').textContent = `${(parseInt(ch)*7200).toLocaleString('es')} palabras aprox.`;
         document.getElementById('export-modal').classList.add('visible');
+
+        // Set current simulated obra so audit works
+        currentObra = {
+          title: mockTitle,
+          genre: currentGenre,
+          outline: { title: mockTitle, chapters: [{ index: 1, title: "Planteamiento" }] },
+          chapters: ["Este es el borrador simulado del capítulo uno. Trata sobre los senderos invisibles de la mente y la memoria."]
+        };
+        
+        if (auditEmpty) {
+          auditEmpty.innerHTML = `
+            <div class="state-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <p>La obra simulada <strong>"${mockTitle}"</strong> está lista para auditar. Haz clic en "Auditar Manuscrito" arriba.</p>
+          `;
+        }
       }, 700);
     }
   }, 100);
@@ -558,3 +609,113 @@ userAvatarBtn.addEventListener('click', (e) => {
 });
 document.addEventListener('click', () => userMenu.classList.remove('open'));
 btnLogout.addEventListener('click', () => signOut(auth));
+
+// ── QA AUDIT BUTTON LOGIC ────────────────────────────────────
+const btnAudit = document.getElementById('btn-audit-manuscript');
+const auditEmpty = document.getElementById('audit-empty');
+const auditLoading = document.getElementById('audit-loading');
+const auditResults = document.getElementById('audit-results');
+
+if (btnAudit) {
+  btnAudit.addEventListener('click', async () => {
+    if (!currentObra || !currentObra.chapters || currentObra.chapters.length === 0) {
+      alert("Por favor, genera una obra primero.");
+      return;
+    }
+
+    btnAudit.disabled = true;
+    if (auditEmpty) auditEmpty.style.display = 'none';
+    if (auditResults) auditResults.style.display = 'none';
+    if (auditLoading) auditLoading.style.display = 'flex';
+
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) {
+        throw new Error("No se pudo obtener el token de usuario. Por favor inicia sesión de nuevo.");
+      }
+
+      const payload = {
+        title: currentObra.title,
+        genre: currentObra.genre,
+        author: auth.currentUser?.displayName || 'Autor Timeless',
+        outline: currentObra.outline,
+        chapters: currentObra.chapters
+      };
+
+      const res = await fetch('/api/agent/qa-check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error?.message || "Error al conectar con el servicio de auditoría.");
+      }
+
+      // Rellenar valores e iniciar barras de progreso
+      document.getElementById('audit-val-coherencia').textContent = data.score_coherencia + '%';
+      document.getElementById('audit-bar-coherencia').style.width = data.score_coherencia + '%';
+      
+      document.getElementById('audit-val-originalidad').textContent = data.score_originalidad + '%';
+      document.getElementById('audit-bar-originalidad').style.width = data.score_originalidad + '%';
+      
+      document.getElementById('audit-val-ritmo').textContent = data.score_ritmo + '%';
+      document.getElementById('audit-bar-ritmo').style.width = data.score_ritmo + '%';
+      
+      document.getElementById('audit-val-global').textContent = data.score_global + '/100';
+      
+      // Feedback global
+      const globalFeedback = document.getElementById('audit-global-status');
+      if (data.score_global >= 85) {
+        globalFeedback.textContent = "Excelente calidad estructural y léxica. Lista para publicación premium.";
+        globalFeedback.style.color = '#5CB88A';
+      } else if (data.score_global >= 70) {
+        globalFeedback.textContent = "Buena calidad base. Recomendamos aplicar los consejos de mejora antes de exportar.";
+        globalFeedback.style.color = 'var(--gold)';
+      } else {
+        globalFeedback.textContent = "Calidad insuficiente. Se requiere revisión estructural o rediseño del outline.";
+        globalFeedback.style.color = '#C87870';
+      }
+
+      // Populate list helper
+      const populateList = (listId, items) => {
+        const listEl = document.getElementById(listId);
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        if (items && items.length > 0) {
+          items.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            listEl.appendChild(li);
+          });
+        } else {
+          const li = document.createElement('li');
+          li.textContent = "Sin observaciones significativas.";
+          listEl.appendChild(li);
+        }
+      };
+
+      populateList('audit-obs-coherencia-list', data.observaciones_coherencia);
+      populateList('audit-obs-originalidad-list', data.observaciones_originalidad);
+      populateList('audit-obs-ritmo-list', data.observaciones_ritmo);
+      populateList('audit-advice-list', data.consejos_mejora);
+
+      if (auditResults) auditResults.style.display = 'block';
+
+    } catch (err) {
+      alert("Error en la auditoría: " + err.message);
+      if (auditEmpty) {
+        auditEmpty.style.display = 'flex';
+        auditEmpty.querySelector('p').innerHTML = `<span style="color:#C87870;">Error: ${esc(err.message)}</span>`;
+      }
+    } finally {
+      if (auditLoading) auditLoading.style.display = 'none';
+      btnAudit.disabled = false;
+    }
+  });
+}

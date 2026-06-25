@@ -100,6 +100,256 @@
       transition: all 0.3s ease;
       min-height: 36px;
     }
+
+    /* ── QA AUDIT VIEW ────────────────────────────────────── */
+    #view-audit {
+      overflow-y: auto;
+      height: 100%;
+      padding-right: 4px;
+    }
+    #view-audit::-webkit-scrollbar { width: 4px; }
+    #view-audit::-webkit-scrollbar-track { background: transparent; }
+    #view-audit::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.3); border-radius: 2px; }
+
+    .audit-workspace-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-bottom: 20px;
+    }
+    .audit-intro-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .audit-title {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+      font-style: italic;
+    }
+    .audit-subtitle {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+    .btn-audit {
+      background: var(--gold);
+      color: #12100E;
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .btn-audit:hover:not(:disabled) {
+      background: var(--gold-dark);
+      border-color: var(--gold-dark);
+      transform: translateY(-1px);
+    }
+    .btn-audit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .audit-status-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      line-height: 1.5;
+      gap: 15px;
+    }
+    .state-icon svg {
+      width: 36px;
+      height: 36px;
+      stroke: var(--text-muted);
+    }
+    
+    .audit-spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(201, 169, 110, 0.1);
+      border-left-color: var(--gold);
+      border-radius: 50%;
+      animation: audit-spin 1s linear infinite;
+    }
+    @keyframes audit-spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .audit-results-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .audit-scores-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    @media (min-width: 768px) {
+      .audit-scores-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .audit-score-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+    .audit-score-card.gold { border-top: 3px solid var(--gold); }
+    .audit-score-card.green { border-top: 3px solid #5CB88A; }
+    .audit-score-card.blue { border-top: 3px solid #6098C8; }
+    
+    .card-metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+    .metric-value {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: var(--mono);
+    }
+    .audit-score-card.gold .metric-value { color: var(--gold); }
+    .audit-score-card.green .metric-value { color: #5CB88A; }
+    .audit-score-card.blue .metric-value { color: #6098C8; }
+    
+    .audit-progress-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .audit-progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .audit-progress-fill.gold { background: var(--gold); }
+    .audit-progress-fill.green { background: #5CB88A; }
+    .audit-progress-fill.blue { background: #6098C8; }
+    
+    .audit-obs-section h5 {
+      margin: 0 0 6px 0;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .obs-list {
+      margin: 0;
+      padding-left: 12px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .obs-list li {
+      list-style-type: square;
+    }
+    
+    .audit-global-card {
+      background: rgba(201, 169, 110, 0.05);
+      border: 1px solid rgba(201, 169, 110, 0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .global-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .global-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+    .global-info h4 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .global-feedback {
+      font-size: 12px;
+      font-style: italic;
+      color: var(--text-secondary);
+      text-align: right;
+      max-width: 250px;
+      line-height: 1.4;
+    }
+    
+    .audit-advice-panel {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .audit-advice-panel h4 {
+      margin: 0 0 12px 0;
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--text-primary);
+    }
+    .advice-list {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
   </style>
   
   <!-- PWA & Apple Web App Meta -->
@@ -483,6 +733,7 @@
             <div class="workspace-tabs">
               <button class="w-tab active" id="tab-terminal" onclick="switchWorkspace('terminal')">Consola</button>
               <button class="w-tab" id="tab-preview" onclick="switchWorkspace('preview')">Vista Previa</button>
+              <button class="w-tab" id="tab-audit" onclick="switchWorkspace('audit')">Auditoría</button>
             </div>
             <span class="panel-badge pb-green" id="status-badge">En espera</span>
           </div>
@@ -495,6 +746,92 @@
             <div id="view-preview" class="workspace-view">
               <div class="preview-canvas" id="preview-canvas">
                 <div class="preview-empty">La vista previa aparecerá durante la fase de redacción.</div>
+              </div>
+            </div>
+            <!-- QA Audit View -->
+            <div id="view-audit" class="workspace-view">
+              <div class="audit-workspace-content">
+                <div class="audit-intro-box">
+                  <h3 class="audit-title">Auditoría Literaria (Gemini QA)</h3>
+                  <p class="audit-subtitle">Analiza la calidad narrativa y coherencia estructural de tu manuscrito según el estándar BSC.</p>
+                  <button class="btn-audit" id="btn-audit-manuscript">Auditar Manuscrito</button>
+                </div>
+
+                <!-- Empty State -->
+                <div id="audit-empty" class="audit-status-state">
+                  <div class="state-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  </div>
+                  <p>No hay ninguna obra generada en la sesión actual. Inicia la generación en el panel izquierdo para poder auditarla.</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="audit-loading" class="audit-status-state" style="display: none;">
+                  <div class="audit-spinner"></div>
+                  <p>Analizando la obra con la Inteligencia Editorial de Gemini... Esto puede tomar unos segundos.</p>
+                </div>
+
+                <!-- Results Panel -->
+                <div id="audit-results" class="audit-results-panel" style="display: none;">
+                  <div class="audit-scores-grid">
+                    <div class="audit-score-card gold">
+                      <div class="card-metric-header">
+                        <span class="metric-label">Coherencia Narrativa</span>
+                        <span class="metric-value" id="audit-val-coherencia">--</span>
+                      </div>
+                      <div class="audit-progress-track">
+                        <div class="audit-progress-fill gold" id="audit-bar-coherencia" style="width: 0%"></div>
+                      </div>
+                      <div class="audit-obs-section">
+                        <h5>Observaciones</h5>
+                        <ul id="audit-obs-coherencia-list" class="obs-list"></ul>
+                      </div>
+                    </div>
+
+                    <div class="audit-score-card green">
+                      <div class="card-metric-header">
+                        <span class="metric-label">Originalidad Léxica</span>
+                        <span class="metric-value" id="audit-val-originalidad">--</span>
+                      </div>
+                      <div class="audit-progress-track">
+                        <div class="audit-progress-fill green" id="audit-bar-originalidad" style="width: 0%"></div>
+                      </div>
+                      <div class="audit-obs-section">
+                        <h5>Observaciones</h5>
+                        <ul id="audit-obs-originalidad-list" class="obs-list"></ul>
+                      </div>
+                    </div>
+
+                    <div class="audit-score-card blue">
+                      <div class="card-metric-header">
+                        <span class="metric-label">Ritmo y Legibilidad</span>
+                        <span class="metric-value" id="audit-val-ritmo">--</span>
+                      </div>
+                      <div class="audit-progress-track">
+                        <div class="audit-progress-fill blue" id="audit-bar-ritmo" style="width: 0%"></div>
+                      </div>
+                      <div class="audit-obs-section">
+                        <h5>Observaciones</h5>
+                        <ul id="audit-obs-ritmo-list" class="obs-list"></ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Global Score Card -->
+                  <div class="audit-global-card">
+                    <div class="global-info">
+                      <span class="global-label">Score Global Editorial</span>
+                      <h4 id="audit-val-global">--</h4>
+                    </div>
+                    <div class="global-feedback" id="audit-global-status">--</div>
+                  </div>
+
+                  <!-- Actionable Advice -->
+                  <div class="audit-advice-panel">
+                    <h4>Consejos de Mejora Editorial</h4>
+                    <ul id="audit-advice-list" class="advice-list"></ul>
+                  </div>
+                </div>
               </div>
             </div>
             

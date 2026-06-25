@@ -1,0 +1,3311 @@
+[
+  {
+    "id": "fb1",
+    "cat": "ensayo",
+    "title": "El Arte de la Contemplación",
+    "author": "Emilio Vargas",
+    "genre": "Ensayo",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 218,
+    "readTime": "5h 40min",
+    "chapters": 12,
+    "tagline": "En un mundo que corre, aprender a detenerse es el acto más radical.",
+    "synopsis": "Emilio Vargas propone en este ensayo una filosofía de la atención como forma de resistencia cultural. A través de doce meditaciones independientes — sobre el silencio, la lentitud, la luz de la tarde, los museos vacíos — construye un argumento que no se enuncia sino que se acumula, como la humedad antes de la lluvia. Una voz que no urge: espera.",
+    "themes": [
+      "Atención",
+      "Silencio",
+      "Cultura contemporánea"
+    ],
+    "openingQuote": "«No se trata de no pensar. Se trata de pensar hacia abajo, en lugar de hacia adelante.»"
+  },
+  {
+    "id": "fb2",
+    "cat": "ficcion",
+    "title": "La Memoria del Agua",
+    "author": "Claudia Iriarte",
+    "genre": "Ficción",
+    "cover": "assets/cover_memoria.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 342,
+    "readTime": "8h 20min",
+    "chapters": 18,
+    "tagline": "Los muertos no se van. Se disuelven en el sistema de acueductos.",
+    "synopsis": "En una ciudad que comienza a olvidarse a sí misma, una archivista descubre que los recuerdos de los muertos persisten atrapados en el agua que bebe la gente. Cada vez que alguien llora, recuerda algo que no vivió. Claudia Iriarte teje una novela sobre el peso invisible de la memoria colectiva, la violencia silenciosa del olvido institucional y el amor que se filtra entre las grietas del concreto.",
+    "themes": [
+      "Memoria",
+      "Pérdida",
+      "Ciudad",
+      "Duelo colectivo"
+    ],
+    "openingQuote": "«El agua tiene memoria. Es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "fb3",
+    "cat": "tecnica",
+    "title": "El Arquitecto de Sombras",
+    "author": "Marcos Delgado",
+    "genre": "Técnica narrativa",
+    "cover": "assets/cover_arquitecto.png",
+    "pages": 280,
+    "readTime": "6h 55min",
+    "chapters": 15,
+    "tagline": "Un manual para construir mundos que el lector habite sin saberlo.",
+    "synopsis": "Marcos Delgado, arquitecto de profesión y escritor por necesidad, expone en este volumen singular la gramática oculta detrás de los espacios narrativos que más nos han habitado. Cómo la luz entra en una escena. Cómo el silencio ocupa espacio en una página. Cómo construir una habitación que el lector recuerde aunque jamás la haya visto. Un libro técnico que se lee como una novela.",
+    "themes": [
+      "Escritura",
+      "Arquitectura narrativa",
+      "Espacio ficcional"
+    ],
+    "openingQuote": "«Todo gran edificio tiene una sombra. Toda gran historia también.»"
+  },
+  {
+    "id": "fb4",
+    "cat": "ficcion",
+    "title": "En el Umbral",
+    "author": "Isabel Noriega",
+    "genre": "Ficción",
+    "cover": "assets/cover_umbral.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 390,
+    "readTime": "9h 45min",
+    "chapters": 22,
+    "tagline": "Entre los vivos y los muertos hay una habitación. Isabel Noriega vive allí.",
+    "synopsis": "Cuatro personajes convergen durante una sola noche en un hotel de frontera que no aparece en ningún mapa. Ninguno sabe exactamente cómo llegó. Ninguno recuerda bien su nombre. Isabel Noriega construye una novela donde el suspenso no viene de lo que pasa sino de lo que no termina de resolverse: esa sensación de estar a punto de comprender algo que se retira justo cuando uno se acerca.",
+    "themes": [
+      "Identidad",
+      "Límite",
+      "Lo no dicho",
+      "Suspenso existencial"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares que nos esperan.»"
+  },
+  {
+    "id": "seeded-ficcion-5",
+    "cat": "ficcion",
+    "title": "El mapa de los laberintos discretos",
+    "author": "Emilio Vargas",
+    "genre": "Ficción Metafísica",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 248,
+    "readTime": "5h 57min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Olvido",
+      "Espejos",
+      "Laberintos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-6",
+    "cat": "ficcion",
+    "title": "La teología de la arena",
+    "author": "Claudia Iriarte",
+    "genre": "Fantasía Nocturna",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 264,
+    "readTime": "6h 18min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Memoria",
+      "Identidad",
+      "Laberintos"
+    ],
+    "openingQuote": "«Un espejo no es más que una puerta que se cansó de reflejar la mentira del día.»"
+  },
+  {
+    "id": "seeded-ficcion-7",
+    "cat": "ficcion",
+    "title": "El jardín de los senderos cruzados",
+    "author": "Haru Murakami",
+    "genre": "Fantasía Nocturna",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 205,
+    "readTime": "4h 55min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Memoria",
+      "Laberintos",
+      "Olvido"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-8",
+    "cat": "ficcion",
+    "title": "La sonata del agua inmóvil",
+    "author": "Roberto Belano",
+    "genre": "Suspenso Existencial",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 329,
+    "readTime": "7h 52min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Memoria",
+      "Identidad",
+      "Laberintos"
+    ],
+    "openingQuote": "«Hubo un día en que el mar olvidó su oleaje, y en ese instante eterno nació la arena.»"
+  },
+  {
+    "id": "seeded-ficcion-9",
+    "cat": "ficcion",
+    "title": "El ajedrecista de Praga",
+    "author": "Clara Domínguez",
+    "genre": "Realismo Mágico",
+    "cover": "🗝️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 252,
+    "readTime": "6h 0min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Tiempo",
+      "Olvido",
+      "Espejos"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-10",
+    "cat": "ficcion",
+    "title": "Las ruinas circulares de la memoria",
+    "author": "Virginia Silva",
+    "genre": "Suspenso Existencial",
+    "cover": "🌊",
+    "badge": "",
+    "badgeText": "",
+    "pages": 208,
+    "readTime": "4h 60min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Tiempo",
+      "Olvido",
+      "Espejos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-11",
+    "cat": "ficcion",
+    "title": "La biblioteca de los libros no escritos",
+    "author": "Clara Domínguez",
+    "genre": "Ficción Metafísica",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 162,
+    "readTime": "3h 54min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Laberintos",
+      "Olvido",
+      "Memoria"
+    ],
+    "openingQuote": "«Hubo un día en que el mar olvidó su oleaje, y en ese instante eterno nació la arena.»"
+  },
+  {
+    "id": "seeded-ficcion-12",
+    "cat": "ficcion",
+    "title": "El coleccionista de crepúsculos",
+    "author": "Emilio Vargas",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 331,
+    "readTime": "7h 55min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "La historia de un coleccionista de espejos cóncavos en la Praga de entreguerras que jura haber contemplado el rostro del infinito, desatando una conspiración silenciosa de relojeros y filósofos herejes.",
+    "themes": [
+      "Espejos",
+      "Olvido",
+      "Laberintos"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-13",
+    "cat": "ficcion",
+    "title": "El teorema de la lluvia",
+    "author": "Clara Domínguez",
+    "genre": "Suspenso Existencial",
+    "cover": "🎭",
+    "badge": "",
+    "badgeText": "",
+    "pages": 340,
+    "readTime": "8h 6min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Olvido",
+      "Espejos",
+      "Memoria"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-14",
+    "cat": "ficcion",
+    "title": "La levedad del viento austral",
+    "author": "Arturo Borges",
+    "genre": "Ficción Metafísica",
+    "cover": "🧭",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 189,
+    "readTime": "4h 31min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "La historia de un coleccionista de espejos cóncavos en la Praga de entreguerras que jura haber contemplado el rostro del infinito, desatando una conspiración silenciosa de relojeros y filósofos herejes.",
+    "themes": [
+      "Olvido",
+      "Laberintos",
+      "Espejos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-15",
+    "cat": "ficcion",
+    "title": "El juego de los espejos cóncavos",
+    "author": "Humberto Eco",
+    "genre": "Fantasía Nocturna",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 375,
+    "readTime": "8h 58min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Espejos",
+      "Memoria",
+      "Laberintos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-16",
+    "cat": "ficcion",
+    "title": "La sintaxis del silencio",
+    "author": "Arturo Borges",
+    "genre": "Suspenso Existencial",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 348,
+    "readTime": "8h 18min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "La historia de un coleccionista de espejos cóncavos en la Praga de entreguerras que jura haber contemplado el rostro del infinito, desatando una conspiración silenciosa de relojeros y filósofos herejes.",
+    "themes": [
+      "Tiempo",
+      "Olvido",
+      "Espejos"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-17",
+    "cat": "ficcion",
+    "title": "El faro de las constelaciones perdidas",
+    "author": "Clara Domínguez",
+    "genre": "Realismo Mágico",
+    "cover": "🗝️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 191,
+    "readTime": "4h 34min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Memoria",
+      "Olvido",
+      "Identidad"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-18",
+    "cat": "ficcion",
+    "title": "La última noche de la vigilia",
+    "author": "Francisco Kafka",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 201,
+    "readTime": "4h 49min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Olvido",
+      "Laberintos",
+      "Espejos"
+    ],
+    "openingQuote": "«Un espejo no es más que una puerta que se cansó de reflejar la mentira del día.»"
+  },
+  {
+    "id": "seeded-ficcion-19",
+    "cat": "ficcion",
+    "title": "El afinador de silencios",
+    "author": "Francisco Kafka",
+    "genre": "Suspenso Existencial",
+    "cover": "assets/cover_umbral.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 226,
+    "readTime": "5h 24min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Memoria",
+      "Espejos",
+      "Tiempo"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-20",
+    "cat": "ficcion",
+    "title": "La geometría del olvido",
+    "author": "Emilio Vargas",
+    "genre": "Suspenso Existencial",
+    "cover": "♟️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 331,
+    "readTime": "7h 55min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Olvido",
+      "Identidad",
+      "Memoria"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-21",
+    "cat": "ficcion",
+    "title": "El manuscrito de Mombasa",
+    "author": "Clara Domínguez",
+    "genre": "Ficción Metafísica",
+    "cover": "♟️",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 263,
+    "readTime": "6h 16min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Memoria",
+      "Olvido",
+      "Identidad"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-22",
+    "cat": "ficcion",
+    "title": "El invierno en los ojos de Virginia",
+    "author": "Humberto Eco",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 290,
+    "readTime": "6h 57min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Olvido",
+      "Tiempo",
+      "Memoria"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-23",
+    "cat": "ficcion",
+    "title": "La metamorfosis del tiempo",
+    "author": "Hugo Silva",
+    "genre": "Ficción Metafísica",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 280,
+    "readTime": "6h 42min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "La historia de un coleccionista de espejos cóncavos en la Praga de entreguerras que jura haber contemplado el rostro del infinito, desatando una conspiración silenciosa de relojeros y filósofos herejes.",
+    "themes": [
+      "Olvido",
+      "Laberintos",
+      "Espejos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-24",
+    "cat": "ficcion",
+    "title": "El sastre de las sombras",
+    "author": "Hugo Silva",
+    "genre": "Suspenso Existencial",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 214,
+    "readTime": "5h 6min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Tiempo",
+      "Espejos",
+      "Memoria"
+    ],
+    "openingQuote": "«Un espejo no es más que una puerta que se cansó de reflejar la mentira del día.»"
+  },
+  {
+    "id": "seeded-ficcion-25",
+    "cat": "ficcion",
+    "title": "La conspiración de los relojes",
+    "author": "Hugo Silva",
+    "genre": "Fantasía Nocturna",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 192,
+    "readTime": "4h 36min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Olvido",
+      "Memoria",
+      "Identidad"
+    ],
+    "openingQuote": "«Hubo un día en que el mar olvidó su oleaje, y en ese instante eterno nació la arena.»"
+  },
+  {
+    "id": "seeded-ficcion-26",
+    "cat": "ficcion",
+    "title": "El traductor de la niebla",
+    "author": "Ernesto Hemingway",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_umbral.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 325,
+    "readTime": "7h 46min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Memoria",
+      "Identidad",
+      "Espejos"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-27",
+    "cat": "ficcion",
+    "title": "La emperatriz de los laberintos",
+    "author": "Marcos Delgado",
+    "genre": "Suspenso Existencial",
+    "cover": "assets/cover_memoria.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 346,
+    "readTime": "8h 15min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Memoria",
+      "Espejos",
+      "Identidad"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-28",
+    "cat": "ficcion",
+    "title": "El puente de los suspiros sordos",
+    "author": "Simone de Vois",
+    "genre": "Ficción Literaria",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 216,
+    "readTime": "5h 9min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Memoria",
+      "Laberintos",
+      "Espejos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-29",
+    "cat": "ficcion",
+    "title": "El archivero del viento",
+    "author": "Marcos Delgado",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 358,
+    "readTime": "8h 33min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "La historia de un coleccionista de espejos cóncavos en la Praga de entreguerras que jura haber contemplado el rostro del infinito, desatando una conspiración silenciosa de relojeros y filósofos herejes.",
+    "themes": [
+      "Memoria",
+      "Espejos",
+      "Tiempo"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-30",
+    "cat": "ficcion",
+    "title": "La anatomía de un instante eterno",
+    "author": "Francisco Kafka",
+    "genre": "Suspenso Existencial",
+    "cover": "🥀",
+    "badge": "",
+    "badgeText": "",
+    "pages": 204,
+    "readTime": "4h 54min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Laberintos",
+      "Memoria",
+      "Identidad"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-31",
+    "cat": "ficcion",
+    "title": "El pescador de estrellas muertas",
+    "author": "Arturo Borges",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 290,
+    "readTime": "6h 57min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Tiempo",
+      "Memoria",
+      "Espejos"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-32",
+    "cat": "ficcion",
+    "title": "La balada del gato de medianoche",
+    "author": "Haru Murakami",
+    "genre": "Ficción Metafísica",
+    "cover": "assets/cover_umbral.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 169,
+    "readTime": "4h 1min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Olvido",
+      "Identidad",
+      "Laberintos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-33",
+    "cat": "ficcion",
+    "title": "El club de los insomnes de Tokio",
+    "author": "Julio Cortázar-Ríos",
+    "genre": "Ficción Metafísica",
+    "cover": "assets/cover_umbral.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 332,
+    "readTime": "7h 57min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Identidad",
+      "Memoria",
+      "Laberintos"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-34",
+    "cat": "ficcion",
+    "title": "Las huellas de la arena húmeda",
+    "author": "Arturo Borges",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 322,
+    "readTime": "7h 42min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Espejos",
+      "Tiempo",
+      "Olvido"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-35",
+    "cat": "ficcion",
+    "title": "El enigma del espejo roto",
+    "author": "Clara Márquez",
+    "genre": "Fantasía Nocturna",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 276,
+    "readTime": "6h 36min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Memoria",
+      "Olvido",
+      "Identidad"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-36",
+    "cat": "ficcion",
+    "title": "La sombra del jaguar de obsidiana",
+    "author": "José de Sousa",
+    "genre": "Ficción Metafísica",
+    "cover": "🌊",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 300,
+    "readTime": "7h 9min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Tiempo",
+      "Olvido",
+      "Laberintos"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-37",
+    "cat": "ficcion",
+    "title": "Los conspiradores del silencio",
+    "author": "José de Sousa",
+    "genre": "Ficción Literaria",
+    "cover": "assets/cover_umbral.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 368,
+    "readTime": "8h 48min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Espejos",
+      "Tiempo",
+      "Olvido"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-38",
+    "cat": "ficcion",
+    "title": "La frontera transparente",
+    "author": "Hugo Silva",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 341,
+    "readTime": "8h 7min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Tiempo",
+      "Identidad",
+      "Olvido"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-39",
+    "cat": "ficcion",
+    "title": "El manuscrito de Praga",
+    "author": "Clara Márquez",
+    "genre": "Suspenso Existencial",
+    "cover": "🕯️",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 322,
+    "readTime": "7h 42min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Olvido",
+      "Laberintos",
+      "Espejos"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-40",
+    "cat": "ficcion",
+    "title": "El coleccionista de lluvia",
+    "author": "Isabel Noriega",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 370,
+    "readTime": "8h 51min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "Una pieza narrativa de alta costura que explora la disolución de la identidad, los límites de la palabra y la belleza melancólica de las fronteras donde el viento del sur borra las huellas de los vivos.",
+    "themes": [
+      "Olvido",
+      "Tiempo",
+      "Espejos"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-41",
+    "cat": "ficcion",
+    "title": "Los laberintos de la noche larga",
+    "author": "Arturo Borges",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_umbral.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 226,
+    "readTime": "5h 24min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Espejos",
+      "Laberintos",
+      "Identidad"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-42",
+    "cat": "ficcion",
+    "title": "El inventor de crepúsculos",
+    "author": "Haru Murakami",
+    "genre": "Fantasía Nocturna",
+    "cover": "✒️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 268,
+    "readTime": "6h 24min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Espejos",
+      "Tiempo",
+      "Olvido"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-43",
+    "cat": "ficcion",
+    "title": "La sonata del viento inmóvil",
+    "author": "Emilio Vargas",
+    "genre": "Fantasía Nocturna",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 252,
+    "readTime": "6h 0min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Memoria",
+      "Tiempo",
+      "Espejos"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-44",
+    "cat": "ficcion",
+    "title": "La biblioteca de Alejandría",
+    "author": "José de Sousa",
+    "genre": "Ficción Metafísica",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 167,
+    "readTime": "3h 61min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "La historia de un coleccionista de espejos cóncavos en la Praga de entreguerras que jura haber contemplado el rostro del infinito, desatando una conspiración silenciosa de relojeros y filósofos herejes.",
+    "themes": [
+      "Tiempo",
+      "Espejos",
+      "Identidad"
+    ],
+    "openingQuote": "«Había llegado al hotel antes de saber que lo buscaba. Así funcionan los lugares sagrados.»"
+  },
+  {
+    "id": "seeded-ficcion-45",
+    "cat": "ficcion",
+    "title": "El espejo cóncavo del Sena",
+    "author": "Arturo Borges",
+    "genre": "Ficción Metafísica",
+    "cover": "🥀",
+    "badge": "",
+    "badgeText": "",
+    "pages": 248,
+    "readTime": "5h 57min",
+    "chapters": 5,
+    "tagline": "Los secretos del pasado persisten disueltos en el murmullo de los acueductos lejanos.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Tiempo",
+      "Espejos",
+      "Olvido"
+    ],
+    "openingQuote": "«No se trata de mirar hacia adelante, sino de pensar hacia abajo, donde duerme el silencio.»"
+  },
+  {
+    "id": "seeded-ficcion-46",
+    "cat": "ficcion",
+    "title": "La conspiración del péndulo",
+    "author": "Javier del Campo",
+    "genre": "Suspenso Existencial",
+    "cover": "assets/cover_memoria.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 371,
+    "readTime": "8h 52min",
+    "chapters": 5,
+    "tagline": "Toda biblioteca contiene, en silencio, los libros que el mundo decidió olvidar.",
+    "synopsis": "La historia de un coleccionista de espejos cóncavos en la Praga de entreguerras que jura haber contemplado el rostro del infinito, desatando una conspiración silenciosa de relojeros y filósofos herejes.",
+    "themes": [
+      "Memoria",
+      "Olvido",
+      "Identidad"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-47",
+    "cat": "ficcion",
+    "title": "El sastre de las memorias lejanas",
+    "author": "Claudia Iriarte",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 169,
+    "readTime": "4h 1min",
+    "chapters": 5,
+    "tagline": "El mapa que dibujamos no representa una provincia, sino los laberintos de la memoria.",
+    "synopsis": "Una novela extraordinaria sobre el peso invisible de los recuerdos colectivos, la violencia silenciosa del olvido institucional y los laberintos urbanos que recorremos sin saber que ya fuimos olvidados en ellos.",
+    "themes": [
+      "Memoria",
+      "Tiempo",
+      "Espejos"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-48",
+    "cat": "ficcion",
+    "title": "El eco del violín apagado",
+    "author": "José de Sousa",
+    "genre": "Ficción Metafísica",
+    "cover": "⏳",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 356,
+    "readTime": "8h 30min",
+    "chapters": 5,
+    "tagline": "El tiempo es la sustancia de la que estamos hechos; un río que me arrebata, pero yo soy el río.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Memoria",
+      "Laberintos",
+      "Olvido"
+    ],
+    "openingQuote": "«El tiempo tiene memoria, y es lo único que no podemos purificar del todo.»"
+  },
+  {
+    "id": "seeded-ficcion-49",
+    "cat": "ficcion",
+    "title": "Los cartógrafos del vacío",
+    "author": "Humberto Eco",
+    "genre": "Ficción Metafísica",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 191,
+    "readTime": "4h 34min",
+    "chapters": 5,
+    "tagline": "Entre la vigilia y el sueño existe una habitación que no aparece en ningún mapa.",
+    "synopsis": "Un relato satírico e hipnótico sobre un archivista que descubre una fisura en el tiempo de tres segundos durante la caída de las hojas en otoño, permitiéndole habitar los recuerdos no vividos de la ciudad.",
+    "themes": [
+      "Laberintos",
+      "Espejos",
+      "Identidad"
+    ],
+    "openingQuote": "«Un espejo no es más que una puerta que se cansó de reflejar la mentira del día.»"
+  },
+  {
+    "id": "seeded-ensayo-50",
+    "cat": "ensayo",
+    "title": "El elogio de la lentitud",
+    "author": "Haru Murakami",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 229,
+    "readTime": "5h 28min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Silencio",
+      "Resistencia",
+      "Cultura"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-51",
+    "cat": "ensayo",
+    "title": "La tiranía de la prisa",
+    "author": "Virginia Silva",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 170,
+    "readTime": "4h 3min",
+    "chapters": 5,
+    "tagline": "La gramática de nuestra melancolía revela las grietas invisibles de la modernidad.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Cultura",
+      "Silencio",
+      "Resistencia"
+    ],
+    "openingQuote": "«El silencio no es la ausencia de sonido, sino la presencia de una atención absoluta.»"
+  },
+  {
+    "id": "seeded-ensayo-52",
+    "cat": "ensayo",
+    "title": "La estética del silencio contemporáneo",
+    "author": "Alicia M. Gómez",
+    "genre": "Ensayo Poético",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 253,
+    "readTime": "6h 1min",
+    "chapters": 5,
+    "tagline": "La gramática de nuestra melancolía revela las grietas invisibles de la modernidad.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Resistencia",
+      "Silencio",
+      "Filosofía"
+    ],
+    "openingQuote": "«La prisa contemporánea no acelera el movimiento, simplemente mutila la mirada.»"
+  },
+  {
+    "id": "seeded-ensayo-53",
+    "cat": "ensayo",
+    "title": "El peso invisible de la memoria",
+    "author": "Ernesto Hemingway",
+    "genre": "Estética Literaria",
+    "cover": "🧭",
+    "badge": "",
+    "badgeText": "",
+    "pages": 227,
+    "readTime": "5h 25min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Filosofía",
+      "Silencio",
+      "Atención"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-ensayo-54",
+    "cat": "ensayo",
+    "title": "La ética del lector distraído",
+    "author": "Simone de Vois",
+    "genre": "Estética Literaria",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 336,
+    "readTime": "8h 0min",
+    "chapters": 5,
+    "tagline": "La gramática de nuestra melancolía revela las grietas invisibles de la modernidad.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Filosofía",
+      "Silencio",
+      "Estética"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-55",
+    "cat": "ensayo",
+    "title": "La arqueología de las palabras",
+    "author": "Alicia M. Gómez",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_umbral.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 248,
+    "readTime": "5h 57min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Silencio",
+      "Cultura",
+      "Estética"
+    ],
+    "openingQuote": "«El silencio no es la ausencia de sonido, sino la presencia de una atención absoluta.»"
+  },
+  {
+    "id": "seeded-ensayo-56",
+    "cat": "ensayo",
+    "title": "El laberinto de la verdad líquida",
+    "author": "Roberto Belano",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_umbral.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 282,
+    "readTime": "6h 45min",
+    "chapters": 5,
+    "tagline": "La palabra escrita no es un espejo de la realidad, sino un refugio contra su erosión.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Filosofía",
+      "Silencio",
+      "Cultura"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-ensayo-57",
+    "cat": "ensayo",
+    "title": "La rebelión de la atención",
+    "author": "Ernesto Hemingway",
+    "genre": "Ensayo Filosófico",
+    "cover": "🧭",
+    "badge": "",
+    "badgeText": "",
+    "pages": 301,
+    "readTime": "7h 10min",
+    "chapters": 5,
+    "tagline": "La contemplación no es una renuncia a la acción, sino la resistencia intelectual más profunda.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Filosofía",
+      "Cultura",
+      "Silencio"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-58",
+    "cat": "ensayo",
+    "title": "La contemplación como resistencia",
+    "author": "Claudia Iriarte",
+    "genre": "Ensayo Poético",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 281,
+    "readTime": "6h 43min",
+    "chapters": 5,
+    "tagline": "La contemplación no es una renuncia a la acción, sino la resistencia intelectual más profunda.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Cultura",
+      "Filosofía",
+      "Atención"
+    ],
+    "openingQuote": "«El silencio no es la ausencia de sonido, sino la presencia de una atención absoluta.»"
+  },
+  {
+    "id": "seeded-ensayo-59",
+    "cat": "ensayo",
+    "title": "El murmullo de las ruinas",
+    "author": "Alejandra Pozzo",
+    "genre": "Estética Literaria",
+    "cover": "🥀",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 264,
+    "readTime": "6h 18min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Resistencia",
+      "Cultura",
+      "Filosofía"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-ensayo-60",
+    "cat": "ensayo",
+    "title": "La condición del creador solitario",
+    "author": "Claudia Iriarte",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 190,
+    "readTime": "4h 33min",
+    "chapters": 5,
+    "tagline": "La contemplación no es una renuncia a la acción, sino la resistencia intelectual más profunda.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Filosofía",
+      "Silencio",
+      "Cultura"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-61",
+    "cat": "ensayo",
+    "title": "El arte de perder el tiempo",
+    "author": "Emilio Vargas",
+    "genre": "Ensayo Poético",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 245,
+    "readTime": "5h 52min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una exploración filosófica de la estética del vacío y la deriva intelectual en las grandes urbes contemporáneas, cuestionando cómo consumimos ideas y cómo el ruido digital nos ha distanciado de la experiencia de pensar.",
+    "themes": [
+      "Cultura",
+      "Silencio",
+      "Resistencia"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-ensayo-62",
+    "cat": "ensayo",
+    "title": "La deriva de las ideas",
+    "author": "Arturo Borges",
+    "genre": "Estética Literaria",
+    "cover": "assets/cover_memoria.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 259,
+    "readTime": "6h 10min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Cultura",
+      "Atención",
+      "Estética"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-ensayo-63",
+    "cat": "ensayo",
+    "title": "El espejo de la cultura",
+    "author": "Clara Domínguez",
+    "genre": "Ensayo Filosófico",
+    "cover": "🥀",
+    "badge": "",
+    "badgeText": "",
+    "pages": 311,
+    "readTime": "7h 25min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una exploración filosófica de la estética del vacío y la deriva intelectual en las grandes urbes contemporáneas, cuestionando cómo consumimos ideas y cómo el ruido digital nos ha distanciado de la experiencia de pensar.",
+    "themes": [
+      "Resistencia",
+      "Atención",
+      "Filosofía"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-64",
+    "cat": "ensayo",
+    "title": "La gramática de la melancolía",
+    "author": "Javier del Campo",
+    "genre": "Ensayo Filosófico",
+    "cover": "📖",
+    "badge": "",
+    "badgeText": "",
+    "pages": 367,
+    "readTime": "8h 46min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Silencio",
+      "Resistencia",
+      "Cultura"
+    ],
+    "openingQuote": "«El silencio no es la ausencia de sonido, sino la presencia de una atención absoluta.»"
+  },
+  {
+    "id": "seeded-ensayo-65",
+    "cat": "ensayo",
+    "title": "El horizonte de lo indecible",
+    "author": "Haru Murakami",
+    "genre": "Ensayo Filosófico",
+    "cover": "✒️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 221,
+    "readTime": "5h 16min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Atención",
+      "Resistencia",
+      "Estética"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-66",
+    "cat": "ensayo",
+    "title": "La mirada suspendida",
+    "author": "Humberto Eco",
+    "genre": "Estética Literaria",
+    "cover": "assets/cover_umbral.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 245,
+    "readTime": "5h 52min",
+    "chapters": 5,
+    "tagline": "La palabra escrita no es un espejo de la realidad, sino un refugio contra su erosión.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Filosofía",
+      "Silencio",
+      "Cultura"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-ensayo-67",
+    "cat": "ensayo",
+    "title": "El eco de los pasos perdidos",
+    "author": "Isabel Noriega",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_umbral.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 355,
+    "readTime": "8h 28min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Atención",
+      "Resistencia",
+      "Silencio"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-68",
+    "cat": "ensayo",
+    "title": "La frontera de la vigilia",
+    "author": "Isabel Noriega",
+    "genre": "Crítica Cultural",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 280,
+    "readTime": "6h 42min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Filosofía",
+      "Atención",
+      "Estética"
+    ],
+    "openingQuote": "«La prisa contemporánea no acelera el movimiento, simplemente mutila la mirada.»"
+  },
+  {
+    "id": "seeded-ensayo-69",
+    "cat": "ensayo",
+    "title": "La construcción del vacío",
+    "author": "Francisco Kafka",
+    "genre": "Ensayo Poético",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 269,
+    "readTime": "6h 25min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Filosofía",
+      "Silencio",
+      "Resistencia"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-70",
+    "cat": "ensayo",
+    "title": "La estética de la renuncia",
+    "author": "Humberto Eco",
+    "genre": "Estética Literaria",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 344,
+    "readTime": "8h 12min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Filosofía",
+      "Atención",
+      "Cultura"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-71",
+    "cat": "ensayo",
+    "title": "El laberinto de los signos mudos",
+    "author": "Alejandra Pozzo",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 185,
+    "readTime": "4h 25min",
+    "chapters": 5,
+    "tagline": "La palabra escrita no es un espejo de la realidad, sino un refugio contra su erosión.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Atención",
+      "Cultura",
+      "Silencio"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-72",
+    "cat": "ensayo",
+    "title": "La paradoja del tiempo suspendido",
+    "author": "José de Sousa",
+    "genre": "Crítica Cultural",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 227,
+    "readTime": "5h 25min",
+    "chapters": 5,
+    "tagline": "La palabra escrita no es un espejo de la realidad, sino un refugio contra su erosión.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Cultura",
+      "Silencio",
+      "Atención"
+    ],
+    "openingQuote": "«La arqueología del lenguaje demuestra que cada palabra es una ruina que aún respira.»"
+  },
+  {
+    "id": "seeded-ensayo-73",
+    "cat": "ensayo",
+    "title": "La ética del fragmento poético",
+    "author": "Clara Domínguez",
+    "genre": "Estética Literaria",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 311,
+    "readTime": "7h 25min",
+    "chapters": 5,
+    "tagline": "En un mundo que corre a toda prisa, aprender a detenerse es el único acto de soberanía.",
+    "synopsis": "Una meditación honda e indispensable sobre la atención como forma de resistencia cultural frente a la estimulación constante. A través de reflexiones poéticas sobre el silencio y la lentitud, construye un argumento que se acumula como la humedad antes de la tormenta.",
+    "themes": [
+      "Filosofía",
+      "Cultura",
+      "Silencio"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-ensayo-74",
+    "cat": "ensayo",
+    "title": "El murmullo de los espejos rotos",
+    "author": "Francisco Kafka",
+    "genre": "Ensayo Filosófico",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 325,
+    "readTime": "7h 46min",
+    "chapters": 5,
+    "tagline": "La gramática de nuestra melancolía revela las grietas invisibles de la modernidad.",
+    "synopsis": "Una arqueología de las palabras olvidadas y los conceptos extintos que alguna vez definieron la belleza, trazando una línea directa entre la gramática medieval y la soledad del lector contemporáneo.",
+    "themes": [
+      "Resistencia",
+      "Estética",
+      "Cultura"
+    ],
+    "openingQuote": "«Escribir es trazar una línea en el agua con la esperanza de que la corriente entienda el trazo.»"
+  },
+  {
+    "id": "seeded-biografia-75",
+    "cat": "biografia",
+    "title": "La vida breve de las palabras",
+    "author": "Alejandra Pozzo",
+    "genre": "Biografía Literaria",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 222,
+    "readTime": "5h 18min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Un recorrido biográfico y epistolar de una sensibilidad abrumadora que ilumina el exilio voluntario de una creadora solitaria en el Brighton de entreguerras, rescatando sus diarios de convalecencia y sus diálogos silenciados con el oleaje.",
+    "themes": [
+      "Brighton",
+      "Vidas íntimas",
+      "Diarios"
+    ],
+    "openingQuote": "«El rumor de los días idos es la única música que no cansa al alma cansada.»"
+  },
+  {
+    "id": "seeded-biografia-76",
+    "cat": "biografia",
+    "title": "Diarios de la sombra y la luz",
+    "author": "Marcos Delgado",
+    "genre": "Biografía Literaria",
+    "cover": "♟️",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 203,
+    "readTime": "4h 52min",
+    "chapters": 5,
+    "tagline": "Toda vida es una serie de cartas enviadas a destinatarios que ya han partido.",
+    "synopsis": "La bitácora reconstruida de un náufrago urbano que recorrió las calles de París y Buenos Aires coleccionando crepúsculos y palabras mudas, ofreciendo un testimonio único sobre la amistad, la melancolía y el arte de persistir.",
+    "themes": [
+      "Exilio",
+      "París",
+      "Brighton"
+    ],
+    "openingQuote": "«Los pasos sobre el hielo delgado son los únicos que dejan una huella imborrable.»"
+  },
+  {
+    "id": "seeded-biografia-77",
+    "cat": "biografia",
+    "title": "El exilio voluntario del alma",
+    "author": "Roberto Belano",
+    "genre": "Memorias",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 237,
+    "readTime": "5h 40min",
+    "chapters": 5,
+    "tagline": "Toda vida es una serie de cartas enviadas a destinatarios que ya han partido.",
+    "synopsis": "Un recorrido biográfico y epistolar de una sensibilidad abrumadora que ilumina el exilio voluntario de una creadora solitaria en el Brighton de entreguerras, rescatando sus diarios de convalecencia y sus diálogos silenciados con el oleaje.",
+    "themes": [
+      "París",
+      "Diarios",
+      "Exilio"
+    ],
+    "openingQuote": "«No escribo para ser recordada, sino para comprender por qué el agua siempre busca el mar.»"
+  },
+  {
+    "id": "seeded-biografia-78",
+    "cat": "biografia",
+    "title": "La viajera solitaria del Sena",
+    "author": "Arturo Borges",
+    "genre": "Correspondencia",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 269,
+    "readTime": "6h 25min",
+    "chapters": 5,
+    "tagline": "Toda vida es una serie de cartas enviadas a destinatarios que ya han partido.",
+    "synopsis": "Una semblanza poética sobre los años de juventud de una de las voces líricas más desgarradoras de la literatura hispana, analizando sus cuadernos íntimos y su tormentosa pero brillante relación con el lenguaje.",
+    "themes": [
+      "Brighton",
+      "Diarios",
+      "Vidas íntimas"
+    ],
+    "openingQuote": "«No escribo para ser recordada, sino para comprender por qué el agua siempre busca el mar.»"
+  },
+  {
+    "id": "seeded-biografia-79",
+    "cat": "biografia",
+    "title": "Las cartas que nunca envié",
+    "author": "Francisco Kafka",
+    "genre": "Biografía Literaria",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 305,
+    "readTime": "7h 16min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Un recorrido biográfico y epistolar de una sensibilidad abrumadora que ilumina el exilio voluntario de una creadora solitaria en el Brighton de entreguerras, rescatando sus diarios de convalecencia y sus diálogos silenciados con el oleaje.",
+    "themes": [
+      "Brighton",
+      "Diarios",
+      "Vidas íntimas"
+    ],
+    "openingQuote": "«El rumor de los días idos es la única música que no cansa al alma cansada.»"
+  },
+  {
+    "id": "seeded-biografia-80",
+    "cat": "biografia",
+    "title": "El rumor de los días idos",
+    "author": "Virginia Silva",
+    "genre": "Memorias",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 219,
+    "readTime": "5h 13min",
+    "chapters": 5,
+    "tagline": "Toda vida es una serie de cartas enviadas a destinatarios que ya han partido.",
+    "synopsis": "Un recorrido biográfico y epistolar de una sensibilidad abrumadora que ilumina el exilio voluntario de una creadora solitaria en el Brighton de entreguerras, rescatando sus diarios de convalecencia y sus diálogos silenciados con el oleaje.",
+    "themes": [
+      "Correspondencia",
+      "Brighton",
+      "Exilio"
+    ],
+    "openingQuote": "«El rumor de los días idos es la única música que no cansa al alma cansada.»"
+  },
+  {
+    "id": "seeded-biografia-81",
+    "cat": "biografia",
+    "title": "Retrato de un invierno en Brighton",
+    "author": "Arturo Borges",
+    "genre": "Memorias",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 261,
+    "readTime": "6h 13min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Una semblanza poética sobre los años de juventud de una de las voces líricas más desgarradoras de la literatura hispana, analizando sus cuadernos íntimos y su tormentosa pero brillante relación con el lenguaje.",
+    "themes": [
+      "Vidas íntimas",
+      "Brighton",
+      "Correspondencia"
+    ],
+    "openingQuote": "«El rumor de los días idos es la única música que no cansa al alma cansada.»"
+  },
+  {
+    "id": "seeded-biografia-82",
+    "cat": "biografia",
+    "title": "La infancia de los espejos",
+    "author": "Arturo Borges",
+    "genre": "Memorias",
+    "cover": "assets/cover_umbral.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 353,
+    "readTime": "8h 25min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Un recorrido biográfico y epistolar de una sensibilidad abrumadora que ilumina el exilio voluntario de una creadora solitaria en el Brighton de entreguerras, rescatando sus diarios de convalecencia y sus diálogos silenciados con el oleaje.",
+    "themes": [
+      "Exilio",
+      "Diarios",
+      "Brighton"
+    ],
+    "openingQuote": "«El rumor de los días idos es la única música que no cansa al alma cansada.»"
+  },
+  {
+    "id": "seeded-biografia-83",
+    "cat": "biografia",
+    "title": "La memoria habitada",
+    "author": "Roberto Belano",
+    "genre": "Correspondencia",
+    "cover": "🥀",
+    "badge": "",
+    "badgeText": "",
+    "pages": 320,
+    "readTime": "7h 39min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Una semblanza poética sobre los años de juventud de una de las voces líricas más desgarradoras de la literatura hispana, analizando sus cuadernos íntimos y su tormentosa pero brillante relación con el lenguaje.",
+    "themes": [
+      "Diarios",
+      "Exilio",
+      "Vidas íntimas"
+    ],
+    "openingQuote": "«Los pasos sobre el hielo delgado son los únicos que dejan una huella imborrable.»"
+  },
+  {
+    "id": "seeded-biografia-84",
+    "cat": "biografia",
+    "title": "El rastro de una voz herida",
+    "author": "Haru Murakami",
+    "genre": "Diarios de Viaje",
+    "cover": "🌙",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 291,
+    "readTime": "6h 58min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Una semblanza poética sobre los años de juventud de una de las voces líricas más desgarradoras de la literatura hispana, analizando sus cuadernos íntimos y su tormentosa pero brillante relación con el lenguaje.",
+    "themes": [
+      "Vidas íntimas",
+      "Diarios",
+      "Exilio"
+    ],
+    "openingQuote": "«El rumor de los días idos es la única música que no cansa al alma cansada.»"
+  },
+  {
+    "id": "seeded-biografia-85",
+    "cat": "biografia",
+    "title": "La bitácora del náufrago urbano",
+    "author": "Alejandra Pozzo",
+    "genre": "Correspondencia",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 250,
+    "readTime": "5h 60min",
+    "chapters": 5,
+    "tagline": "Toda vida es una serie de cartas enviadas a destinatarios que ya han partido.",
+    "synopsis": "Un recorrido biográfico y epistolar de una sensibilidad abrumadora que ilumina el exilio voluntario de una creadora solitaria en el Brighton de entreguerras, rescatando sus diarios de convalecencia y sus diálogos silenciados con el oleaje.",
+    "themes": [
+      "Brighton",
+      "Correspondencia",
+      "Vidas íntimas"
+    ],
+    "openingQuote": "«Los pasos sobre el hielo delgado son los únicos que dejan una huella imborrable.»"
+  },
+  {
+    "id": "seeded-biografia-86",
+    "cat": "biografia",
+    "title": "El diario de la convalecencia",
+    "author": "Virginia Silva",
+    "genre": "Biografía Literaria",
+    "cover": "🏺",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 248,
+    "readTime": "5h 57min",
+    "chapters": 5,
+    "tagline": "Toda vida es una serie de cartas enviadas a destinatarios que ya han partido.",
+    "synopsis": "Una semblanza poética sobre los años de juventud de una de las voces líricas más desgarradoras de la literatura hispana, analizando sus cuadernos íntimos y su tormentosa pero brillante relación con el lenguaje.",
+    "themes": [
+      "Diarios",
+      "Brighton",
+      "Correspondencia"
+    ],
+    "openingQuote": "«Los pasos sobre el hielo delgado son los únicos que dejan una huella imborrable.»"
+  },
+  {
+    "id": "seeded-biografia-87",
+    "cat": "biografia",
+    "title": "La sombra del cerezo en flor",
+    "author": "Haru Murakami",
+    "genre": "Biografía Literaria",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 174,
+    "readTime": "4h 9min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Un recorrido biográfico y epistolar de una sensibilidad abrumadora que ilumina el exilio voluntario de una creadora solitaria en el Brighton de entreguerras, rescatando sus diarios de convalecencia y sus diálogos silenciados con el oleaje.",
+    "themes": [
+      "Brighton",
+      "Correspondencia",
+      "Exilio"
+    ],
+    "openingQuote": "«Los pasos sobre el hielo delgado son los únicos que dejan una huella imborrable.»"
+  },
+  {
+    "id": "seeded-biografia-88",
+    "cat": "biografia",
+    "title": "El viento en las páginas sueltas",
+    "author": "José de Sousa",
+    "genre": "Correspondencia",
+    "cover": "🧭",
+    "badge": "",
+    "badgeText": "",
+    "pages": 271,
+    "readTime": "6h 28min",
+    "chapters": 5,
+    "tagline": "El exilio no es la pérdida de una geografía, sino la dolorosa ganancia de una memoria.",
+    "synopsis": "Una semblanza poética sobre los años de juventud de una de las voces líricas más desgarradoras de la literatura hispana, analizando sus cuadernos íntimos y su tormentosa pero brillante relación con el lenguaje.",
+    "themes": [
+      "Diarios",
+      "Vidas íntimas",
+      "Exilio"
+    ],
+    "openingQuote": "«El rumor de los días idos es la única música que no cansa al alma cansada.»"
+  },
+  {
+    "id": "seeded-biografia-89",
+    "cat": "biografia",
+    "title": "Los pasos sobre el hielo delgado",
+    "author": "Javier del Campo",
+    "genre": "Correspondencia",
+    "cover": "⏳",
+    "badge": "",
+    "badgeText": "",
+    "pages": 283,
+    "readTime": "6h 46min",
+    "chapters": 5,
+    "tagline": "Retrato íntimo de una escritora que hizo del invierno su estación de máxima luz.",
+    "synopsis": "Una semblanza poética sobre los años de juventud de una de las voces líricas más desgarradoras de la literatura hispana, analizando sus cuadernos íntimos y su tormentosa pero brillante relación con el lenguaje.",
+    "themes": [
+      "Correspondencia",
+      "París",
+      "Vidas íntimas"
+    ],
+    "openingQuote": "«Los pasos sobre el hielo delgado son los únicos que dejan una huella imborrable.»"
+  },
+  {
+    "id": "seeded-tecnica-90",
+    "cat": "tecnica",
+    "title": "El arquitecto de sombras y luces",
+    "author": "Arturo Borges",
+    "genre": "Técnica Narrativa",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 275,
+    "readTime": "6h 34min",
+    "chapters": 5,
+    "tagline": "La alquimia del adjetivo preciso no decora la frase, la ancla al suelo de la verdad.",
+    "synopsis": "Un análisis profundo del ritmo, la carpintería del suspenso existencial y la respiración de la prosa, estructurado como una partitura teórica indispensable para escritores en formación y lectores exigentes.",
+    "themes": [
+      "Estilo",
+      "Elipsis",
+      "Suspenso"
+    ],
+    "openingQuote": "«La elipsis no es una omisión perezosa, sino el motor que hace respirar a la novela.»"
+  },
+  {
+    "id": "seeded-tecnica-91",
+    "cat": "tecnica",
+    "title": "La carpintería del suspenso",
+    "author": "Haru Murakami",
+    "genre": "Técnica Narrativa",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 333,
+    "readTime": "7h 58min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un análisis profundo del ritmo, la carpintería del suspenso existencial y la respiración de la prosa, estructurado como una partitura teórica indispensable para escritores en formación y lectores exigentes.",
+    "themes": [
+      "Elipsis",
+      "Estilo",
+      "Taller literario"
+    ],
+    "openingQuote": "«La frase perfecta tiene el peso exacto de una piedra húmeda bajo la lluvia nocturna.»"
+  },
+  {
+    "id": "seeded-tecnica-92",
+    "cat": "tecnica",
+    "title": "La respiración de la frase",
+    "author": "Marcos Delgado",
+    "genre": "Técnica Narrativa",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 216,
+    "readTime": "5h 9min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un cuaderno de taller que reflexiona sobre la gramática de la atención y la alquimia verbal, enseñando a construir habitaciones literarias que el lector recordará con la nitidez de una casa de la infancia.",
+    "themes": [
+      "Estilo",
+      "Arquitectura",
+      "Taller literario"
+    ],
+    "openingQuote": "«Toda gran historia tiene una sombra invisible. Tu trabajo es hacer que el lector la siente.»"
+  },
+  {
+    "id": "seeded-tecnica-93",
+    "cat": "tecnica",
+    "title": "La física del espacio ficcional",
+    "author": "Ernesto Hemingway",
+    "genre": "Manual de Estilo",
+    "cover": "assets/cover_memoria.png",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 369,
+    "readTime": "8h 49min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un cuaderno de taller que reflexiona sobre la gramática de la atención y la alquimia verbal, enseñando a construir habitaciones literarias que el lector recordará con la nitidez de una casa de la infancia.",
+    "themes": [
+      "Arquitectura",
+      "Elipsis",
+      "Escritura"
+    ],
+    "openingQuote": "«Toda gran historia tiene una sombra invisible. Tu trabajo es hacer que el lector la siente.»"
+  },
+  {
+    "id": "seeded-tecnica-94",
+    "cat": "tecnica",
+    "title": "El ritmo de las palabras mudas",
+    "author": "Clara Márquez",
+    "genre": "Técnica Narrativa",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 182,
+    "readTime": "4h 21min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un análisis profundo del ritmo, la carpintería del suspenso existencial y la respiración de la prosa, estructurado como una partitura teórica indispensable para escritores en formación y lectores exigentes.",
+    "themes": [
+      "Elipsis",
+      "Arquitectura",
+      "Escritura"
+    ],
+    "openingQuote": "«La frase perfecta tiene el peso exacto de una piedra húmeda bajo la lluvia nocturna.»"
+  },
+  {
+    "id": "seeded-tecnica-95",
+    "cat": "tecnica",
+    "title": "La ingeniería del personaje ausente",
+    "author": "Hugo Silva",
+    "genre": "Técnica Narrativa",
+    "cover": "✒️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 317,
+    "readTime": "7h 34min",
+    "chapters": 5,
+    "tagline": "En la arquitectura de una gran novela, el silencio ocupa más espacio que la voz.",
+    "synopsis": "Un cuaderno de taller que reflexiona sobre la gramática de la atención y la alquimia verbal, enseñando a construir habitaciones literarias que el lector recordará con la nitidez de una casa de la infancia.",
+    "themes": [
+      "Arquitectura",
+      "Escritura",
+      "Elipsis"
+    ],
+    "openingQuote": "«La frase perfecta tiene el peso exacto de una piedra húmeda bajo la lluvia nocturna.»"
+  },
+  {
+    "id": "seeded-tecnica-96",
+    "cat": "tecnica",
+    "title": "El arte de la elipsis",
+    "author": "Arturo Borges",
+    "genre": "Crítica Teórica",
+    "cover": "🔮",
+    "badge": "",
+    "badgeText": "",
+    "pages": 216,
+    "readTime": "5h 9min",
+    "chapters": 5,
+    "tagline": "La alquimia del adjetivo preciso no decora la frase, la ancla al suelo de la verdad.",
+    "synopsis": "Un análisis profundo del ritmo, la carpintería del suspenso existencial y la respiración de la prosa, estructurado como una partitura teórica indispensable para escritores en formación y lectores exigentes.",
+    "themes": [
+      "Elipsis",
+      "Estilo",
+      "Taller literario"
+    ],
+    "openingQuote": "«La elipsis no es una omisión perezosa, sino el motor que hace respirar a la novela.»"
+  },
+  {
+    "id": "seeded-tecnica-97",
+    "cat": "tecnica",
+    "title": "La partitura del diálogo implícito",
+    "author": "Alejandra Pozzo",
+    "genre": "Técnica Narrativa",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 245,
+    "readTime": "5h 52min",
+    "chapters": 5,
+    "tagline": "La alquimia del adjetivo preciso no decora la frase, la ancla al suelo de la verdad.",
+    "synopsis": "Un manual de estilo e ingeniería literaria de una lucidez excepcional, donde se desvelan los mecanismos ocultos de la tensión narrativa, el uso arquitectónico de la luz en las escenas y el diseño de diálogos implícitos donde lo no dicho es lo que verdaderamente importa.",
+    "themes": [
+      "Estilo",
+      "Elipsis",
+      "Taller literario"
+    ],
+    "openingQuote": "«Toda gran historia tiene una sombra invisible. Tu trabajo es hacer que el lector la siente.»"
+  },
+  {
+    "id": "seeded-tecnica-98",
+    "cat": "tecnica",
+    "title": "La alquimia del adjetivo preciso",
+    "author": "Virginia Silva",
+    "genre": "Crítica Teórica",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 379,
+    "readTime": "9h 1min",
+    "chapters": 5,
+    "tagline": "En la arquitectura de una gran novela, el silencio ocupa más espacio que la voz.",
+    "synopsis": "Un manual de estilo e ingeniería literaria de una lucidez excepcional, donde se desvelan los mecanismos ocultos de la tensión narrativa, el uso arquitectónico de la luz en las escenas y el diseño de diálogos implícitos donde lo no dicho es lo que verdaderamente importa.",
+    "themes": [
+      "Escritura",
+      "Arquitectura",
+      "Taller literario"
+    ],
+    "openingQuote": "«La frase perfecta tiene el peso exacto de una piedra húmeda bajo la lluvia nocturna.»"
+  },
+  {
+    "id": "seeded-tecnica-99",
+    "cat": "tecnica",
+    "title": "La estructura invisible de la novela",
+    "author": "Isabel Noriega",
+    "genre": "Crítica Teórica",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "new",
+    "badgeText": "Nuevo",
+    "pages": 351,
+    "readTime": "8h 22min",
+    "chapters": 5,
+    "tagline": "La alquimia del adjetivo preciso no decora la frase, la ancla al suelo de la verdad.",
+    "synopsis": "Un cuaderno de taller que reflexiona sobre la gramática de la atención y la alquimia verbal, enseñando a construir habitaciones literarias que el lector recordará con la nitidez de una casa de la infancia.",
+    "themes": [
+      "Escritura",
+      "Arquitectura",
+      "Suspenso"
+    ],
+    "openingQuote": "«La elipsis no es una omisión perezosa, sino el motor que hace respirar a la novela.»"
+  },
+  {
+    "id": "seeded-tecnica-100",
+    "cat": "tecnica",
+    "title": "La carpintería del final perfecto",
+    "author": "Julio Cortázar-Ríos",
+    "genre": "Técnica Narrativa",
+    "cover": "🌙",
+    "badge": "",
+    "badgeText": "",
+    "pages": 329,
+    "readTime": "7h 52min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un manual de estilo e ingeniería literaria de una lucidez excepcional, donde se desvelan los mecanismos ocultos de la tensión narrativa, el uso arquitectónico de la luz en las escenas y el diseño de diálogos implícitos donde lo no dicho es lo que verdaderamente importa.",
+    "themes": [
+      "Escritura",
+      "Estilo",
+      "Arquitectura"
+    ],
+    "openingQuote": "«La frase perfecta tiene el peso exacto de una piedra húmeda bajo la lluvia nocturna.»"
+  },
+  {
+    "id": "seeded-tecnica-101",
+    "cat": "tecnica",
+    "title": "El arte del subtexto poético",
+    "author": "Arturo Borges",
+    "genre": "Técnica Narrativa",
+    "cover": "✒️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 200,
+    "readTime": "4h 48min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un análisis profundo del ritmo, la carpintería del suspenso existencial y la respiración de la prosa, estructurado como una partitura teórica indispensable para escritores en formación y lectores exigentes.",
+    "themes": [
+      "Escritura",
+      "Estilo",
+      "Taller literario"
+    ],
+    "openingQuote": "«La frase perfecta tiene el peso exacto de una piedra húmeda bajo la lluvia nocturna.»"
+  },
+  {
+    "id": "seeded-tecnica-102",
+    "cat": "tecnica",
+    "title": "La ingeniería del ritmo verbal",
+    "author": "Roberto Belano",
+    "genre": "Manual de Estilo",
+    "cover": "🗝️",
+    "badge": "excl",
+    "badgeText": "Exclusivo",
+    "pages": 215,
+    "readTime": "5h 7min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un manual de estilo e ingeniería literaria de una lucidez excepcional, donde se desvelan los mecanismos ocultos de la tensión narrativa, el uso arquitectónico de la luz en las escenas y el diseño de diálogos implícitos donde lo no dicho es lo que verdaderamente importa.",
+    "themes": [
+      "Estilo",
+      "Elipsis",
+      "Arquitectura"
+    ],
+    "openingQuote": "«Toda gran historia tiene una sombra invisible. Tu trabajo es hacer que el lector la siente.»"
+  },
+  {
+    "id": "seeded-tecnica-103",
+    "cat": "tecnica",
+    "title": "La física del diálogo implícito",
+    "author": "Claudia Iriarte",
+    "genre": "Manual de Estilo",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 278,
+    "readTime": "6h 39min",
+    "chapters": 5,
+    "tagline": "En la arquitectura de una gran novela, el silencio ocupa más espacio que la voz.",
+    "synopsis": "Un manual de estilo e ingeniería literaria de una lucidez excepcional, donde se desvelan los mecanismos ocultos de la tensión narrativa, el uso arquitectónico de la luz en las escenas y el diseño de diálogos implícitos donde lo no dicho es lo que verdaderamente importa.",
+    "themes": [
+      "Escritura",
+      "Arquitectura",
+      "Suspenso"
+    ],
+    "openingQuote": "«Toda gran historia tiene una sombra invisible. Tu trabajo es hacer que el lector la siente.»"
+  },
+  {
+    "id": "seeded-tecnica-104",
+    "cat": "tecnica",
+    "title": "La partitura de la novela moderna",
+    "author": "Clara Márquez",
+    "genre": "Crítica Teórica",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 245,
+    "readTime": "5h 52min",
+    "chapters": 5,
+    "tagline": "El escritor no inventa personajes; erige muros y proyecta sombras para que el lector los habite.",
+    "synopsis": "Un cuaderno de taller que reflexiona sobre la gramática de la atención y la alquimia verbal, enseñando a construir habitaciones literarias que el lector recordará con la nitidez de una casa de la infancia.",
+    "themes": [
+      "Suspenso",
+      "Taller literario",
+      "Estilo"
+    ],
+    "openingQuote": "«Toda gran historia tiene una sombra invisible. Tu trabajo es hacer que el lector la siente.»"
+  },
+  {
+    "id": "seeded-comedia-1",
+    "cat": "comedia",
+    "title": "La rebelión de los paraguas extraviados",
+    "author": "Virginia Silva",
+    "genre": "Comedia Absurda",
+    "cover": "⏳",
+    "badge": "new",
+    "badgeText": "Humor",
+    "pages": 184,
+    "readTime": "4h 15min",
+    "tagline": "¿A dónde van los paraguas cuando llueve?",
+    "synopsis": "En una pintoresca ciudad costera, los paraguas deciden ponerse en huelga y marcharse al desierto. Una divertida y delirante aventura satírica sobre la obstinación de los objetos y la fragilidad del control humano.",
+    "themes": [
+      "Humor",
+      "Sátira",
+      "Absurdo"
+    ],
+    "openingQuote": "«Los paraguas tienen alma, y es un alma sumamente mojada.»",
+    "outline": {
+      "title": "La rebelión de los paraguas extraviados",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-comedia-2",
+    "cat": "comedia",
+    "title": "Manual del perfecto impostor literario",
+    "author": "Julio Cortázar-Ríos",
+    "genre": "Sátira Literaria",
+    "cover": "🐱",
+    "badge": "new",
+    "badgeText": "Sátira",
+    "pages": 195,
+    "readTime": "4h 38min",
+    "tagline": "El talento es opcional; el prestigio es una pose.",
+    "synopsis": "Un aspirante a escritor que jamás ha leído un libro se convierte en la revelación literaria del siglo mediante el simple arte del suspiro y la mirada ausente en los cócteles literarios.",
+    "themes": [
+      "Sátira",
+      "Literatura",
+      "Comedia"
+    ],
+    "openingQuote": "«Escribir es difícil, pero parecer que escribes es un arte de tiempo completo.»",
+    "outline": {
+      "title": "Manual del perfecto impostor literario",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-comedia-3",
+    "cat": "comedia",
+    "title": "La insólita gravedad del señor Péndulo",
+    "author": "Haru Murakami",
+    "genre": "Comedia Surrealista",
+    "cover": "🌳",
+    "badge": "",
+    "badgeText": "",
+    "pages": 210,
+    "readTime": "5h 00min",
+    "tagline": "Flotar es una cuestión de mala memoria.",
+    "synopsis": "Un contable jubilado descubre que su cuerpo pierde peso físico proporcionalmente a su nivel de aburrimiento. Para no salir volando por la ventana, se ve obligado a buscar las situaciones más absurdas y caóticas de su vecindario.",
+    "themes": [
+      "Surrealismo",
+      "Humor",
+      "Absurdo"
+    ],
+    "openingQuote": "«La gravedad es solo un hábito del que cuesta desaprender.»",
+    "outline": {
+      "title": "La insólita gravedad del señor Péndulo",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-comedia-4",
+    "cat": "comedia",
+    "title": "Tratado sobre la siesta perfecta",
+    "author": "Arturo Borges",
+    "genre": "Ensayo Satírico",
+    "cover": "🛡️",
+    "badge": "",
+    "badgeText": "",
+    "pages": 150,
+    "readTime": "3h 30min",
+    "tagline": "Dormir en la tarde es un arte marcial.",
+    "synopsis": "Una guía cómica y exhaustiva que clasifica las siestas por su duración, ángulo del sol y el tipo de pijama, elevando el descanso vespertino a la categoría de ciencia exacta.",
+    "themes": [
+      "Humor",
+      "Ensayo",
+      "Filosofía"
+    ],
+    "openingQuote": "«La siesta de más de veinte minutos no es un descanso, es un viaje de ida y vuelta al inframundo.»",
+    "outline": {
+      "title": "Tratado sobre la siesta perfecta",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-comedia-5",
+    "cat": "comedia",
+    "title": "El club de los malos traductores",
+    "author": "Marcos Delgado",
+    "genre": "Comedia de Enredos",
+    "cover": "🔑",
+    "badge": "",
+    "badgeText": "",
+    "pages": 220,
+    "readTime": "5h 15min",
+    "tagline": "Traducir es traicionar, pero con estilo.",
+    "synopsis": "Tres lingüistas rebeldes deciden sabotear las conferencias internacionales traduciendo las metáforas diplomáticas con modismos extravagantes, provocando un desopilante caos geopolítico.",
+    "themes": [
+      "Enredos",
+      "Humor",
+      "Lenguaje"
+    ],
+    "openingQuote": "«Cuando el embajador dijo que el acuerdo estaba cocinado, yo traduje que íbamos a comer pollo.»",
+    "outline": {
+      "title": "El club de los malos traductores",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-novela-1",
+    "cat": "novela",
+    "title": "La sombra del cerezo en otoño",
+    "author": "Clara Márquez",
+    "genre": "Novela Histórica",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "new",
+    "badgeText": "Histórica",
+    "pages": 312,
+    "readTime": "7h 25min",
+    "tagline": "Las flores caen, pero las promesas echan raíces.",
+    "synopsis": "En el Japón rural del siglo XIX, una joven tejedora de seda guarda un manuscrito prohibido en el forro de un quimono de bodas, un secreto que viajará a través de tres generaciones de mujeres.",
+    "themes": [
+      "Japón",
+      "Historia",
+      "Legado"
+    ],
+    "openingQuote": "«El viento de otoño no borra el aroma de las viejas promesas.»",
+    "outline": {
+      "title": "La sombra del cerezo en otoño",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-novela-2",
+    "cat": "novela",
+    "title": "Donde el viento da la vuelta",
+    "author": "Roberto Belano",
+    "genre": "Novela de Formación",
+    "cover": "assets/cover_umbral.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 280,
+    "readTime": "6h 40min",
+    "tagline": "El verdadero destino de un viaje nunca está en los mapas.",
+    "synopsis": "Un joven cartógrafo viaja a la Patagonia en busca de una isla que solo aparece cuando la marea está en su punto más bajo, encontrando en su lugar los vestigios de una comunidad utópica perdida.",
+    "themes": [
+      "Patagonia",
+      "Viaje",
+      "Utopía"
+    ],
+    "openingQuote": "«Cartografiar es el intento de poner límites a lo que no tiene fin.»",
+    "outline": {
+      "title": "Donde el viento da la vuelta",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-novela-3",
+    "cat": "novela",
+    "title": "El rumor de las piedras tibias",
+    "author": "Isabel Noriega",
+    "genre": "Realismo Mágico",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 340,
+    "readTime": "8h 05min",
+    "tagline": "Las casas no se heredan; se aprenden sus murmullos.",
+    "synopsis": "Al regresar a la antigua hacienda de sus antepasados en la serranía andina, Elena descubre que las piedras de los cimientos conservan las voces y las risas de todas las familias que las habitaron.",
+    "themes": [
+      "Realismo Mágico",
+      "Familia",
+      "Andes"
+    ],
+    "openingQuote": "«La piedra es fría solo para el que no sabe escuchar su historia.»",
+    "outline": {
+      "title": "El rumor de las piedras tibias",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-novela-4",
+    "cat": "novela",
+    "title": "Los cuadernos de la luz oblicua",
+    "author": "Virginia Silva",
+    "genre": "Novela Psicológica",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 265,
+    "readTime": "6h 18min",
+    "tagline": "La luz no ilumina el pasado, solo proyecta sombras más largas.",
+    "synopsis": "Una fotógrafa retirada decide revisar sus archivos de negativos descartados para descubrir un detalle oculto en el fondo de sus imágenes que reescribirá la historia de su propia vida.",
+    "themes": [
+      "Fotografía",
+      "Secretos",
+      "Identidad"
+    ],
+    "openingQuote": "«El revelador químico muestra lo que el ojo prefirió ignorar.»",
+    "outline": {
+      "title": "Los cuadernos de la luz oblicua",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-novela-5",
+    "cat": "novela",
+    "title": "La última estación de Brighton",
+    "author": "Claudia Iriarte",
+    "genre": "Novela Romántica",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 298,
+    "readTime": "7h 05min",
+    "tagline": "El mar siempre devuelve lo que la memoria decide callar.",
+    "synopsis": "Una historia conmovedora sobre el reencuentro de dos almas que se amaron en secreto durante el invierno de 1968 en un balneario inglés, hilado a través de cuadernos de notas y diarios compartidos.",
+    "themes": [
+      "Amor",
+      "Reencuentro",
+      "Brighton"
+    ],
+    "openingQuote": "«Hay personas que son estaciones de tren; siempre volvemos a ellas para partir de nuevo.»",
+    "outline": {
+      "title": "La última estación de Brighton",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-thriller-1",
+    "cat": "thriller",
+    "title": "El enigma del relojero de Praga",
+    "author": "Francisco Kafka",
+    "genre": "Suspenso Existencial",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "new",
+    "badgeText": "Intriga",
+    "pages": 320,
+    "readTime": "7h 35min",
+    "tagline": "Cuando la aguja se detenga, el imperio caerá.",
+    "synopsis": "Un inspector es asignado para investigar la muerte del maestro relojero de la corte imperial. El único indicio es un plano indescifrable que esconde el mecanismo de una bomba de relojería social.",
+    "themes": [
+      "Praga",
+      "Intriga",
+      "Tiempo"
+    ],
+    "openingQuote": "«El tiempo es un engranaje que muerde sin dientes.»",
+    "outline": {
+      "title": "El enigma del relojero de Praga",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-thriller-2",
+    "cat": "thriller",
+    "title": "Sombras en la red de seda",
+    "author": "Marcos Delgado",
+    "genre": "Tecno-Thriller",
+    "cover": "assets/cover_umbral.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 305,
+    "readTime": "7h 15min",
+    "tagline": "Tu secreto más oscuro está codificado en el código fuente.",
+    "synopsis": "Una experta en ciberseguridad descubre una red criminal que utiliza manuscritos literarios digitales encriptados para transmitir mensajes secretos entre las altas esferas del poder financiero.",
+    "themes": [
+      "Ciberseguridad",
+      "Intriga",
+      "Tecnología"
+    ],
+    "openingQuote": "«El cifrado más seguro es el que se oculta detrás de la poesía.»",
+    "outline": {
+      "title": "Sombras en la red de seda",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-thriller-3",
+    "cat": "thriller",
+    "title": "La novena sinfonía de la arena",
+    "author": "Arturo Borges",
+    "genre": "Thriller Arqueológico",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 350,
+    "readTime": "8h 20min",
+    "tagline": "El desierto no esconde tesoros; esconde verdades letales.",
+    "synopsis": "Una arqueóloga encuentra un cilindro de arcilla sumerio en las ruinas de Nínive que contiene partituras capaces de alterar la frecuencia cerebral de quien las escucha, desatando una mortal persecución.",
+    "themes": [
+      "Arqueología",
+      "Música",
+      "Poder"
+    ],
+    "openingQuote": "«El desierto tiene oídos, y la arena canta melodías prohibidas desde el inicio del mundo.»",
+    "outline": {
+      "title": "La novena sinfonía de la arena",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-thriller-4",
+    "cat": "thriller",
+    "title": "El manuscrito del conspirador",
+    "author": "Julio Cortázar-Ríos",
+    "genre": "Thriller Intelectual",
+    "cover": "assets/cover_memoria.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 288,
+    "readTime": "6h 50min",
+    "tagline": "El lector es el cómplice ideal.",
+    "synopsis": "Un profesor de semiología descubre que las novelas de misterio de un autor anónimo son en realidad instrucciones precisas para cometer atentados de gran envergadura a nivel global.",
+    "themes": [
+      "Semiología",
+      "Conspiración",
+      "Misterio"
+    ],
+    "openingQuote": "«Leer es un acto peligroso; descifrar es un acto mortal.»",
+    "outline": {
+      "title": "El manuscrito del conspirador",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-thriller-5",
+    "cat": "thriller",
+    "title": "La conspiración del silencio cóncavo",
+    "author": "Virginia Silva",
+    "genre": "Thriller Psicológico",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 315,
+    "readTime": "7h 30min",
+    "tagline": "El peor monstruo es el que ves en el espejo.",
+    "synopsis": "Una psiquiatra forense en Boston se enfrenta a un asesino en serie que afirma no matar personas, sino 'borrar sus reflejos del mundo' mediante una técnica de manipulación mental extrema.",
+    "themes": [
+      "Psiquiatría",
+      "Boston",
+      "Espejos"
+    ],
+    "openingQuote": "«El espejo no miente, simplemente calla la verdad que no queremos ver.»",
+    "outline": {
+      "title": "La conspiración del silencio cóncavo",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-neurociencia-1",
+    "cat": "neurociencia",
+    "title": "La sinfonía de las neuronas espejo",
+    "author": "Virginia Silva",
+    "genre": "Neurociencia Divulgativa",
+    "cover": "🌙",
+    "badge": "new",
+    "badgeText": "Ciencia",
+    "pages": 224,
+    "readTime": "5h 20min",
+    "tagline": "Sentir lo que el otro siente es un arte cerebral.",
+    "synopsis": "Una fascinante exploración de cómo las neuronas espejo forman la base de la empatía, el lenguaje, el arte y el aprendizaje social, explicando cómo el cerebro humano está biológicamente diseñado para conectar con los demás.",
+    "themes": [
+      "Cerebro",
+      "Empatía",
+      "Ciencia"
+    ],
+    "openingQuote": "«No somos islas; somos redes de neuronas que se reflejan unas a otras.»",
+    "outline": {
+      "title": "La sinfonía de las neuronas espejo",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-neurociencia-2",
+    "cat": "neurociencia",
+    "title": "El cerebro del lector",
+    "author": "Clara Márquez",
+    "genre": "Neurociencia Cognitiva",
+    "cover": "⛵",
+    "badge": "",
+    "badgeText": "",
+    "pages": 242,
+    "readTime": "5h 45min",
+    "tagline": "Cómo la lectura de novelas modifica tu cableado neuronal.",
+    "synopsis": "Un viaje a través de los escaneos cerebrales que revela los asombrosos cambios anatómicos y funcionales que ocurren en nuestro lóbulo temporal cuando nos sumergimos en una historia literaria profunda.",
+    "themes": [
+      "Cerebro",
+      "Lectura",
+      "Cognición"
+    ],
+    "openingQuote": "«El cerebro no fue diseñado para leer, pero la lectura es su mejor entrenamiento.»",
+    "outline": {
+      "title": "El cerebro del lector",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-neurociencia-3",
+    "cat": "neurociencia",
+    "title": "Los laberintos de la memoria plástica",
+    "author": "Virginia Silva",
+    "genre": "Neurociencia y Aprendizaje",
+    "cover": "🐾",
+    "badge": "",
+    "badgeText": "",
+    "pages": 258,
+    "readTime": "6h 10min",
+    "tagline": "No somos el pasado que recordamos, sino el cerebro que lo esculpe.",
+    "synopsis": "Una reveladora obra sobre la neuroplasticidad y el hipocampo, demostrando cómo podemos reentrenar nuestros circuitos neuronales para superar traumas y moldear nuestra capacidad de recordar.",
+    "themes": [
+      "Memoria",
+      "Plasticidad",
+      "Hipocampo"
+    ],
+    "openingQuote": "«El cerebro no es de piedra; es de cera que aprende y de fuego que recuerda.»",
+    "outline": {
+      "title": "Los laberintos de la memoria plástica",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-neurociencia-4",
+    "cat": "neurociencia",
+    "title": "La física de la atención consciente",
+    "author": "Emilio Vargas",
+    "genre": "Ensayos sobre el Cerebro",
+    "cover": "⏳",
+    "badge": "",
+    "badgeText": "",
+    "pages": 212,
+    "readTime": "5h 05min",
+    "tagline": "Prestar atención es el mayor recurso metabólico del ser humano.",
+    "synopsis": "Un análisis interdisciplinar sobre cómo el cerebro gestiona el enfoque mental en la era de la distracción digital, y la neurobiología detrás del silencio y la meditación profunda.",
+    "themes": [
+      "Atención",
+      "Enfoque",
+      "Neurobiología"
+    ],
+    "openingQuote": "«La atención es la moneda más valiosa de la economía mental.»",
+    "outline": {
+      "title": "La física de la atención consciente",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-neurociencia-5",
+    "cat": "neurociencia",
+    "title": "El misterio del sueño REM",
+    "author": "Claudia Iriarte",
+    "genre": "Neurobiología del Sueño",
+    "cover": "⭐",
+    "badge": "",
+    "badgeText": "",
+    "pages": 230,
+    "readTime": "5h 30min",
+    "tagline": "El cerebro despierto por dentro.",
+    "synopsis": "Una investigación rigurosa sobre los mecanismos neuronales que producen el sueño y las alucinaciones lúcidas, explicando cómo el cerebro limpia sus toxinas emocionales mientras el cuerpo duerme.",
+    "themes": [
+      "Sueño",
+      "REM",
+      "Fisiología"
+    ],
+    "openingQuote": "«Soñar es el ensayo general de la cordura del día siguiente.»",
+    "outline": {
+      "title": "El misterio del sueño REM",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-finanzas-1",
+    "cat": "finanzas",
+    "title": "La alquimia del interés compuesto",
+    "author": "Arturo Borges",
+    "genre": "Finanzas Personales",
+    "cover": "⛵",
+    "badge": "new",
+    "badgeText": "Finanzas",
+    "pages": 196,
+    "readTime": "4h 40min",
+    "tagline": "La paciencia es la mayor palanca de riqueza.",
+    "synopsis": "Una guía conceptual sobre el valor del tiempo aplicado al dinero, explicando de forma matemática y filosófica cómo los pequeños hábitos financieros diarios se convierten en grandes imperios a lo largo de los años.",
+    "themes": [
+      "Finanzas",
+      "Tiempo",
+      "Riqueza"
+    ],
+    "openingQuote": "«El interés compuesto es la octava maravilla del mundo físico y financiero.»",
+    "outline": {
+      "title": "La alquimia del interés compuesto",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-finanzas-2",
+    "cat": "finanzas",
+    "title": "La psicología del dinero y el deseo",
+    "author": "Emilio Vargas",
+    "genre": "Economía Conductual",
+    "cover": "🔑",
+    "badge": "",
+    "badgeText": "",
+    "pages": 215,
+    "readTime": "5h 08min",
+    "tagline": "Tus decisiones de gasto son solo reflejos de tus carencias emocionales.",
+    "synopsis": "Un profundo estudio conductual que examina por qué compramos lo que no necesitamos con dinero que no tenemos para impresionar a personas que no nos importan, y cómo sanar nuestra relación mental con el dinero.",
+    "themes": [
+      "Dinero",
+      "Psicología",
+      "Deseo"
+    ],
+    "openingQuote": "«El dinero suele ser caro cuando lo pagamos con nuestra propia paz mental.»",
+    "outline": {
+      "title": "La psicología del dinero y el deseo",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-finanzas-3",
+    "cat": "finanzas",
+    "title": "El arquitecto de la libertad financiera",
+    "author": "Roberto Belano",
+    "genre": "Educación Financiera",
+    "cover": "assets/cover_arquitecto.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 250,
+    "readTime": "5h 55min",
+    "tagline": "Trabajar por dinero es una trampa; haz que el dinero sea tu obrero.",
+    "synopsis": "Un manifiesto práctico para diseñar fuentes de ingresos pasivos, dominar el apalancamiento estratégico y construir un portafolio de activos que sostenga un estilo de vida de libertad e independencia absoluta.",
+    "themes": [
+      "Libertad",
+      "Activos",
+      "Ingresos"
+    ],
+    "openingQuote": "«La libertad financiera no es tener mucho; es no tener que pedir permiso para disponer de tu tiempo.»",
+    "outline": {
+      "title": "El arquitecto de la libertad financiera",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-finanzas-4",
+    "cat": "finanzas",
+    "title": "Mentalidad de abundancia en tiempos de escasez",
+    "author": "Clara Márquez",
+    "genre": "Filosofía del Éxito",
+    "cover": "assets/cover_contemplacion.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 210,
+    "readTime": "5h 00min",
+    "tagline": "La riqueza no se acumula; se proyecta desde la mente.",
+    "synopsis": "Una obra inspiradora que analiza los patrones mentales de los grandes empresarios de la historia, enseñando a reconfigurar los pensamientos de escasez y miedo para detectar oportunidades donde otros ven crisis.",
+    "themes": [
+      "Mentalidad",
+      "Éxito",
+      "Abundancia"
+    ],
+    "openingQuote": "«La escasez es una creencia; la abundancia es una decisión atencional.»",
+    "outline": {
+      "title": "Mentalidad de abundancia en tiempos de escasez",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "seeded-finanzas-5",
+    "cat": "finanzas",
+    "title": "El código del valor intrínseco",
+    "author": "Marcos Delgado",
+    "genre": "Estrategia Financiera",
+    "cover": "assets/cover_umbral.png",
+    "badge": "",
+    "badgeText": "",
+    "pages": 235,
+    "readTime": "5h 35min",
+    "tagline": "El precio es lo que pagas; el valor es lo que obtienes.",
+    "synopsis": "Un manual sobre cómo evaluar el valor real de los negocios, los activos digitales y nuestro propio tiempo laboral, permitiéndonos tomar decisiones racionales de inversión libres de la especulación del mercado.",
+    "themes": [
+      "Valor",
+      "Precio",
+      "Inversión"
+    ],
+    "openingQuote": "«Invertir sin entender el valor es como apostar a las cartas con los ojos vendados.»",
+    "outline": {
+      "title": "El código del valor intrínseco",
+      "chapters": [
+        {
+          "title": "1. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 1"
+        },
+        {
+          "title": "2. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 2"
+        },
+        {
+          "title": "3. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 3"
+        },
+        {
+          "title": "4. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 4"
+        },
+        {
+          "title": "5. Capítulo",
+          "arc": "Arco de desarrollo del capítulo 5"
+        }
+      ]
+    }
+  }
+]

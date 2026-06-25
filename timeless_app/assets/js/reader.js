@@ -19,6 +19,210 @@ const state = {
   highlights: []
 };
 
+// ── INDEXEDDB OFFLINE STORAGE & QUEUE ─────────────────────────────────
+function openOfflineDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('timeless_offline_db', 2);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('offline_books')) {
+        db.createObjectStore('offline_books', { keyPath: 'bookId' });
+      }
+      if (!db.objectStoreNames.contains('offline_keys')) {
+        db.createObjectStore('offline_keys', { keyPath: 'bookId' });
+      }
+      if (!db.objectStoreNames.contains('telemetry_queue')) {
+        db.createObjectStore('telemetry_queue', { autoIncrement: true });
+      }
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+function getBookOffline(bookId) {
+  return openOfflineDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(['offline_books', 'offline_keys'], 'readonly');
+      const bookReq = tx.objectStore('offline_books').get(bookId);
+      const keyReq = tx.objectStore('offline_keys').get(bookId);
+      tx.oncomplete = () => {
+        if (bookReq.result && keyReq.result) {
+          if (Date.now() > keyReq.result.expiresAt) {
+            reject(new Error("La licencia offline de esta obra ha caducado. Conéctate a internet para renovarla."));
+          } else {
+            resolve({ book: bookReq.result.data, license: keyReq.result.license });
+          }
+        } else {
+          resolve(null);
+        }
+      };
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  });
+}
+
+function queueTelemetryOffline(payload) {
+  return openOfflineDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('telemetry_queue', 'readwrite');
+      tx.objectStore('telemetry_queue').add({ ...payload, timestamp: Date.now() });
+      tx.oncomplete = () => {
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+          navigator.serviceWorker.ready.then(reg => {
+            return reg.sync.register('sync-telemetry');
+          }).then(() => {
+            console.log("  ✦ [PWA] Background Sync registrado con éxito ('sync-telemetry').");
+          }).catch(err => {
+            console.warn("  ⚠ [PWA] No se pudo registrar Background Sync:", err.message);
+          });
+        }
+        resolve();
+      };
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  });
+}
+
+async function syncOfflineTelemetry() {
+  if (!navigator.onLine || !auth.currentUser) return;
+  try {
+    const db = await openOfflineDB();
+    const tx = db.transaction('telemetry_queue', 'readonly');
+    const store = tx.objectStore('telemetry_queue');
+    const events = await new Promise((resolve, reject) => {
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+
+    if (!events || events.length === 0) return;
+    
+    console.log(`  ✦ [Telemetry Sync] Detectada conexión. Sincronizando ${events.length} eventos offline en lote...`);
+    const token = await auth.currentUser.getIdToken();
+    
+    const res = await fetch('/api/telemetry/bulk', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ events })
+    });
+    
+    if (res.ok) {
+      const clearTx = db.transaction('telemetry_queue', 'readwrite');
+      clearTx.objectStore('telemetry_queue').clear();
+      console.log("  ✦ [Telemetry Sync] Sincronización masiva offline completada con éxito.");
+    } else {
+      console.warn("  ⚠ [Telemetry Sync] Error en el servidor al sincronizar lote:", res.statusText);
+    }
+  } catch(e) {
+    console.warn("Error al sincronizar telemetría offline:", e);
+  }
+}
+
+window.addEventListener('online', syncOfflineTelemetry);
+
+// ---- TELEMETRY & DRM CONFIG (Pilar 1 & 2) ----
+let readingStartTime = Date.now();
+let telemetryInterval = null;
+
+async function decryptText(encryptedHex, ivHex) {
+  const password = "timeless_secret_key_32_bytes_long_!!!";
+  const encoder = new TextEncoder();
+  const passwordBuffer = encoder.encode(password);
+  
+  const hash = await window.crypto.subtle.digest('SHA-256', passwordBuffer);
+  const key = await window.crypto.subtle.importKey(
+    'raw',
+    hash,
+    { name: 'AES-CBC' },
+    false,
+    ['decrypt']
+  );
+  
+  const iv = new Uint8Array(ivHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+  const ciphertext = new Uint8Array(encryptedHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+  
+  const decryptedBuffer = await window.crypto.subtle.decrypt(
+    { name: 'AES-CBC', iv: iv },
+    key,
+    ciphertext
+  );
+  
+  const decoder = new TextDecoder();
+  return decoder.decode(decryptedBuffer);
+}
+
+function startTelemetry() {
+  readingStartTime = Date.now();
+  if (telemetryInterval) clearInterval(telemetryInterval);
+  telemetryInterval = setInterval(() => {
+    sendTelemetryPacket();
+  }, 25000);
+  
+  syncOfflineTelemetry();
+}
+
+async function sendTelemetryPacket() {
+  if (!state.book || !auth.currentUser) return;
+  
+  const now = Date.now();
+  const timeSpent = Math.round((now - readingStartTime) / 1000);
+  if (timeSpent <= 0) return;
+  readingStartTime = now;
+  
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const scrollDepth = scrollHeight > 0 ? (window.scrollY / scrollHeight) : 0;
+  
+  const payload = {
+    bookId: state.bookId,
+    chapterIndex: state.currentChapter,
+    timeSpent: timeSpent,
+    scrollDepth: parseFloat(scrollDepth.toFixed(3)),
+    exitPoint: `scroll_${Math.round(scrollDepth * 100)}%`
+  };
+  
+  if (!navigator.onLine) {
+    try {
+      await queueTelemetryOffline(payload);
+      console.log("  ✦ [Telemetry Offline] Evento encolado localmente en IndexedDB.");
+    } catch(e) {
+      console.warn("No se pudo encolar telemetría offline:", e);
+    }
+    return;
+  }
+  
+  try {
+    const token = await auth.currentUser.getIdToken();
+    fetch('/api/telemetry', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload),
+      keepalive: true
+    });
+  } catch (e) {
+    console.warn("  ⚠ [Telemetry] Error al enviar ping:", e.message);
+  }
+}
+
+// Bloqueos de Copia DRM activos
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
+    e.preventDefault();
+  }
+});
+
+window.addEventListener('beforeunload', () => {
+  sendTelemetryPacket();
+});
+
 // ── Data Loading ─────────────────────────────────────────────────────────────
 async function loadBook() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -55,16 +259,35 @@ async function loadBook() {
     }
 
     let data = null;
-    const sessionActiveBook = sessionStorage.getItem('tl_active_book');
-    if (sessionActiveBook) {
-      try {
-        const parsedBook = JSON.parse(sessionActiveBook);
-        if (parsedBook.id === state.bookId) {
-          data = parsedBook;
-          console.log("  ✦ [Reader] Obra cargada al instante desde sesión local.");
+    let isOfflineCopy = false;
+
+    // Intentar cargar desde IndexedDB primero (Pilar 1 - Offline)
+    try {
+      const offlineData = await getBookOffline(state.bookId);
+      if (offlineData) {
+        data = offlineData.book;
+        isOfflineCopy = true;
+        console.log("  ✦ [Reader] Obra cargada con éxito desde IndexedDB (Lectura Offline).");
+      }
+    } catch (offlineErr) {
+      console.warn("  ⚠ [Reader] Licencia offline caducada o error de lectura:", offlineErr.message);
+      if (!navigator.onLine) {
+        throw offlineErr; // si está offline, arrojamos el error de expiración de licencia
+      }
+    }
+
+    if (!data) {
+      const sessionActiveBook = sessionStorage.getItem('tl_active_book');
+      if (sessionActiveBook) {
+        try {
+          const parsedBook = JSON.parse(sessionActiveBook);
+          if (parsedBook.id === state.bookId) {
+            data = parsedBook;
+            console.log("  ✦ [Reader] Obra cargada al instante desde sesión local.");
+          }
+        } catch (err) {
+          console.warn("Error leyendo obra activa de sesión:", err);
         }
-      } catch (err) {
-        console.warn("Error leyendo obra activa de sesión:", err);
       }
     }
 
@@ -206,10 +429,18 @@ function formatBookData(data) {
     cover: data.cover || 'assets/cover.png',
     chapters: outline.chapters.map((chOutline, i) => {
       let content = "";
-      if (isChaptersArray && typeof data.chapters[i] === 'string') {
-        content = data.chapters[i];
+      let encryptedContent = "";
+      let iv = "";
+      
+      if (isChaptersArray && data.chapters[i]) {
+        if (typeof data.chapters[i] === 'string') {
+          content = data.chapters[i];
+        } else if (typeof data.chapters[i] === 'object') {
+          encryptedContent = data.chapters[i].encryptedContent || "";
+          iv = data.chapters[i].iv || "";
+          content = data.chapters[i].content || "";
+        }
       } else {
-        // Generación procedimental JIT tipográfica de ultra lujo contextual
         content = generateJITProse(category, i + 1, title, author, chOutline.title || '', chOutline.arc || '', themes);
       }
       
@@ -217,7 +448,10 @@ function formatBookData(data) {
         id: i + 1,
         title: chOutline.title || `Capítulo ${i+1}`,
         desc: chOutline.arc || "",
-        content: content
+        content: content,
+        encryptedContent: encryptedContent,
+        iv: iv,
+        fallbackContent: content
       };
     })
   };
@@ -564,7 +798,12 @@ function showErrorState(msg) {
 }
 
 // ── Rendering ────────────────────────────────────────────────────────────────
-function renderChapter(idx) {
+async function renderChapter(idx) {
+  // Enviar telemetría del capítulo anterior antes de cambiar (Pilar 2)
+  if (state.book) {
+    await sendTelemetryPacket();
+  }
+
   state.currentChapter = idx;
   const ch = state.book.chapters[idx];
   
@@ -580,6 +819,42 @@ function renderChapter(idx) {
   const container = $('reading-content');
   container.style.opacity = '0';
   
+  // Si no se ha cargado el contenido del streaming, solicitarlo al servidor y descifrarlo en memoria (Pilar 1)
+  if (!ch.content) {
+    if (ch.encryptedContent && ch.iv) {
+      try {
+        const decrypted = await decryptText(ch.encryptedContent, ch.iv);
+        ch.content = decrypted;
+        console.log(`  ✦ [Reader Offline] Capítulo ${idx + 1} descifrado con éxito desde copia local IndexedDB.`);
+      } catch (err) {
+        console.warn("  ⚠ [Reader Offline] Fallo al descifrar capítulo descargado:", err.message);
+        ch.content = `<p>Error de DRM: No se pudo descifrar el manuscrito local.</p>`;
+      }
+    } else {
+      container.innerHTML = `<div style="text-align:center; padding:120px; font-family:var(--font-serif); color:var(--text-secondary);"><div style="font-size:32px; margin-bottom:15px; animation: kids-float 2.5s ease-in-out infinite;">🔒</div>Cifrando canal y transmitiendo manuscrito líquido...</div>`;
+      container.style.opacity = '1';
+      
+      try {
+        const token = auth.currentUser ? await auth.currentUser.getIdToken() : '';
+        const response = await fetch(`/api/book/${state.bookId}/chunk/${idx}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+          throw new Error(response.status === 403 ? "Suscripción activa requerida para lectura Premium." : "Error en el servidor de streaming.");
+        }
+        
+        const chunk = await response.json();
+        const decrypted = await decryptText(chunk.data, chunk.iv);
+        ch.content = decrypted;
+        console.log(`  ✦ [Streaming] Capítulo ${idx + 1} transmitido y descifrado localmente.`);
+      } catch (err) {
+        console.warn("  ⚠ [Streaming Offline] Fallo de streaming en canal seguro, usando respaldo local:", err.message);
+        ch.content = ch.fallbackContent || `<p>Este capítulo no se pudo descargar del canal de streaming seguro. Por favor verifica tu suscripción o conexión a internet.</p>`;
+      }
+    }
+  }
+
   setTimeout(() => {
     container.innerHTML = `
       <div class="chapter-heading">
@@ -1225,7 +1500,27 @@ function showGiftCTA() {
   $('btn-gift-action').onclick = generateGift;
 }
 
-onAuthStateChanged(auth, u => {
+function saveAuthTokenToIndexedDB(token) {
+  return openOfflineDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('offline_keys', 'readwrite');
+      tx.objectStore('offline_keys').put({ bookId: '_user_token', license: token, expiresAt: Date.now() + 55 * 60 * 1000 }); // 55 min
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  });
+}
+
+onAuthStateChanged(auth, async (u) => {
+  if (u) {
+    try {
+      const token = await u.getIdToken();
+      await saveAuthTokenToIndexedDB(token);
+      console.log("  ✦ [PWA] Token JWT guardado en IndexedDB para Background Sync desde Reader.");
+    } catch(e) {
+      console.warn("No se pudo guardar el token JWT en IndexedDB:", e.message);
+    }
+  }
   if (u || new URLSearchParams(window.location.search).get('gift')) loadBook();
   else window.location.href = 'index.html';
 });
