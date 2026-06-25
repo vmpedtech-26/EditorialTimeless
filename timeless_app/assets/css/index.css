@@ -2058,3 +2058,232 @@
       opacity: 0.9;
       text-transform: uppercase;
     }
+
+    /* ======================================================
+       GUEST VS MEMBER VIEW GATING (Gobernanza & Arquitectura)
+       ====================================================== */
+    body.auth-guest .member-only {
+      display: none !important;
+    }
+    body.auth-member .guest-only {
+      display: none !important;
+    }
+
+    /* ======================================================
+       HERO EMAIL GATE (Experiencia de Ingreso Netflix)
+       ====================================================== */
+    .hero-email-gate {
+      margin-top: 35px;
+      max-width: 540px;
+      background: rgba(30, 27, 24, 0.45);
+      border: 1px solid rgba(200, 180, 150, 0.15);
+      padding: 24px;
+      border-radius: 12px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: var(--shadow-md);
+      border-left: 2.5px solid var(--gold);
+    }
+    .email-gate-text {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--bg-alt);
+      margin-bottom: 14px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+    .email-gate-form {
+      display: flex;
+      gap: 12px;
+    }
+    .email-gate-form input {
+      flex: 1;
+      background: rgba(10, 8, 6, 0.6);
+      border: 1px solid rgba(200, 180, 150, 0.25);
+      padding: 12px 18px;
+      border-radius: 6px;
+      color: #FFF;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      outline: none;
+      transition: all var(--t);
+    }
+    .email-gate-form input:focus {
+      border-color: var(--gold);
+      background: rgba(10, 8, 6, 0.85);
+      box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
+    }
+    .btn-gate-submit {
+      background: linear-gradient(90deg, var(--gold), var(--gold-dark));
+      color: #141210;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--t);
+    }
+    .btn-gate-submit:hover {
+      background: linear-gradient(90deg, var(--gold-light), var(--gold));
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(201, 169, 110, 0.3);
+    }
+    .btn-gate-submit svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s;
+    }
+    .btn-gate-submit:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* ======================================================
+       NETFLIX STYLE HORIZONTAL ROW CAROUSELS
+       ====================================================== */
+    .netflix-row {
+      margin-bottom: 50px;
+      position: relative;
+    }
+    .netflix-row-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      color: var(--gold);
+      margin-bottom: 18px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .netflix-row-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 20px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+    .netflix-row-scroll-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .netflix-row-inner {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none; /* Firefox */
+      padding: 15px 12px 30px 12px; /* Espacio para hover scale y sombras */
+      width: 100%;
+      margin: 0 -12px;
+    }
+    .netflix-row-inner::-webkit-scrollbar {
+      display: none; /* Safari/Chrome */
+    }
+    .netflix-row-inner .book-card {
+      flex: 0 0 190px; /* Ancho fijo para carrusel */
+      margin: 0;
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.32s ease, border-color 0.32s;
+    }
+    .netflix-row-inner .book-card:hover {
+      transform: scale(1.08) translateY(-6px);
+      z-index: 10;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.55);
+    }
+    
+    /* Botones de navegación del carrusel */
+    .row-nav-btn {
+      position: absolute;
+      top: calc(50% - 20px);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(20, 18, 16, 0.9);
+      border: 1.5px solid rgba(200, 180, 150, 0.25);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 15;
+      transition: all 0.28s var(--ease);
+      opacity: 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .netflix-row-scroll-container:hover .row-nav-btn {
+      opacity: 1;
+    }
+    .row-nav-btn:hover {
+      background: var(--gold);
+      color: #141210;
+      border-color: var(--gold);
+      transform: scale(1.12);
+      box-shadow: 0 6px 20px rgba(201, 169, 110, 0.4);
+    }
+    .row-nav-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.5;
+    }
+    .prev-btn { left: -22px; }
+    .next-btn { right: -22px; }
+    
+    /* Mobile Responsiveness for Rows */
+    @media (max-width: 768px) {
+      .netflix-row-inner .book-card {
+        flex: 0 0 150px; /* Portadas más pequeñas en móvil */
+        gap: 16px;
+      }
+      .prev-btn { left: -10px; }
+      .next-btn { right: -10px; }
+      .row-nav-btn {
+        width: 36px;
+        height: 36px;
+        opacity: 0.7; /* Siempre visibles pero más pequeñas en móvil */
+      }
+      .netflix-row-title {
+        font-size: 20px;
+      }
+    }
+
+    /* Kids grid re-styled as carousel */
+    .kids-carousel-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .kids-grid-carousel {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      padding: 15px 12px 30px 12px;
+      width: 100%;
+      margin: 0 -12px;
+    }
+    .kids-grid-carousel::-webkit-scrollbar {
+      display: none;
+    }
+    .kids-grid-carousel .kids-card {
+      flex: 0 0 240px; /* Kids cards are slightly wider/larger */
+      margin: 0;
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.32s ease;
+    }
+    .kids-grid-carousel .kids-card:hover {
+      transform: scale(1.06) translateY(-6px);
+      z-index: 10;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+    }
+    
+    @media (max-width: 768px) {
+      .kids-grid-carousel .kids-card {
+        flex: 0 0 200px;
+      }
+    }

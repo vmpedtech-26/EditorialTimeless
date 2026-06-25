@@ -8,7 +8,7 @@ import {
 let currentUser = null;
 let currentCat = 'all';
 let isPremiumUser = false;
-const bookGrid = document.getElementById('book-grid');
+const libraryContent = document.getElementById('library-content');
 
 // ---- SCROLL REVEAL ----
 const observer = new IntersectionObserver((entries) => {
@@ -144,42 +144,148 @@ function createUniqueBookCover(b) {
   `;
 }
 
-// ---- RENDER BOOKS ----
-function renderBooks(books, offlineIds = new Set()) {
+// ---- CAROUSEL NAVIGATION FUNCTION ----
+window.scrollRow = function(btn, direction) {
+  const container = btn.parentElement.querySelector('.netflix-row-inner') || btn.parentElement.querySelector('.kids-grid-carousel');
+  if (container) {
+    const scrollAmount = container.clientWidth * 0.75 * direction;
+    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+};
+
+// ---- RENDER BOOKS IN A GRID LAYOUT (FILTERED MODE) ----
+function renderBooksGrid(books, offlineIds = new Set()) {
+  const container = document.getElementById('library-content');
+  if (!container) return;
+
   if (!books.length) {
-    bookGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--ink-faint);">No se encontraron obras en esta categoría.</div>';
+    container.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--ink-faint);">No se encontraron obras en esta categoría.</div>';
     return;
   }
 
-  bookGrid.innerHTML = books.map((b, i) => {
-    const isDownloaded = offlineIds.has(b.id);
-    const coverHtml = createUniqueBookCover(b);
-
-    return `
-      <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}" onclick="openBookModal('${b.id}')">
-        <div class="book-card-cover">
-          <div class="book-card-spine"></div>
-          ${coverHtml}
-          ${isDownloaded ? `<div class="book-offline-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Offline
-          </div>` : ''}
-          <div class="book-card-overlay">
-            <div class="book-card-read-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              Ver contraportada
+  container.innerHTML = `
+    <div class="book-grid" id="book-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 30px; width: 100%;">
+      ${books.map((b, i) => {
+        const isDownloaded = offlineIds.has(b.id);
+        const coverHtml = createUniqueBookCover(b);
+        return `
+          <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}" onclick="openBookModal('${b.id}')">
+            <div class="book-card-cover">
+              <div class="book-card-spine"></div>
+              ${coverHtml}
+              ${isDownloaded ? `<div class="book-offline-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Offline
+              </div>` : ''}
+              <div class="book-card-overlay">
+                <div class="book-card-read-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  Ver contraportada
+                </div>
+              </div>
+              ${b.badge === 'excl' ? `<div class="book-excl">${b.badgeText || 'Exclusivo'}</div>` : ''}
+              ${b.badge === 'new'  ? `<div class="book-new">${b.badgeText || 'Nuevo'}</div>` : ''}
             </div>
+            <div class="book-card-genre">${b.genre}</div>
+            <div class="book-card-title">${b.title}</div>
+            <div class="book-card-author">${b.author || 'Timeless Agent'}</div>
           </div>
-          ${b.badge === 'excl' ? `<div class="book-excl">${b.badgeText || 'Exclusivo'}</div>` : ''}
-          ${b.badge === 'new'  ? `<div class="book-new">${b.badgeText || 'Nuevo'}</div>` : ''}
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  document.querySelectorAll('.book-card.reveal').forEach(el => observer.observe(el));
+}
+
+// ---- RENDER NETFLIX STYLE HORIZONTAL ROW CAROUSELS (HOME DASHBOARD) ----
+function renderNetflixRows(books, offlineIds = new Set()) {
+  const container = document.getElementById('library-content');
+  if (!container) return;
+
+  const recs = books.filter(b => b.badge === 'excl' && b.badgeText === 'Recomendado');
+  const ficcion = books.filter(b => b.cat === 'ficcion' || b.genre?.toLowerCase().includes('ficción') || b.genre?.toLowerCase().includes('novela'));
+  const ensayo = books.filter(b => b.cat === 'ensayo' || b.genre?.toLowerCase().includes('ensayo') || b.genre?.toLowerCase().includes('filosofía'));
+  
+  const kidsIds = new Set(books.filter(b => b.cat === 'kids').map(b => b.id));
+  const others = books.filter(b => 
+    b.cat !== 'ficcion' && 
+    b.cat !== 'ensayo' && 
+    b.cat !== 'kids' && 
+    !kidsIds.has(b.id) &&
+    !recs.map(r => r.id).includes(b.id) &&
+    !ficcion.map(f => f.id).includes(b.id) &&
+    !ensayo.map(e => e.id).includes(b.id)
+  );
+
+  const rows = [
+    { title: 'Recomendados para ti', books: recs },
+    { title: 'Ficción & Novela', books: ficcion },
+    { title: 'Ensayos & Filosofía', books: ensayo },
+    { title: 'Otros Temas & Desarrollo', books: others }
+  ];
+
+  let html = '';
+
+  rows.forEach((row) => {
+    if (!row.books || row.books.length === 0) return;
+    
+    const uniqueRowBooks = [];
+    const seenIds = new Set();
+    row.books.forEach(b => {
+      if (!seenIds.has(b.id)) {
+        seenIds.add(b.id);
+        uniqueRowBooks.push(b);
+      }
+    });
+
+    const cardsHtml = uniqueRowBooks.map((b, i) => {
+      const isDownloaded = offlineIds.has(b.id);
+      const coverHtml = createUniqueBookCover(b);
+      return `
+        <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}" onclick="openBookModal('${b.id}')">
+          <div class="book-card-cover">
+            <div class="book-card-spine"></div>
+            ${coverHtml}
+            ${isDownloaded ? `<div class="book-offline-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Offline
+            </div>` : ''}
+            <div class="book-card-overlay">
+              <div class="book-card-read-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Ver
+              </div>
+            </div>
+            ${b.badge === 'excl' && b.badgeText !== 'Recomendado' ? `<div class="book-excl">${b.badgeText || 'Exclusivo'}</div>` : ''}
+            ${b.badge === 'new'  ? `<div class="book-new">${b.badgeText || 'Nuevo'}</div>` : ''}
+          </div>
+          <div class="book-card-genre">${b.genre}</div>
+          <div class="book-card-title">${b.title}</div>
+          <div class="book-card-author">${b.author || 'Timeless Editorial'}</div>
         </div>
-        <div class="book-card-genre">${b.genre}</div>
-        <div class="book-card-title">${b.title}</div>
-        <div class="book-card-author">${b.author || 'Timeless Agent'}</div>
+      `;
+    }).join('');
+
+    html += `
+      <div class="netflix-row">
+        <h3 class="netflix-row-title">${row.title}</h3>
+        <div class="netflix-row-scroll-container">
+          <button class="row-nav-btn prev-btn" onclick="scrollRow(this, -1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="netflix-row-inner">
+            ${cardsHtml}
+          </div>
+          <button class="row-nav-btn next-btn" onclick="scrollRow(this, 1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
       </div>
     `;
-  }).join('');
+  });
 
+  container.innerHTML = html || '<div style="text-align: center; padding: 60px; color: var(--ink-faint);">No se encontraron obras.</div>';
   document.querySelectorAll('.book-card.reveal').forEach(el => observer.observe(el));
 }
 
@@ -244,11 +350,20 @@ function renderKidsGrid(books, offlineIds = new Set()) {
 }
 
 async function fetchLibrary(category = 'all') {
+  // Guard: Block Firestore read if unauthenticated guest to protect reads budget (OpEx governance)
+  if (!currentUser && category !== 'descargados') {
+    console.log("  ✦ [Budget Guard] fetchLibrary saltado: el usuario es invitado.");
+    return;
+  }
+
   if (!navigator.onLine) {
     category = 'descargados';
   }
 
-  bookGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--ink-faint);">Sincronizando biblioteca…</div>';
+  const container = document.getElementById('library-content');
+  if (container) {
+    container.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--ink-faint);">Sincronizando biblioteca…</div>';
+  }
   
   // 1. Obtener IDs descargados desde IndexedDB para mostrar badges y controlar visibilidad de pill
   let offlineIds = new Set();
@@ -276,11 +391,13 @@ async function fetchLibrary(category = 'all') {
       renderKidsGrid(kidsBooks, offlineIds);
       
       const filtered = offlineBooks.filter(b => b.cat !== 'kids');
-      renderBooks(filtered, offlineIds);
+      renderBooksGrid(filtered, offlineIds);
       return;
     } catch (err) {
       console.error("Error al cargar biblioteca offline:", err);
-      bookGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--ink-faint);">Error al cargar las obras sin conexión.</div>';
+      if (container) {
+        container.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--ink-faint);">Error al cargar las obras sin conexión.</div>';
+      }
       return;
     }
   }
@@ -355,10 +472,12 @@ async function fetchLibrary(category = 'all') {
     const kidsBooks = books.filter(b => b.cat === 'kids');
     renderKidsGrid(kidsBooks, offlineIds);
 
-    const filtered = category === 'all' 
-      ? books.filter(b => b.cat !== 'kids') 
-      : books.filter(b => b.cat === category || b.genre?.toLowerCase().includes(category));
-    renderBooks(filtered, offlineIds);
+    if (category === 'all') {
+      renderNetflixRows(books, offlineIds);
+    } else {
+      const filtered = books.filter(b => b.cat === category || b.genre?.toLowerCase().includes(category));
+      renderBooksGrid(filtered, offlineIds);
+    }
 
   } catch (error) {
     console.error("Error fetching library, trying local cache:", error);
@@ -373,10 +492,12 @@ async function fetchLibrary(category = 'all') {
       } catch (e) {}
     }
     BOOK_CATALOG = [...FALLBACK_BOOKS, ...KIDS_FALLBACK_BOOKS];
-    const filtered = category === 'all' 
-      ? FALLBACK_BOOKS 
-      : FALLBACK_BOOKS.filter(b => b.cat === category || b.genre?.toLowerCase().includes(category));
-    renderBooks(filtered, offlineIds);
+    if (category === 'all') {
+      renderNetflixRows(BOOK_CATALOG, offlineIds);
+    } else {
+      const filtered = FALLBACK_BOOKS.filter(b => b.cat === category || b.genre?.toLowerCase().includes(category));
+      renderBooksGrid(filtered, offlineIds);
+    }
   }
 }
 
@@ -607,6 +728,10 @@ onAuthStateChanged(auth, async (user) => {
   isPremiumUser = false;
   const btnAdmin = document.getElementById('btn-admin-console');
   if (user) {
+    // Toggle body classes for member view
+    document.body.classList.remove('auth-guest');
+    document.body.classList.add('auth-member');
+
     if(authBtns) authBtns.style.display = 'none';
     if(userProf) userProf.classList.add('visible');
     if (btnAdmin) {
@@ -636,12 +761,23 @@ onAuthStateChanged(auth, async (user) => {
         isPremiumUser = true; // Fallback tolerante en sandbox local
       }
     }
+    
+    // Fetch library only when authenticated
+    fetchLibrary(currentCat);
   } else {
+    // Toggle body classes for guest view
+    document.body.classList.remove('auth-member');
+    document.body.classList.add('auth-guest');
+
     if(authBtns) authBtns.style.display = 'flex';
     if(userProf) userProf.classList.remove('visible');
     if (btnAdmin) btnAdmin.style.display = 'none';
+    
+    // Clear library content to save reads on guest loads
+    const container = document.getElementById('library-content');
+    if (container) container.innerHTML = '';
+    console.log("  ✦ [Budget Guard] Modo invitado activo: se omitieron lecturas a base de datos.");
   }
-  fetchLibrary(currentCat);
 });
 
 // ---- PLAN SELECTION & SECURE CHECKOUT ----
@@ -984,20 +1120,20 @@ window.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('is-offline');
       if (banner) banner.style.display = 'none';
       
-      // Si la categoría era 'descargados' y volvimos online, restablecer a 'all'
+      // Si la categoría era 'descargados' y volvimos online, restablecer a 'all' si hay usuario logueado
       if (currentCat === 'descargados') {
         const pillAll = document.querySelector('.cat-pill[data-cat="all"]');
-        if (pillAll) pillAll.click();
+        if (pillAll && currentUser) pillAll.click();
       } else {
-        fetchLibrary(currentCat);
+        if (currentUser) fetchLibrary(currentCat);
       }
     } else {
       document.body.classList.add('is-offline');
       if (banner) banner.style.display = 'flex';
       
-      // Forzar visualización de descargados
+      // Forzar visualización de descargados si hay usuario logueado
       const pillDescargados = document.getElementById('pill-descargados');
-      if (pillDescargados) {
+      if (pillDescargados && currentUser) {
         pillDescargados.style.display = 'inline-block';
         pillDescargados.click();
       }
@@ -1077,6 +1213,35 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       };
     }
+  }
+
+  // Hero Email Gate Form Handler (Netflix Experience)
+  const emailGateForm = document.getElementById('email-gate-form');
+  if (emailGateForm) {
+    emailGateForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailInput = document.getElementById('gate-email');
+      const emailVal = emailInput ? emailInput.value.trim() : '';
+      if (emailVal) {
+        // Pre-fill email field in authentication modal
+        const authEmail = document.getElementById('auth-email');
+        if (authEmail) authEmail.value = emailVal;
+
+        // Switch auth modal to registration mode
+        isSignUp = true;
+        if (authTitle) authTitle.textContent = 'Crear cuenta Timeless';
+        if (authSubtitle) authSubtitle.textContent = 'Únete a la experiencia de lectura premium';
+        if (authSubmitBtn) authSubmitBtn.textContent = 'Registrarse';
+        if (authFooter) {
+          authFooter.innerHTML = '¿Ya tienes cuenta? <button id="btn-switch-auth" style="background:none; border:none; color:var(--gold); font-weight:600; cursor:pointer; text-decoration:underline;">Inicia sesión</button>';
+          const switchBtn = document.getElementById('btn-switch-auth');
+          if (switchBtn) switchBtn.addEventListener('click', switchModeHandler);
+        }
+
+        // Open the authentication modal
+        if (authModal) authModal.classList.add('visible');
+      }
+    });
   }
 
   // Ejecutar verificación inicial después de un breve delay para permitir el setup de auth

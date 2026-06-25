@@ -87,7 +87,7 @@
   <link rel="apple-touch-icon" href="assets/cover_memoria.png" />
 </head>
 
-<body>
+<body class="auth-guest">
 
   <div id="offline-banner">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.5"/><path d="M5 12.5a10.94 10.94 0 0 1 5.83-2.84"/><path d="M12 18h.01"/><path d="M9.17 15.17a3 3 0 0 1 5.66 0"/></svg>
@@ -105,10 +105,10 @@
       </a>
 
       <ul class="nav-links">
-        <li><a href="#collection" class="active">Colección</a></li>
-        <li><a href="#subscription">Suscripción</a></li>
-        <li><a href="#testimonials">Lectores</a></li>
-        <li><a href="#featured">Destacados</a></li>
+        <li class="member-only"><a href="#featured" class="active">Destacados</a></li>
+        <li class="member-only"><a href="#categories">Biblioteca</a></li>
+        <li class="guest-only"><a href="#subscription">Suscripción</a></li>
+        <li class="guest-only"><a href="#testimonials">Lectores</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -155,7 +155,7 @@
   <!-- ============================================================
        HERO
   ============================================================ -->
-  <section id="hero">
+  <section id="hero" class="guest-only">
     <div class="hero-bg-texture"></div>
 
     <div class="hero-text-col">
@@ -170,15 +170,15 @@
         Una editorial de suscripción cerrada. Obras exclusivas de autores de primera línea. Diseñada para lectores que no se conforman con el ruido.
       </p>
 
-      <div class="hero-cta-row">
-        <a href="#subscription" class="btn-cta" id="cta-hero">
-          <span>Solicitar acceso</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
-        <a href="reader.html?id=fb1" class="btn-link" id="cta-preview">
-          <span>Ver lector</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
+      <div class="hero-email-gate">
+        <p class="email-gate-text">¿Listo para sumergirte en literatura exclusiva? Ingresa tu correo para unirte como miembro.</p>
+        <form class="email-gate-form" id="email-gate-form">
+          <input type="email" id="gate-email" placeholder="tu@email.com" required autocomplete="email" />
+          <button type="submit" class="btn-gate-submit">
+            <span>Comenzar</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </form>
       </div>
 
       <div class="hero-stats">
@@ -223,7 +223,7 @@
   <!-- ============================================================
        FEATURED BOOK
   ============================================================ -->
-  <section id="featured">
+  <section id="featured" class="member-only">
     <div class="container">
       <div class="featured-inner reveal">
         <div class="featured-cover-wrap">
@@ -273,7 +273,7 @@
   <!-- ============================================================
        CATEGORIES + BOOK GRID
   ============================================================ -->
-  <section id="categories">
+  <section id="categories" class="member-only">
     <div class="container">
       <div class="cats-header">
         <div>
@@ -297,10 +297,10 @@
     </div>
   </section>
 
-  <section id="collection">
+  <section id="collection" class="member-only">
     <div class="container">
-      <div class="book-grid" id="book-grid">
-        <!-- injected by JS -->
+      <div id="library-content">
+        <!-- Dynamic Netflix-style rows injected by JS -->
       </div>
     </div>
   </section>
@@ -308,7 +308,7 @@
   <!-- ============================================================
        KIDS SECTION
   ============================================================ -->
-  <section id="kids-section" class="reveal">
+  <section id="kids-section" class="member-only reveal">
     <div class="kids-bg-glow-1"></div>
     <div class="kids-bg-glow-2"></div>
     <div class="container">
@@ -320,7 +320,11 @@
         </p>
       </div>
 
-      <div class="kids-grid" id="kids-grid">
+      <div class="kids-carousel-container">
+        <button class="row-nav-btn prev-btn" onclick="scrollRow(this, -1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="kids-grid-carousel" id="kids-grid">
         <div class="kids-card" onclick="openBookModal('kid1')">
           <div class="kids-card-cover" style="--cover-accent: #d5e3f0; --cover-accent-muted: #a4c2db;">
             <div class="kids-age-badge">4-8 años</div>
@@ -424,9 +428,13 @@
           <h3 class="kids-card-title">Las Huellas del Bosque</h3>
           <p class="kids-card-author">de Hugo Silva</p>
         </div>
-      </div>
+        </div>
+      <button class="row-nav-btn next-btn" onclick="scrollRow(this, 1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
 
-      <div class="kids-cta-row">
+    <div class="kids-cta-row">
         <a href="#subscription" class="btn-kids-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Unirse al Plan Familiar
@@ -439,7 +447,7 @@
   <!-- ============================================================
        SUBSCRIPTION
   ============================================================ -->
-  <section id="subscription">
+  <section id="subscription" class="guest-only">
     <div class="sub-bg"></div>
     <div class="container">
       <div class="sub-inner">
@@ -537,7 +545,7 @@
   <!-- ============================================================
        TESTIMONIALS
   ============================================================ -->
-  <section id="testimonials">
+  <section id="testimonials" class="guest-only">
     <div class="container">
       <div class="testimonials-header">
         <div class="section-eyebrow" style="justify-content:center;">Lectores</div>
@@ -725,6 +733,9 @@
             setTimeout(() => banner.style.display = 'none', 300);
           };
         }
+      }
+    });
+  </script>
   <!-- ============================================================
        BOTÓN DE ARREPENTIMIENTO MODAL
   ============================================================ -->
