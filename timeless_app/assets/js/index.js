@@ -1244,6 +1244,168 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Initialize new 3D and Netflix animations
+  initParticles();
+  init3DTilt();
+  initFaqAccordion();
+  populateHeroCurtain();
+
   // Ejecutar verificación inicial después de un breve delay para permitir el setup de auth
   setTimeout(updateOnlineStatus, 500);
 });
+
+// ============================================================================
+// REDESIGN 3D & PARALLAX ANIMATIONS (Netflix Redesign Spec)
+// ============================================================================
+
+function init3DTilt() {
+  const cards = document.querySelectorAll('.tilt-card-3d');
+  
+  cards.forEach(card => {
+    card.addEventListener('mousemove', e => {
+      if (window.matchMedia("(pointer: coarse)").matches) return;
+
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const xc = rect.width / 2;
+      const yc = rect.height / 2;
+      
+      const angleX = (yc - y) / 14;
+      const angleY = (x - xc) / 14;
+      
+      card.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) scale3d(1.02, 1.02, 1.02)`;
+      card.style.transition = 'transform 0.08s ease-out';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      card.style.transition = 'transform 0.5s ease-out';
+    });
+  });
+}
+
+function initFaqAccordion() {
+  const triggers = document.querySelectorAll('.faq-trigger');
+  
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const row = trigger.parentElement;
+      const content = row.querySelector('.faq-content');
+      const isActive = row.classList.contains('active');
+      
+      document.querySelectorAll('.faq-row').forEach(r => {
+        if (r !== row) {
+          r.classList.remove('active');
+          const c = r.querySelector('.faq-content');
+          if (c) c.style.maxHeight = '0px';
+        }
+      });
+
+      if (isActive) {
+        row.classList.remove('active');
+        if (content) content.style.maxHeight = '0px';
+      } else {
+        row.classList.add('active');
+        if (content) content.style.maxHeight = content.scrollHeight + 'px';
+      }
+    });
+  });
+}
+
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+  
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+  
+  const particleCount = 40;
+  const particles = [];
+  
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 2 + 0.5,
+      vy: Math.random() * 0.35 + 0.08,
+      vx: Math.random() * 0.16 - 0.08,
+      alpha: Math.random() * 0.45 + 0.15
+    });
+  }
+  
+  let scrollY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    scrollY = window.scrollY;
+  }, { passive: true });
+  
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    
+    particles.forEach(p => {
+      ctx.beginPath();
+      const currentY = (p.y - scrollY * (p.r * 0.12)) % height;
+      const adjustedY = currentY < 0 ? height + currentY : currentY;
+      
+      ctx.arc(p.x, adjustedY, p.r, 0, Math.PI * 2, true);
+      ctx.fillStyle = `rgba(201, 169, 110, ${p.alpha})`;
+      ctx.fill();
+      
+      p.y -= p.vy;
+      p.x += p.vx;
+      
+      if (p.y < 0) p.y = height;
+      if (p.x < 0) p.x = width;
+      if (p.x > width) p.x = 0;
+    });
+    
+    requestAnimationFrame(draw);
+  }
+  
+  draw();
+}
+
+function populateHeroCurtain() {
+  const curtain = document.getElementById('hero-curtain');
+  if (!curtain) return;
+  
+  const fetchCurtain = async () => {
+    try {
+      const [fRes, kRes] = await Promise.all([
+        fetch('/fallback_catalog.json').then(r => r.json()).catch(() => []),
+        fetch('/kids_fallback_catalog.json').then(r => r.json()).catch(() => [])
+      ]);
+      const merged = [...fRes, ...kRes];
+      renderCurtain(merged);
+    } catch (e) {
+      console.warn("Could not load hero curtain fallback:", e);
+    }
+  };
+
+  function renderCurtain(books) {
+    if (books.length === 0) return;
+    
+    let html = '';
+    // We want 28 items in the grid
+    for (let i = 0; i < 28; i++) {
+      const book = books[i % books.length];
+      const coverHtml = createUniqueBookCover(book);
+      html += `
+        <div class="curtain-item">
+          ${coverHtml}
+        </div>
+      `;
+    }
+    curtain.innerHTML = html;
+  }
+
+  fetchCurtain();
+}
+

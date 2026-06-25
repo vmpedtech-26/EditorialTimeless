@@ -88,6 +88,7 @@
 </head>
 
 <body class="auth-guest">
+  <canvas id="particles-canvas"></canvas>
 
   <div id="offline-banner">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.5"/><path d="M5 12.5a10.94 10.94 0 0 1 5.83-2.84"/><path d="M12 18h.01"/><path d="M9.17 15.17a3 3 0 0 1 5.66 0"/></svg>
@@ -104,11 +105,10 @@
         <span class="logo-badge">Editorial</span>
       </a>
 
-      <ul class="nav-links">
-        <li class="member-only"><a href="#featured" class="active">Destacados</a></li>
-        <li class="member-only"><a href="#categories">Biblioteca</a></li>
-        <li class="guest-only"><a href="#subscription">Suscripción</a></li>
-        <li class="guest-only"><a href="#testimonials">Lectores</a></li>
+      <ul class="nav-links member-only">
+        <li><a href="#featured" class="active">Destacados</a></li>
+        <li><a href="#categories">Biblioteca</a></li>
+        <li><a href="#kids-section">Familiar</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -153,25 +153,28 @@
   </nav>
 
   <!-- ============================================================
-       HERO
+       HERO (Netflix Curtain & Centered Style)
   ============================================================ -->
   <section id="hero" class="guest-only">
-    <div class="hero-bg-texture"></div>
+    <div class="hero-poster-curtain-container">
+      <div class="hero-poster-curtain" id="hero-curtain">
+        <!-- Dynamic book covers injected by JS -->
+      </div>
+    </div>
 
-    <div class="hero-text-col">
+    <div class="hero-centered-content">
       <div class="hero-kicker">Editorial Digital · Acceso cerrado</div>
 
       <h1 class="hero-title">
-        Literatura que <em>persiste</em><br>
-        en el tiempo
+        Literatura exclusiva, ensayos profundos y lecturas eternas.
       </h1>
 
       <p class="hero-subtitle">
-        Una editorial de suscripción cerrada. Obras exclusivas de autores de primera línea. Diseñada para lectores que no se conforman con el ruido.
+        Lee en cualquier dispositivo. Cancela cuando quieras.
       </p>
 
       <div class="hero-email-gate">
-        <p class="email-gate-text">¿Listo para sumergirte en literatura exclusiva? Ingresa tu correo para unirte como miembro.</p>
+        <p class="email-gate-text">¿Listo para sumergirte en literatura de autor? Ingresa tu correo para unirte como miembro.</p>
         <form class="email-gate-form" id="email-gate-form">
           <input type="email" id="gate-email" placeholder="tu@email.com" required autocomplete="email" />
           <button type="submit" class="btn-gate-submit">
@@ -180,40 +183,158 @@
           </button>
         </form>
       </div>
+    </div>
+  </section>
 
-      <div class="hero-stats">
-        <div class="stat-item">
-          <div class="stat-num">240+</div>
-          <div class="stat-label">Obras exclusivas</div>
+  <!-- ============================================================
+       NETFLIX ALTERNATING FEATURE PANELS (Guest Only)
+  ============================================================ -->
+  <section class="guest-only netflix-feature-panel">
+    <div class="container">
+      <div class="feature-panel-inner">
+        <div class="feature-text-block">
+          <div class="feature-eyebrow">Lectura líquida</div>
+          <h2 class="feature-title">Disfruta en cualquier pantalla.</h2>
+          <p class="feature-desc">
+            Nuestra tecnología de formato líquido adapta los textos con precisión milimétrica a tu tablet, móvil o computadora. Lee con comodidad absoluta, modo noche premium y tipografías diseñadas para descansar la vista.
+          </p>
         </div>
-        <div class="stat-item">
-          <div class="stat-num">4</div>
-          <div class="stat-label">Géneros literarios</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num">∞</div>
-          <div class="stat-label">Lectura offline</div>
+        <div class="feature-visual-block">
+          <div class="tablet-mockup-3d tilt-card-3d">
+            <div class="tablet-screen">
+              <div class="tablet-screen-content">
+                <div class="tablet-screen-title">Capítulo I: El Umbral del Tiempo</div>
+                <p>El viento soplaba entre las ruinas del viejo faro, arrastrando consigo el olor a sal y a secretos olvidados. En la mesa, el mapa seguía desplegado, revelando caminos que no figuraban en ningún registro oficial...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Books visual -->
-    <div class="hero-books-col">
-      <div class="hero-books-scene">
-        <div class="hero-book hero-book-back1">
-          <img src="assets/cover_memoria.png" alt="La Memoria del Agua" />
+  <section class="guest-only netflix-feature-panel">
+    <div class="container">
+      <div class="feature-panel-inner reversed">
+        <div class="feature-text-block">
+          <div class="feature-eyebrow">Soporte Offline</div>
+          <h2 class="feature-title">Descarga tus obras y lee sin conexión.</h2>
+          <p class="feature-desc">
+            Lleva tu biblioteca contigo. Con nuestra tecnología PWA de vanguardia, descarga manuscritos completos de forma encriptada en tu dispositivo y disfruta de la lectura durante tus viajes, vuelos o zonas sin cobertura durante 30 días.
+          </p>
         </div>
-        <div class="hero-book hero-book-back2">
-          <img src="assets/cover_umbral.png" alt="En el Umbral" />
+        <div class="feature-visual-block">
+          <div class="bookshelf-scene-3d tilt-card-3d">
+            <div class="bookshelf-spine-mockup bs-mock-1">
+              <div style="background: linear-gradient(135deg, #1e293b, #0f172a); width:100%; height:100%; border-radius:4px; border-left:5px solid #C9A96E; padding:15px; box-sizing:border-box;">
+                <div style="font-size:7px; color:#C9A96E; font-weight:700; letter-spacing:1px; margin-bottom:15px;">TIMELESS</div>
+                <div style="font-size:12px; color:#FFF; font-family:var(--font-serif); font-weight:600;">En el Umbral</div>
+                <div style="font-size:8px; color:#A07840; margin-top:20px; font-style:italic;">H. Silva</div>
+              </div>
+            </div>
+            <div class="bookshelf-spine-mockup bs-mock-2">
+              <div style="background: linear-gradient(135deg, #2e1065, #1e1b4b); width:100%; height:100%; border-radius:4px; border-left:5px solid #d4af37; padding:15px; box-sizing:border-box; position:relative;">
+                <div style="font-size:7px; color:#d4af37; font-weight:700; letter-spacing:1px; margin-bottom:15px;">TIMELESS</div>
+                <div style="font-size:12px; color:#FFF; font-family:var(--font-serif); font-weight:600;">El Arquitecto de Sombras</div>
+                <div style="font-size:8px; color:#A07840; margin-top:20px; font-style:italic;">C. Domínguez</div>
+                <div class="book-offline-badge" style="position:absolute; bottom:12px; right:12px; background:#5CB88A; padding:3px 6px; font-size:8px; border-radius:10px; color:#fff; display:flex; align-items:center; gap:2px; font-weight:600;">✓ Offline</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="hero-book hero-book-back3">
-          <img src="assets/cover_arquitecto.png" alt="El Arquitecto de Sombras" />
+      </div>
+    </div>
+  </section>
+
+  <section class="guest-only netflix-feature-panel">
+    <div class="container">
+      <div class="feature-panel-inner">
+        <div class="feature-text-block">
+          <div class="feature-eyebrow">Timeless Kids</div>
+          <h2 class="feature-title">Un espacio seguro para los niños.</h2>
+          <p class="feature-desc">
+            Descubre nuestra colección familiar e infantil. Cuentos mágicos y novelas de aventuras seleccionadas para fomentar valores profundos y la imaginación, sin distracciones de pantallas estimulantes ni anuncios.
+          </p>
         </div>
-        <div class="hero-book hero-book-main">
-          <img src="assets/cover_contemplacion.png" alt="El Arte de la Contemplación" />
-          <div class="hero-book-label">
-            <div class="hero-book-label-title">El Arte de la Contemplación</div>
-            <div class="hero-book-label-tag">Destacado del mes</div>
+        <div class="feature-visual-block">
+          <div style="background: rgba(30, 27, 24, 0.45); border:1px solid rgba(200,180,150,0.15); border-radius:12px; padding:30px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); text-align:center;" class="tilt-card-3d">
+            <div style="font-size:54px; margin-bottom:15px;">🧸</div>
+            <div style="font-family:var(--font-serif); font-size:18px; color:var(--gold); margin-bottom:5px;">Lecturas Infantiles</div>
+            <div style="font-size:12px; color:var(--ink-faint);">Colecciones mágicas de 4 a 12 años</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FAQ ACCORDION SECTION (Netflix Style)
+  ============================================================ -->
+  <section class="guest-only netflix-faq-section">
+    <div class="container">
+      <div class="testimonials-header">
+        <div class="section-eyebrow" style="justify-content:center;">Preguntas frecuentes</div>
+        <h2 class="section-title" style="text-align:center;">Respuestas a tus dudas</h2>
+      </div>
+
+      <div class="faq-accordion">
+        <div class="faq-row">
+          <button class="faq-trigger">
+            <span>¿Qué es Timeless Editorial?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              Timeless es una editorial digital de suscripción cerrada que ofrece acceso exclusivo a obras selectas, ensayos filosóficos y literatura de autor. Diseñada para amantes de las buenas historias que buscan una experiencia de lectura fluida, libre de ruidos y publicidad.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <button class="faq-trigger">
+            <span>¿Cuánto cuesta la membresía?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              Ofrecemos tres planes adaptados a tus necesidades: un Plan Mensual por $12, un Plan Anual por $89 (que ahorra un 38%), y un Plan Familiar por $18 al mes que permite hasta 6 cuentas activas con control parental y la colección infantil Kids incluida.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <button class="faq-trigger">
+            <span>¿En qué dispositivos puedo leer?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              Puedes leer en cualquier smartphone, tablet o computadora con acceso a internet. Nuestra tecnología de formato líquido adapta el tamaño, tipografías y contraste al tamaño de tu pantalla para una legibilidad ideal en modo noche, tarde o día.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <button class="faq-trigger">
+            <span>¿Cómo funciona el soporte sin conexión?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              Si tienes una suscripción activa, puedes presionar el botón "Descargar offline" en los detalles de cualquier obra. Los capítulos se descargarán de forma cifrada en la base de datos de tu navegador. Podrás acceder a ellos y leerlos de principio a fin incluso si estás sin internet durante un período de hasta 30 días.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-row">
+          <button class="faq-trigger">
+            <span>¿Puedo cancelar mi cuenta cuando quiera?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-content">
+            <div class="faq-content-inner">
+              Sí, absolutamente. No hay contratos de permanencia ni compromisos. Puedes cancelar tu membresía en cualquier momento desde tu panel de ajustes con un solo clic. Si cancelas, mantendrás acceso completo a la colección hasta la fecha de finalización del período de facturación actual.
+            </div>
           </div>
         </div>
       </div>
