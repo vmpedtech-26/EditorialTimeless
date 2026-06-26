@@ -1013,28 +1013,34 @@
     }
 
     .plan-card {
-      background: var(--bg-alt);
-      border: 1.5px solid var(--border);
+      background: #141210; /* Fondo oscuro para todos los planes */
+      border: 1.5px solid rgba(201, 169, 110, 0.25); /* Borde dorado sutil por defecto */
       border-radius: 14px;
       padding: 28px 24px;
       text-align: left;
-      transition: border-color var(--t), transform var(--t);
+      transition: all var(--t);
       position: relative;
       cursor: pointer;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     }
     .plan-card:hover {
       border-color: var(--gold);
-      transform: translateY(-2px);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(201, 169, 110, 0.15);
     }
     .plan-card.featured-plan {
-      border-color: var(--ink);
-      background: var(--ink);
-    }
-    .plan-card.featured-plan:hover { border-color: var(--gold-dark); }
-    .plan-card.selected {
-      border-color: var(--gold) !important;
+      border-color: var(--gold) !important; /* Borde dorado más brillante para el plan destacado */
+      background: #141210;
       box-shadow: 0 0 25px rgba(201, 169, 110, 0.25) !important;
-      transform: translateY(-4px) !important;
+    }
+    .plan-card.featured-plan:hover {
+      border-color: var(--gold-light) !important;
+      box-shadow: 0 0 35px rgba(201, 169, 110, 0.38) !important;
+    }
+    .plan-card.selected {
+      border-color: var(--gold-light) !important;
+      box-shadow: 0 0 30px rgba(201, 169, 110, 0.35) !important;
+      transform: translateY(-6px) !important;
     }
 
     .plan-badge {
@@ -1045,10 +1051,11 @@
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--paper);
-      background: var(--gold-dark);
+      color: #141210;
+      background: var(--gold);
       padding: 3px 12px;
       border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(201, 169, 110, 0.3);
     }
 
     .plan-name {
@@ -1056,26 +1063,23 @@
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--ink-muted);
+      color: rgba(200, 180, 150, 0.6); /* Nombre dorado para todos */
       margin-bottom: 10px;
     }
-    .plan-card.featured-plan .plan-name { color: rgba(200,180,150,0.5); }
 
     .plan-price {
       font-family: var(--font-serif);
       font-size: 32px;
       font-weight: 600;
-      color: var(--ink);
+      color: #F7F3EE; /* Precio blanco para todos */
       margin-bottom: 4px;
     }
-    .plan-card.featured-plan .plan-price { color: var(--paper); }
 
     .plan-period {
       font-size: 13px;
-      color: var(--ink-muted);
+      color: rgba(200, 180, 150, 0.45); /* Periodo dorado atenuado para todos */
       margin-bottom: 20px;
     }
-    .plan-card.featured-plan .plan-period { color: rgba(200,180,150,0.4); }
 
     .plan-features {
       list-style: none;
@@ -1088,9 +1092,8 @@
       align-items: center;
       gap: 8px;
       font-size: 13px;
-      color: var(--ink-muted);
+      color: rgba(200, 180, 150, 0.75); /* Características de color beige para todos */
     }
-    .plan-card.featured-plan .plan-features li { color: rgba(200,180,150,0.7); }
     .plan-features li svg { width: 14px; height: 14px; color: var(--gold); flex-shrink: 0; }
 
     .sub-btn {
@@ -1915,9 +1918,6 @@
        FAMILY PLAN CARD  
     ====================================================== */
     .plan-card-family {
-      background: linear-gradient(135deg, #2D5A3D 0%, #1E4A30 100%);
-      border: 1.5px solid rgba(91,158,107,0.4);
-      color: white;
       position: relative;
       overflow: hidden;
     }
@@ -1926,14 +1926,9 @@
       position: absolute;
       top: -10px; right: 20px;
       font-size: 64px;
-      opacity: 0.12;
+      opacity: 0.08;
       pointer-events: none;
     }
-    .plan-card-family .plan-name { color: rgba(255,255,255,0.7); }
-    .plan-card-family .plan-price { color: white; }
-    .plan-card-family .plan-period { color: rgba(255,255,255,0.5); }
-    .plan-card-family .plan-features li { color: rgba(255,255,255,0.85); }
-    .plan-card-family .plan-features svg { stroke: #7FD19E; }
     .plan-btn-family {
       display: block;
       width: 100%;
