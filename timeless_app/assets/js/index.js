@@ -600,6 +600,53 @@ btnGoogle.addEventListener('click', async () => {
   }
 });
 
+// Inject Developer Bypass Button in localhost to avoid being blocked by Firebase configuration
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  const authOptions = document.querySelector('.auth-options');
+  if (authOptions) {
+    const bypassBtn = document.createElement('button');
+    bypassBtn.className = 'btn-ghost';
+    bypassBtn.style.width = '100%';
+    bypassBtn.style.marginTop = '10px';
+    bypassBtn.style.borderColor = 'var(--gold)';
+    bypassBtn.style.color = 'var(--gold)';
+    bypassBtn.style.display = 'flex';
+    bypassBtn.style.alignItems = 'center';
+    bypassBtn.style.justifyContent = 'center';
+    bypassBtn.style.gap = '8px';
+    bypassBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Acceso Desarrollador (Matias)
+    `;
+    bypassBtn.addEventListener('click', async () => {
+      if (errorContainer) errorContainer.textContent = 'Iniciando sesión de prueba...';
+      try {
+        try {
+          await signInWithEmailAndPassword(auth, 'matiaseorejas@gmail.com', 'developer123');
+          console.log("  ✦ [Auth] Bypass de desarrollo completado: Login exitoso.");
+        } catch (loginErr) {
+          if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential' || loginErr.code === 'auth/wrong-password') {
+            console.log("  ✦ [Auth] Cuenta de prueba no existe o clave desactualizada. Registrando...");
+            await createUserWithEmailAndPassword(auth, 'matiaseorejas@gmail.com', 'developer123');
+            if (auth.currentUser) {
+              await updateProfile(auth.currentUser, { displayName: 'Matias Orejas' });
+            }
+            console.log("  ✦ [Auth] Bypass de desarrollo completado: Registro y Login exitosos.");
+          } else {
+            throw loginErr;
+          }
+        }
+        if (authModal) authModal.classList.remove('visible');
+        if (errorContainer) errorContainer.textContent = '';
+      } catch (bypassErr) {
+        console.error("Bypass Error:", bypassErr);
+        if (errorContainer) errorContainer.textContent = `Error en acceso local: ${bypassErr.message}`;
+      }
+    });
+    authOptions.appendChild(bypassBtn);
+  }
+}
+
 // Switch between Login and Sign Up mode
 if (btnSwitchAuth) {
   btnSwitchAuth.addEventListener('click', (e) => {
