@@ -128,8 +128,21 @@ window.addEventListener('online', syncOfflineTelemetry);
 let readingStartTime = Date.now();
 let telemetryInterval = null;
 
+let _drmSaltCache = null;
+async function getDrmSalt() {
+  if (_drmSaltCache) return _drmSaltCache;
+  const res = await fetch('/api/config');
+  const config = await res.json();
+  _drmSaltCache = config.drmSalt;
+  return _drmSaltCache;
+}
+
 async function decryptText(encryptedHex, ivHex) {
-  const password = "timeless_secret_key_32_bytes_long_!!!";
+  const userId = auth.currentUser ? auth.currentUser.uid : '';
+  const bookId = state.bookId || '';
+  const platformSalt = await getDrmSalt();
+  const password = platformSalt + userId + bookId;
+
   const encoder = new TextEncoder();
   const passwordBuffer = encoder.encode(password);
   
@@ -687,18 +700,6 @@ function generateJITProse(category, chapterNum, title, author, chTitle = '', chA
 
     return `<p>${p1}</p>\n<p>${p2}</p>\n<p>${p3}</p>\n<p>${p4}</p>`;
   }
-}iedo a la oscuridad."
-    ]
-  };
-
-  const pool = prosePools[category] || prosePools.ficcion;
-  const seed = (title.length + chapterNum) % pool.length;
-  
-  const p1 = pool[seed];
-  const p2 = pool[(seed + 1) % pool.length];
-  const p3 = pool[(seed + 2) % pool.length];
-  
-  return `<p>${p1}</p>\n<p>${p2}</p>\n<p>${p3}</p>`;
 }
 
 async function claimGift(token, data) {

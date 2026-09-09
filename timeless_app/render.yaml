@@ -19,3 +19,15 @@ services:
         sync: false # Debes configurarlo manualmente en el dashboard de Render
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false # Debes pegar el contenido del JSON de Firebase aquí en Render
+      - key: DLOCAL_LOGIN
+        sync: false # Configura tus credenciales de dLocal Go en el dashboard de Render
+      - key: DLOCAL_TRANS_KEY
+        sync: false
+      - key: DLOCAL_SECRET_KEY
+        sync: false
+      - key: DLOCAL_SMARTFIELDS_API_KEY
+        sync: false
+      - key: DLOCAL_SANDBOX
+        value: false
+      - key: DRM_MASTER_SECRET
+        sync: false # Genera un secreto propio; ver .env.example

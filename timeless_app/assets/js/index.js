@@ -1150,6 +1150,54 @@ window.openBookModal = function(bookId) {
 // ── AUTOMATIC SUBSCRIPTION CONVERSION FUNNEL ────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
+  
+  if (urlParams.get('checkout') === 'success_sandbox') {
+    isPremiumUser = true;
+    
+    // Crear toast con estilo premium
+    const toast = document.createElement('div');
+    toast.style.position = 'fixed';
+    toast.style.bottom = '24px';
+    toast.style.right = '24px';
+    toast.style.background = 'rgba(22, 20, 17, 0.95)';
+    toast.style.border = '1px solid #C9A96E';
+    toast.style.color = '#fff';
+    toast.style.padding = '16px 24px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(201, 169, 110, 0.2)';
+    toast.style.fontFamily = 'var(--font-sans)';
+    toast.style.zIndex = '9999';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '12px';
+    toast.style.transition = 'all 0.5s cubic-bezier(0.19, 1, 0.22, 1)';
+    toast.style.transform = 'translateY(100px)';
+    toast.style.opacity = '0';
+    toast.style.backdropFilter = 'blur(8px)';
+    
+    toast.innerHTML = `
+      <span style="color:#C9A96E; font-size:20px;">✨</span>
+      <div>
+        <div style="font-weight:600; font-size:14px; margin-bottom:2px;">¡Bienvenido a Timeless Premium!</div>
+        <div style="font-size:12px; opacity:0.85;">Tu membresía está activa. Disfruta de la lectura ilimitada.</div>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transform = 'translateY(0)';
+      toast.style.opacity = '1';
+    }, 100);
+    
+    setTimeout(() => {
+      toast.style.transform = 'translateY(100px)';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 500);
+    }, 6000);
+    
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
   if (urlParams.get('action') === 'subscribe') {
     setTimeout(() => {
       if (currentUser) {

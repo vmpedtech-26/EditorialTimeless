@@ -467,7 +467,7 @@ function generateCatalog100() {
     const writer = shuffle([...WRITERS])[0];
     
     // Select metadata templates
-    const pool = METADATA_POOL[category];
+    const pool = METADATA_POOL[category] || METADATA_POOL["ficcion"];
     const tagline = shuffle([...pool.taglines])[0];
     const quote = shuffle([...pool.quotes])[0];
     const synopsis = shuffle([...pool.synopses])[0];
@@ -610,6 +610,12 @@ async function seedFirestore() {
         successCount++;
         process.stdout.write(`  ✔ [${successCount}/100] Cargado: "${book.title.slice(0, 30)}..."\n`);
       } catch (err) {
+        if (err.message && err.message.includes("PERMISSION_DENIED")) {
+          console.error(`\n  ✗ [Error de Firestore] La API de Cloud Firestore no está habilitada en el proyecto 'timeless-5d27d'.`);
+          console.error(`     Para habilitarla, por favor haz clic en el siguiente enlace:`);
+          console.error(`     https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=timeless-5d27d\n`);
+          process.exit(1);
+        }
         console.error(`  ✗ [Error] Fallo al escribir libro ${book.title}:`, err.message);
       }
     }));
