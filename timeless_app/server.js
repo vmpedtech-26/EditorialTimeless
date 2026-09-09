@@ -219,6 +219,27 @@ app.use(express.static(path.join(__dirname)));
 // Caché local para usuarios Premium (evita relecturas repetidas a Firestore)
 const localPremiumUsers = new Set();
 
+// Middleware que solo verifica el token de Firebase, sin exigir estado Premium.
+// Para endpoints a los que un usuario no-premium debe poder llegar, como el
+// propio checkout que lo va a convertir en premium.
+async function verifyToken(req, res, next) {
+  if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: { message: "Falta token de autorización Bearer" }});
+  }
+
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    req.user = await admin.auth().verifyIdToken(token);
+    next();
+  } catch (err) {
+    console.error("  ✗ [verifyToken] Token inválido o expirado:", err.message);
+    return res.status(401).json({ error: { message: "Token inválido o expirado" }});
+  }
+}
+
 // Middleware para verificar token de Firebase y estado Premium
 async function authMiddleware(req, res, next) {
   if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
@@ -779,7 +800,7 @@ ${textToAudit}
   }
 });
 
-app.post('/api/create-checkout-session', authMiddleware, async (req, res) => {
+app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
   if (!DLOCAL_LOGIN || !DLOCAL_TRANS_KEY || !DLOCAL_SECRET_KEY) {
     if (IS_PRODUCTION) {
       console.error('  ✗ [Checkout] dLocal Go no configurado en producción. Rechazando checkout (no se otorga premium gratis).');

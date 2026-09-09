@@ -1476,7 +1476,7 @@ setInterval(() => {
   $('reading-timer').classList.toggle('visible', elapsed > 10);
   
   // Mostrar botón de regalo al final del libro o después de un tiempo de lectura
-  if (state.currentChapter === state.book.chapters.length - 1 && elapsed > 30) {
+  if (state.book && state.currentChapter === state.book.chapters.length - 1 && elapsed > 30) {
     showGiftCTA();
   }
 }, 1000);
