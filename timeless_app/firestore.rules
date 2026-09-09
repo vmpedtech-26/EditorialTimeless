@@ -1,10 +1,17 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
     // Reglas base: denegar acceso por defecto
     match /{document=**} {
       allow read, write: if false;
+    }
+
+    // $(...) solo admite una expresión atómica por segmento de ruta,
+    // por eso el ID compuesto "gift_<obraId>_<uid>" se arma acá y se
+    // interpola como una sola expresión en el exists() de más abajo.
+    function giftDocId(obraId) {
+      return 'gift_' + obraId + '_' + request.auth.uid;
     }
 
     // Colección 'users': los usuarios autenticados solo pueden leer su propio documento
@@ -27,8 +34,8 @@ service cloud.firestore {
     match /obras/{obraId} {
       // Un autor puede gestionar sus obras, o un invitado puede leerla si tiene un regalo válido
       allow read: if request.auth != null && (
-        resource.data.userId == request.auth.uid || 
-        exists(/databases/$(database)/documents/gifts/gift_$(obraId)_$(request.auth.uid))
+        resource.data.userId == request.auth.uid ||
+        exists(/databases/$(database)/documents/gifts/$(giftDocId(obraId)))
       );
       allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
