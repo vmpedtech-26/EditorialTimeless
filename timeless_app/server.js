@@ -933,6 +933,11 @@ app.get('/api/config', (req, res) => {
   });
 });
 
+// Endpoint liviano para el keep-alive: sin Firestore, sin auth, respuesta inmediata.
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ ok: true, uptime: process.uptime() });
+});
+
 // ── Graceful Shutdown (Pilar 2) ──────────────────────────────────────────────
 async function gracefulShutdown(signal) {
   console.log(`\n  ✦ Recibido señal ${signal}. Iniciando apagado ordenado...`);
@@ -966,3 +971,21 @@ app.listen(PORT, () => {
   console.log(`  ${line}\n`);
   console.log('  Presiona Ctrl+C para detener el servidor.\n');
 });
+
+// ── Keep-Alive (evita el spin-down de Render free tier) ──────────────────────
+// Render duerme la instancia tras ~15 min sin tráfico entrante real. Un ping
+// periódico a la propia URL pública cuenta como tráfico y evita el sueño.
+// RENDER_EXTERNAL_URL lo inyecta Render automáticamente; si no está presente
+// (local, u otro host) el keep-alive simplemente no hace nada.
+if (IS_PRODUCTION && process.env.RENDER_EXTERNAL_URL) {
+  const KEEP_ALIVE_URL = `${process.env.RENDER_EXTERNAL_URL}/api/health`;
+  const KEEP_ALIVE_INTERVAL_MS = 10 * 60 * 1000; // 10 min: bien por debajo de los ~15 min de inactividad
+
+  setInterval(() => {
+    fetch(KEEP_ALIVE_URL)
+      .then(res => console.log(`  ✦ [Keep-Alive] Ping a ${KEEP_ALIVE_URL} → ${res.status}`))
+      .catch(err => console.warn(`  ⚠ [Keep-Alive] Fallo al hacer ping: ${err.message}`));
+  }, KEEP_ALIVE_INTERVAL_MS);
+
+  console.log(`  ✦ [Keep-Alive] Activo: ping cada ${KEEP_ALIVE_INTERVAL_MS / 60000} min a ${KEEP_ALIVE_URL}\n`);
+}
