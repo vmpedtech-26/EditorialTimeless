@@ -50,8 +50,8 @@ const DLOCAL_LOGIN = process.env.DLOCAL_LOGIN || '';
 const DLOCAL_TRANS_KEY = process.env.DLOCAL_TRANS_KEY || '';
 const DLOCAL_SECRET_KEY = process.env.DLOCAL_SECRET_KEY || '';
 const DLOCAL_SANDBOX = process.env.DLOCAL_SANDBOX !== 'false';
-const DLOCAL_BASE_URL = DLOCAL_SANDBOX 
-  ? 'https://api-sandbox.dlocalgo.com' 
+const DLOCAL_BASE_URL = DLOCAL_SANDBOX
+  ? 'https://api-sbx.dlocalgo.com'
   : 'https://api.dlocalgo.com';
 
 if (!DLOCAL_LOGIN || !DLOCAL_TRANS_KEY || !DLOCAL_SECRET_KEY) {
@@ -831,10 +831,13 @@ app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
   }
   try {
     const { items } = req.body;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: { message: "Falta el detalle de la compra (items)" } });
+    }
     const userId = req.user.uid;
     const payerEmail = req.user.email || 'cliente@timeless.com';
     const payerName = req.user.name || 'Cliente Timeless';
-    
+
     // Calcular monto total
     const totalAmount = items.reduce((acc, item) => acc + (Number(item.unit_price) * Number(item.quantity)), 0);
     const xDate = new Date().toISOString();
