@@ -1,4 +1,4 @@
-const CACHE_NAME = 'timeless-v1';
+const CACHE_NAME = 'timeless-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -78,22 +78,21 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Cache First para archivos estáticos del mismo origen
+  // Network First para archivos estáticos del mismo origen (JS/CSS deben poder
+  // actualizarse en cada despliegue; el caché queda solo como respaldo offline).
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+    fetch(e.request).then((networkResponse) => {
+      if (networkResponse && networkResponse.status === 200 && url.origin === location.origin) {
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(e.request, responseToCache);
+        });
       }
-      return fetch(e.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && url.origin === location.origin) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(e.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      }).catch((err) => {
-        console.warn("  ⚠ Offline request fallido para:", e.request.url, err);
+      return networkResponse;
+    }).catch(() => {
+      return caches.match(e.request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+        console.warn("  ⚠ Offline request fallido para:", e.request.url);
       });
     })
   );
