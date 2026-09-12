@@ -269,6 +269,20 @@ async function loadBook() {
       } else if (!giftData.claimed && giftData.fromUserId !== auth.currentUser.uid) {
         await claimGift(giftToken, giftData);
       }
+    } else if (auth.currentUser) {
+      // El usuario puede haber reclamado un regalo de esta obra en una visita
+      // anterior a través del link de invitación; si vuelve por el catálogo
+      // normal (?id=...) sin ese link, seguimos honrando el regalo reclamado
+      // (sin repetir el modal de bienvenida, que ya vio la primera vez).
+      try {
+        const claimedGiftSnap = await getDoc(doc(db, "gifts", `gift_${id}_${auth.currentUser.uid}`));
+        if (claimedGiftSnap.exists() && claimedGiftSnap.data().claimed) {
+          state.gift = { id: claimedGiftSnap.id, ...claimedGiftSnap.data() };
+          state.skipInvitationCard = true;
+        }
+      } catch (claimedGiftErr) {
+        console.warn("  ⚠ [Reader] No se pudo verificar un regalo reclamado previamente:", claimedGiftErr.message);
+      }
     }
 
     let data = null;
@@ -341,7 +355,7 @@ async function loadBook() {
       state.isPreview = true;
     }
 
-    if (state.gift) showInvitationCard(state.gift);
+    if (state.gift && !state.skipInvitationCard) showInvitationCard(state.gift);
 
     renderTOC();
     
