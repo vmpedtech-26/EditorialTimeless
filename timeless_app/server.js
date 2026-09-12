@@ -13,9 +13,26 @@ const express = require('express');
 const path    = require('path');
 const admin   = require('firebase-admin');
 const crypto  = require('crypto');
+const helmet  = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app  = express();
+
+// Cabeceras de seguridad. El CSP por defecto de helmet bloquea los estilos y
+// scripts inline que usa todo el frontend actual (style="" y onclick=""
+// esparcidos por index.html/admin.js/etc.), así que se desactiva puntualmente
+// para no romper el sitio; el resto de protecciones (HSTS, X-Frame-Options,
+// nosniff, etc.) se mantienen activas.
+app.set('trust proxy', 1);
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  // 'same-origin' (el default de helmet) rompe el login por popup de Google
+  // (signInWithPopup) porque aísla la ventana del popup del opener.
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
+}));
+
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const KEY  = process.env.GEMINI_API_KEY || '';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
@@ -217,6 +234,38 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
 
 // ── Middleware ───────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '2mb' }));
+
+// Rate limiting general para la API (los webhooks ya quedaron registrados
+// arriba, antes de este middleware, así que no les aplica: no queremos
+// descartar entregas legítimas de dLocal/Stripe por límite de tasa).
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: { message: "Demasiadas solicitudes. Por favor, intenta de nuevo en unos minutos." } }
+});
+app.use('/api/', (req, res, next) => {
+  if (req.path === '/health' || req.path === '/config') return next();
+  return apiLimiter(req, res, next);
+});
+
+// Límite más estricto para el formulario público de arrepentimiento (sin
+// autenticación) y para iniciar checkouts, dos superficies propensas a abuso.
+const strictLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: { message: "Demasiadas solicitudes. Por favor, intenta de nuevo más tarde." } }
+});
+const checkoutLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: { message: "Demasiados intentos de pago. Por favor, intenta de nuevo más tarde." } }
+});
 
 // Sirve todos los archivos estáticos de timeless_app
 app.use(express.static(path.join(__dirname)));
@@ -842,7 +891,7 @@ ${textToAudit}
   }
 });
 
-app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
+app.post('/api/create-checkout-session', checkoutLimiter, verifyToken, async (req, res) => {
   if (!DLOCAL_LOGIN || !DLOCAL_TRANS_KEY || !DLOCAL_SECRET_KEY) {
     if (IS_PRODUCTION) {
       console.error('  ✗ [Checkout] dLocal Go no configurado en producción. Rechazando checkout (no se otorga premium gratis).');
@@ -1097,7 +1146,7 @@ app.post('/api/family/remove', verifyToken, async (req, res) => {
   }
 });
 
-app.post('/api/arrepentimiento', async (req, res) => {
+app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
   try {
     const { email, name, reason } = req.body;
     if (!email || !name) {
