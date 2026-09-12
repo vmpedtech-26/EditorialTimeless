@@ -802,6 +802,11 @@ onAuthStateChanged(auth, async (user) => {
         const userSnap = await getDoc(doc(db, "users", user.uid));
         if (userSnap.exists() && userSnap.data().isPremium === true) {
           isPremiumUser = true;
+        } else if (userSnap.exists() && userSnap.data().familyId) {
+          const familySnap = await getDoc(doc(db, "families", userSnap.data().familyId));
+          if (familySnap.exists() && (familySnap.data().memberIds || []).includes(user.uid)) {
+            isPremiumUser = true;
+          }
         }
       } catch (err) {
         console.warn("  ⚠ [Auth] No se pudo verificar el estado premium en Firestore. Denegando acceso por seguridad:", err.message);
@@ -810,6 +815,7 @@ onAuthStateChanged(auth, async (user) => {
     
     // Fetch library only when authenticated
     fetchLibrary(currentCat);
+    if (typeof window.__tryJoinFamilyFromUrl === 'function') window.__tryJoinFamilyFromUrl();
   } else {
     // Toggle body classes for guest view
     document.body.classList.remove('auth-member');
@@ -886,6 +892,7 @@ if (subCtaBtn) {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
+          planId: selectedPlan.id,
           items: [{ title: selectedPlan.title, quantity: 1, unit_price: selectedPlan.price }]
         })
       });
@@ -1314,6 +1321,152 @@ window.addEventListener('DOMContentLoaded', () => {
       };
     }
   }
+
+  // ── Plan Familiar: panel de gestión ─────────────────────────────────────
+  const btnFamilyPanel = document.getElementById('btn-family-panel');
+  const familyModal = document.getElementById('family-modal');
+  const closeFamilyModal = document.getElementById('close-family-modal');
+  const familyModalBody = document.getElementById('family-modal-body');
+
+  async function renderFamilyPanel() {
+    if (!familyModalBody) return;
+    familyModalBody.innerHTML = 'Cargando...';
+    if (!currentUser) {
+      familyModalBody.innerHTML = '<p>Iniciá sesión para gestionar tu Plan Familiar.</p>';
+      return;
+    }
+    try {
+      const token = await currentUser.getIdToken();
+      const res = await fetch('/api/family/status', { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'No se pudo cargar tu Plan Familiar');
+
+      if (!data.inFamily) {
+        familyModalBody.innerHTML = `
+          <p>No formás parte de ningún Plan Familiar todavía.</p>
+          <p style="opacity:0.7;">Suscribite al <strong>Plan Familiar</strong> ($18/mes, hasta 6 cuentas) para invitar a tu familia, o pedile a quien ya tenga uno que te invite.</p>
+        `;
+        return;
+      }
+
+      const rows = data.members.map(m => `
+        <li style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(200,180,150,0.15);">
+          <span>${m.email || m.uid}${m.uid === currentUser.uid ? ' (vos)' : ''}</span>
+          ${data.isOwner && m.uid !== currentUser.uid ? `<button class="btn-family-remove" data-uid="${m.uid}" style="background:none; border:1px solid rgba(200,180,150,0.3); color:#EDE8E0; border-radius:6px; padding:4px 10px; font-size:11px; cursor:pointer;">Quitar</button>` : ''}
+        </li>
+      `).join('');
+
+      familyModalBody.innerHTML = `
+        <p style="margin-bottom:10px;">${data.isOwner ? 'Sos el titular de este Plan Familiar.' : 'Formás parte de un Plan Familiar.'} (${data.members.length}/${data.maxMembers} cuentas)</p>
+        <ul style="list-style:none; padding:0; margin:0 0 20px;">${rows}</ul>
+        ${data.isOwner ? `
+          <button id="btn-family-invite" ${data.members.length >= data.maxMembers ? 'disabled' : ''} style="width:100%; background: var(--gold); color:#141210; border:none; padding:12px; border-radius:6px; font-weight:600; cursor:pointer; text-transform:uppercase; letter-spacing:1px; font-size:12px; opacity:${data.members.length >= data.maxMembers ? '0.5' : '1'};">
+            ${data.members.length >= data.maxMembers ? 'Plan Familiar completo' : 'Invitar miembro'}
+          </button>
+          <div id="family-invite-link-wrap" style="display:none; margin-top:12px;">
+            <input type="text" id="family-invite-link" readonly style="width:100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(200,180,150,0.25); padding: 10px; border-radius: 6px; color: #EDE8E0; font-family: var(--font-sans); box-sizing: border-box; font-size: 12px; margin-bottom:8px;">
+            <button id="btn-family-copy-link" style="width:100%; background:none; border:1px solid rgba(200,180,150,0.3); color: var(--gold); border-radius:6px; padding:10px; font-size:12px; cursor:pointer;">Copiar link de invitación</button>
+          </div>
+        ` : ''}
+      `;
+
+      const btnInvite = document.getElementById('btn-family-invite');
+      if (btnInvite) {
+        btnInvite.onclick = async () => {
+          btnInvite.disabled = true;
+          btnInvite.textContent = 'Generando...';
+          try {
+            const inviteToken = await currentUser.getIdToken();
+            const inviteRes = await fetch('/api/family/invite', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${inviteToken}` }
+            });
+            const inviteData = await inviteRes.json();
+            if (!inviteRes.ok) throw new Error(inviteData.error?.message || 'No se pudo generar la invitación');
+
+            const link = `${window.location.origin}${window.location.pathname}?familyInvite=${inviteData.inviteId}`;
+            const wrap = document.getElementById('family-invite-link-wrap');
+            const linkInput = document.getElementById('family-invite-link');
+            if (linkInput) linkInput.value = link;
+            if (wrap) wrap.style.display = 'block';
+
+            const btnCopy = document.getElementById('btn-family-copy-link');
+            if (btnCopy) {
+              btnCopy.onclick = () => {
+                linkInput.select();
+                document.execCommand('copy');
+                btnCopy.textContent = '¡Copiado!';
+                setTimeout(() => btnCopy.textContent = 'Copiar link de invitación', 2000);
+              };
+            }
+          } catch (err) {
+            alert(err.message);
+          } finally {
+            btnInvite.disabled = false;
+            btnInvite.textContent = 'Invitar miembro';
+          }
+        };
+      }
+
+      familyModalBody.querySelectorAll('.btn-family-remove').forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm('¿Quitar a este miembro del Plan Familiar? Perderá el acceso premium.')) return;
+          try {
+            const removeToken = await currentUser.getIdToken();
+            const removeRes = await fetch('/api/family/remove', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${removeToken}` },
+              body: JSON.stringify({ memberUid: btn.dataset.uid })
+            });
+            const removeData = await removeRes.json();
+            if (!removeRes.ok) throw new Error(removeData.error?.message || 'No se pudo quitar al miembro');
+            renderFamilyPanel();
+          } catch (err) {
+            alert(err.message);
+          }
+        };
+      });
+    } catch (err) {
+      familyModalBody.innerHTML = `<p>Error: ${err.message}</p>`;
+    }
+  }
+
+  if (btnFamilyPanel && familyModal) {
+    btnFamilyPanel.onclick = (e) => {
+      e.preventDefault();
+      familyModal.style.display = 'flex';
+      renderFamilyPanel();
+    };
+    if (closeFamilyModal) {
+      closeFamilyModal.onclick = () => { familyModal.style.display = 'none'; };
+    }
+    familyModal.onclick = (e) => {
+      if (e.target === familyModal) familyModal.style.display = 'none';
+    };
+  }
+
+  // Aceptar una invitación de Plan Familiar recibida por link (?familyInvite=...)
+  async function tryJoinFamilyFromUrl() {
+    const inviteId = new URLSearchParams(window.location.search).get('familyInvite');
+    if (!inviteId || !currentUser) return;
+    if (!confirm('¿Aceptar la invitación al Plan Familiar? Vas a compartir la suscripción premium con este grupo.')) return;
+    try {
+      const token = await currentUser.getIdToken();
+      const res = await fetch('/api/family/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ inviteId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'No se pudo aceptar la invitación');
+      alert('¡Listo! Ya formás parte del Plan Familiar.');
+      window.location.href = window.location.pathname;
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+  window.__tryJoinFamilyFromUrl = tryJoinFamilyFromUrl;
+  if (currentUser) tryJoinFamilyFromUrl();
 
   // Email Gate Form Handlers (All forms with class .email-gate-form)
   const emailGateForms = document.querySelectorAll('.email-gate-form');

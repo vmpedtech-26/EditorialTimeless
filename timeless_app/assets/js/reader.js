@@ -342,6 +342,11 @@ async function loadBook() {
           const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
           if (userSnap.exists() && userSnap.data().isPremium === true) {
             isUserPremium = true;
+          } else if (userSnap.exists() && userSnap.data().familyId) {
+            const familySnap = await getDoc(doc(db, "families", userSnap.data().familyId));
+            if (familySnap.exists() && (familySnap.data().memberIds || []).includes(auth.currentUser.uid)) {
+              isUserPremium = true;
+            }
           }
         } catch (dbErr) {
           console.warn("  ⚠ [Reader] No se pudo verificar el estado premium en Firestore. Denegando acceso por seguridad:", dbErr.message);

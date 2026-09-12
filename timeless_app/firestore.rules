@@ -54,5 +54,16 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.token.email == 'matiaseorejas@gmail.com';
     }
+
+    // Colección 'families': soporte del Plan Familiar. Solo el titular y sus
+    // miembros pueden leerla (para verificar acceso premium compartido); toda
+    // escritura se hace desde el backend con firebase-admin, nunca desde el cliente.
+    match /families/{familyId} {
+      allow read: if request.auth != null && (
+        resource.data.ownerId == request.auth.uid ||
+        request.auth.uid in resource.data.memberIds
+      );
+      allow write: if false;
+    }
   }
 }

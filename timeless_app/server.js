@@ -183,11 +183,13 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
   console.log(`  ✦ [dLocal Webhook] Recibido evento. ID: ${paymentId}, Estado: ${status}, Order ID: ${orderId}`);
 
   if ((status === 'PAID' || status === 'APPROVED') && orderId) {
-    // Extraer userId de order_id (userId_timestamp o directamente userId)
-    const userId = orderId.split('_')[0];
-    
-    console.log(`  ✦ [dLocal Webhook] Pago APROBADO. Activando premium para usuario: ${userId}`);
-    
+    // order_id se arma como `${userId}_${planId}_${timestamp}` en /api/create-checkout-session
+    const orderParts = orderId.split('_');
+    const userId = orderParts[0];
+    const planId = ['monthly', 'annual', 'family'].includes(orderParts[1]) ? orderParts[1] : 'annual';
+
+    console.log(`  ✦ [dLocal Webhook] Pago APROBADO. Activando premium para usuario: ${userId} (plan: ${planId})`);
+
     if (admin.apps.length > 0) {
       try {
         const db = admin.firestore();
@@ -195,9 +197,12 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
           isPremium: true,
           subscriptionDate: admin.firestore.FieldValue.serverTimestamp(),
           lastPaymentId: paymentId,
-          plan: 'annual_dlocal'
+          plan: `${planId}_dlocal`
         }, { merge: true });
         console.log(`  ✦ [Firestore] Suscripción dLocal Go activada para ${userId}`);
+        if (planId === 'family') {
+          await ensureFamilyForOwner(userId, null);
+        }
       } catch (dbErr) {
         console.error('  ✗ [dLocal Webhook Error] Fallo al escribir en Firestore:', dbErr);
       }
@@ -240,6 +245,41 @@ async function verifyToken(req, res, next) {
   }
 }
 
+const FAMILY_MAX_MEMBERS = 6;
+
+// Un usuario es premium por sí mismo (isPremium) o por pertenecer a un Plan
+// Familiar activo (familyId apunta a una familia cuyo memberIds lo incluye).
+async function isPremiumViaFamily(uid) {
+  try {
+    const db = admin.firestore();
+    const userSnap = await db.collection('users').doc(uid).get();
+    const familyId = userSnap.exists ? userSnap.data().familyId : null;
+    if (!familyId) return false;
+    const familySnap = await db.collection('families').doc(familyId).get();
+    return familySnap.exists && Array.isArray(familySnap.data().memberIds) && familySnap.data().memberIds.includes(uid);
+  } catch (e) {
+    return false;
+  }
+}
+
+// Crea la familia del Plan Familiar para su titular si todavía no tiene una.
+async function ensureFamilyForOwner(uid, ownerEmail) {
+  const db = admin.firestore();
+  const userSnap = await db.collection('users').doc(uid).get();
+  if (userSnap.exists && userSnap.data().familyId) {
+    return userSnap.data().familyId;
+  }
+  const familyRef = db.collection('families').doc();
+  await familyRef.set({
+    ownerId: uid,
+    ownerEmail: ownerEmail || '',
+    memberIds: [uid],
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  await db.collection('users').doc(uid).set({ familyId: familyRef.id }, { merge: true });
+  return familyRef.id;
+}
+
 // Middleware para verificar token de Firebase y estado Premium
 async function authMiddleware(req, res, next) {
   if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
@@ -262,8 +302,10 @@ async function authMiddleware(req, res, next) {
         const userSnap = await admin.firestore().collection('users').doc(uid).get();
         if (userSnap.exists && userSnap.data().isPremium) {
           isPremium = true;
-          localPremiumUsers.add(uid);
+        } else if (userSnap.exists && userSnap.data().familyId) {
+          isPremium = await isPremiumViaFamily(uid);
         }
+        if (isPremium) localPremiumUsers.add(uid);
       } catch (dbErr) {
         console.error(`  ✗ [AuthMiddleware] Error al leer Firestore (${dbErr.message}).`);
         // Solo se tolera en desarrollo local: nunca otorgar premium por un error
@@ -807,11 +849,12 @@ app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
       return res.status(500).json({ error: { message: "Servicio de pagos temporalmente no disponible (dLocal Go no configurado en el servidor)" }});
     }
     const userId = req.user.uid;
-    console.log(`  ✦ [Sandbox Checkout] dLocal Go no configurado (modo desarrollo). Simulando pago inmediato para el usuario: ${userId}`);
-    
+    const planId = ['monthly', 'annual', 'family'].includes(req.body.planId) ? req.body.planId : 'annual';
+    console.log(`  ✦ [Sandbox Checkout] dLocal Go no configurado (modo desarrollo). Simulando pago inmediato para el usuario: ${userId} (plan: ${planId})`);
+
     // Registrar premium en la caché local
     localPremiumUsers.add(userId);
-    
+
     // Escribir en Firestore de forma segura
     if (admin.apps.length > 0) {
       try {
@@ -819,14 +862,17 @@ app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
         await db.collection('users').doc(userId).set({
           isPremium: true,
           subscriptionDate: admin.firestore.FieldValue.serverTimestamp(),
-          plan: 'demo_sandbox_bypass'
+          plan: `demo_sandbox_bypass_${planId}`
         }, { merge: true });
         console.log(`  ✦ [Firestore Sandbox] Suscripción activada para ${userId}`);
+        if (planId === 'family') {
+          await ensureFamilyForOwner(userId, req.user.email);
+        }
       } catch (dbErr) {
         console.warn("  ⚠ [Firestore Sandbox] Fallo al escribir en Firestore (esperado si está deshabilitado):", dbErr.message);
       }
     }
-    
+
     return res.json({ id: "sandbox_payment_ok", url: "/index.html?checkout=success_sandbox" });
   }
   try {
@@ -835,6 +881,7 @@ app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
       return res.status(400).json({ error: { message: "Falta el detalle de la compra (items)" } });
     }
     const userId = req.user.uid;
+    const planId = ['monthly', 'annual', 'family'].includes(req.body.planId) ? req.body.planId : 'annual';
     const payerEmail = req.user.email || 'cliente@timeless.com';
     const payerName = req.user.name || 'Cliente Timeless';
 
@@ -847,7 +894,7 @@ app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
       currency: "USD",
       country: "AR",
       payment_method_flow: "REDIRECT",
-      order_id: `${userId}_${Date.now()}`,
+      order_id: `${userId}_${planId}_${Date.now()}`,
       payer: {
         name: payerName,
         email: payerEmail,
@@ -888,6 +935,164 @@ app.post('/api/create-checkout-session', verifyToken, async (req, res) => {
 
   } catch (err) {
     console.error('[/api/create-checkout-session]', err);
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+// ── Plan Familiar: gestión de miembros (hasta FAMILY_MAX_MEMBERS cuentas) ────
+app.get('/api/family/status', verifyToken, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const db = admin.firestore();
+    const userSnap = await db.collection('users').doc(uid).get();
+    const familyId = userSnap.exists ? userSnap.data().familyId : null;
+
+    if (!familyId) {
+      return res.json({ inFamily: false });
+    }
+
+    const familySnap = await db.collection('families').doc(familyId).get();
+    if (!familySnap.exists) {
+      return res.json({ inFamily: false });
+    }
+
+    const family = familySnap.data();
+    const memberIds = family.memberIds || [];
+    const members = await Promise.all(memberIds.map(async (memberUid) => {
+      try {
+        const memberRecord = await admin.auth().getUser(memberUid);
+        return { uid: memberUid, email: memberRecord.email };
+      } catch (e) {
+        return { uid: memberUid, email: null };
+      }
+    }));
+
+    res.json({
+      inFamily: true,
+      familyId,
+      isOwner: family.ownerId === uid,
+      maxMembers: FAMILY_MAX_MEMBERS,
+      members
+    });
+  } catch (err) {
+    console.error('[/api/family/status]', err);
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+app.post('/api/family/invite', verifyToken, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const db = admin.firestore();
+    const userSnap = await db.collection('users').doc(uid).get();
+    const familyId = userSnap.exists ? userSnap.data().familyId : null;
+    if (!familyId) {
+      return res.status(403).json({ error: { message: "No tenés un Plan Familiar activo." } });
+    }
+
+    const familyRef = db.collection('families').doc(familyId);
+    const familySnap = await familyRef.get();
+    if (!familySnap.exists || familySnap.data().ownerId !== uid) {
+      return res.status(403).json({ error: { message: "Solo el titular del Plan Familiar puede invitar miembros." } });
+    }
+
+    const memberIds = familySnap.data().memberIds || [];
+    if (memberIds.length >= FAMILY_MAX_MEMBERS) {
+      return res.status(400).json({ error: { message: `Ya alcanzaste el máximo de ${FAMILY_MAX_MEMBERS} cuentas del Plan Familiar.` } });
+    }
+
+    const inviteId = `finv_${familyId}_${Math.random().toString(36).substring(2, 10)}`;
+    await db.collection('family_invites').doc(inviteId).set({
+      familyId,
+      invitedBy: uid,
+      claimed: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    res.json({ inviteId });
+  } catch (err) {
+    console.error('[/api/family/invite]', err);
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+app.post('/api/family/join', verifyToken, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { inviteId } = req.body;
+    if (!inviteId) {
+      return res.status(400).json({ error: { message: "Falta el código de invitación." } });
+    }
+
+    const db = admin.firestore();
+    const inviteRef = db.collection('family_invites').doc(inviteId);
+    const inviteSnap = await inviteRef.get();
+    if (!inviteSnap.exists) {
+      return res.status(404).json({ error: { message: "La invitación no existe o ya expiró." } });
+    }
+    const invite = inviteSnap.data();
+    if (invite.claimed) {
+      return res.status(400).json({ error: { message: "Esta invitación ya fue utilizada." } });
+    }
+
+    const familyRef = db.collection('families').doc(invite.familyId);
+    const familySnap = await familyRef.get();
+    if (!familySnap.exists) {
+      return res.status(404).json({ error: { message: "El Plan Familiar ya no existe." } });
+    }
+    const family = familySnap.data();
+    const memberIds = family.memberIds || [];
+
+    if (memberIds.includes(uid)) {
+      return res.json({ success: true, familyId: invite.familyId, alreadyMember: true });
+    }
+    if (memberIds.length >= FAMILY_MAX_MEMBERS) {
+      return res.status(400).json({ error: { message: `Este Plan Familiar ya tiene el máximo de ${FAMILY_MAX_MEMBERS} cuentas.` } });
+    }
+
+    await familyRef.update({ memberIds: admin.firestore.FieldValue.arrayUnion(uid) });
+    await db.collection('users').doc(uid).set({ familyId: invite.familyId }, { merge: true });
+    await inviteRef.update({ claimed: true, claimedBy: uid, claimedAt: admin.firestore.FieldValue.serverTimestamp() });
+    localPremiumUsers.add(uid);
+
+    res.json({ success: true, familyId: invite.familyId });
+  } catch (err) {
+    console.error('[/api/family/join]', err);
+    res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+app.post('/api/family/remove', verifyToken, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const { memberUid } = req.body;
+    if (!memberUid) {
+      return res.status(400).json({ error: { message: "Falta indicar qué miembro quitar." } });
+    }
+    if (memberUid === uid) {
+      return res.status(400).json({ error: { message: "El titular no puede quitarse a sí mismo del Plan Familiar." } });
+    }
+
+    const db = admin.firestore();
+    const userSnap = await db.collection('users').doc(uid).get();
+    const familyId = userSnap.exists ? userSnap.data().familyId : null;
+    if (!familyId) {
+      return res.status(403).json({ error: { message: "No tenés un Plan Familiar activo." } });
+    }
+
+    const familyRef = db.collection('families').doc(familyId);
+    const familySnap = await familyRef.get();
+    if (!familySnap.exists || familySnap.data().ownerId !== uid) {
+      return res.status(403).json({ error: { message: "Solo el titular del Plan Familiar puede quitar miembros." } });
+    }
+
+    await familyRef.update({ memberIds: admin.firestore.FieldValue.arrayRemove(memberUid) });
+    await db.collection('users').doc(memberUid).update({ familyId: admin.firestore.FieldValue.delete() }).catch(() => {});
+    localPremiumUsers.delete(memberUid);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[/api/family/remove]', err);
     res.status(500).json({ error: { message: err.message } });
   }
 });

@@ -141,6 +141,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
               Biblioteca
             </a>
+            <a href="#" class="menu-item" id="btn-family-panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Mi Familia
+            </a>
             <a href="#" class="menu-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2-2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               Ajustes
@@ -979,6 +983,21 @@
         <div style="font-size: 56px; color: var(--gold); margin-bottom: 15px; font-weight: 300;">✓</div>
         <h3 style="color: var(--gold); font-family: var(--font-serif); margin-bottom: 10px; font-size: 20px; font-weight: 400;">Solicitud Recibida</h3>
         <p style="font-size: 13px; opacity: 0.85; line-height: 1.6; color: #EDE8E0;">Hemos registrado tu revocación. Nuestro equipo procesará la baja y se pondrá en contacto con vos a la brevedad.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PLAN FAMILIAR: PANEL DE GESTIÓN
+  ============================================================ -->
+  <div id="family-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 8, 6, 0.7); backdrop-filter: blur(10px); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: rgba(30, 27, 24, 0.95); border: 1px solid rgba(200, 180, 150, 0.2); border-radius: 12px; padding: 30px; width: 90%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); font-family: var(--font-sans); color: var(--ink); max-height: 85vh; overflow-y: auto; box-sizing: border-box;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-family: var(--font-serif); font-size: 24px; color: var(--gold); margin: 0; font-weight: 500;">Mi Familia</h2>
+        <button id="close-family-modal" style="background: none; border: none; color: var(--ink-faint); font-size: 28px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+      </div>
+      <div id="family-modal-body" style="font-size: 13px; line-height: 1.6; color: #EDE8E0;">
+        Cargando...
       </div>
     </div>
   </div>
