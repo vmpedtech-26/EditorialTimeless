@@ -267,6 +267,32 @@ const checkoutLimiter = rateLimit({
   message: { error: { message: "Demasiados intentos de pago. Por favor, intenta de nuevo más tarde." } }
 });
 
+// express.static sirve TODO el directorio del proyecto, no solo los assets
+// públicos del sitio. Bloquear explícitamente lo que nunca debería ser
+// descargable (reglas de seguridad, specs internas, scripts de backend,
+// manifiestos de dependencias, el prototipo de app móvil sin terminar).
+const STATIC_DENY_PATTERNS = [
+  /^\/specs\//,
+  /^\/mobile_app\//,
+  /^\/firestore\.rules$/,
+  /^\/seed_library\.js$/,
+  /^\/apply_local_catalog\.js$/,
+  /^\/package(-lock)?\.json$/,
+  /^\/firebase\.json$/,
+  /^\/\.firebaserc$/,
+  /^\/render\.yaml$/,
+  /^\/\.env(\.|$)/,
+  /^\/serviceAccountKey\.json$/,
+  /^\/agent_placeholder\.html$/
+];
+app.use((req, res, next) => {
+  const p = req.path;
+  if (STATIC_DENY_PATTERNS.some(re => re.test(p))) {
+    return res.status(404).send('Not found');
+  }
+  next();
+});
+
 // Sirve todos los archivos estáticos de timeless_app
 app.use(express.static(path.join(__dirname)));
 
