@@ -330,8 +330,7 @@ async function loadBook() {
             isUserPremium = true;
           }
         } catch (dbErr) {
-          console.warn("  ⚠ [Reader] No se pudo verificar el estado premium en Firestore. Sandbox mode: Permitir acceso temporal.");
-          isUserPremium = true; // Fallback tolerante en sandbox local offline
+          console.warn("  ⚠ [Reader] No se pudo verificar el estado premium en Firestore. Denegando acceso por seguridad:", dbErr.message);
         }
       }
     } else {

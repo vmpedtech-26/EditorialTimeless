@@ -804,8 +804,7 @@ onAuthStateChanged(auth, async (user) => {
           isPremiumUser = true;
         }
       } catch (err) {
-        console.warn("  ⚠ [Auth] No se pudo verificar el estado premium en Firestore. Sandbox mode: Permitir acceso temporal.");
-        isPremiumUser = true; // Fallback tolerante en sandbox local
+        console.warn("  ⚠ [Auth] No se pudo verificar el estado premium en Firestore. Denegando acceso por seguridad:", err.message);
       }
     }
     
