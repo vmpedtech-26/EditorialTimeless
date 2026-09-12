@@ -14,6 +14,22 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+// El contenido de los capítulos guarda HTML "de verdad" (párrafos con <p>),
+// no solo texto plano, y no siempre viene del catálogo curado por el editor:
+// una obra generada por otro usuario (Agente IA) y regalada también pasa por
+// acá. Se permite el formato básico de prosa y se elimina cualquier otra
+// etiqueta o atributo (scripts, manejadores de eventos, iframes, etc.).
+function sanitizeChapterHtml(html) {
+  if (typeof window.DOMPurify === 'undefined') {
+    console.warn('  ⚠ [Seguridad] DOMPurify no cargó; se muestra el capítulo como texto plano por precaución.');
+    return escapeHtml(html);
+  }
+  return window.DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'em', 'strong', 'i', 'b', 'br', 'blockquote', 'span', 'h1', 'h2', 'h3', 'ul', 'ol', 'li'],
+    ALLOWED_ATTR: []
+  });
+}
 const state = {
   book: null,
   bookId: null,
@@ -762,7 +778,7 @@ function renderPreview() {
   
   // Tomamos solo los primeros 3 párrafos para el preview
   const previewParagraphs = ch.content.split('\n').filter(p => p.trim()).slice(0, 3);
-  const contentHtml = previewParagraphs.map(p => `<p>${p}</p>`).join('');
+  const contentHtml = sanitizeChapterHtml(previewParagraphs.map(p => `<p>${p}</p>`).join(''));
 
   let ctaHtml = '';
   if (state.gift) {
@@ -906,7 +922,7 @@ async function renderChapter(idx) {
         <div class="chapter-desc">${escapeHtml(ch.desc || "")}</div>
       </div>
       <div class="reading-body font-${state.fontFamily}">
-        ${ch.content}
+        ${sanitizeChapterHtml(ch.content)}
       </div>
     `;
     container.style.opacity = '1';
