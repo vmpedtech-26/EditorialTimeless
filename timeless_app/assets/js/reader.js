@@ -2,6 +2,18 @@ import { auth, onAuthStateChanged, db, doc, getDoc, setDoc, updateDoc, deleteDoc
 import { CryptoUtils } from './crypto_utils.js';
 
 const $ = id => document.getElementById(id);
+
+// Escapa texto de origen no confiable (notas de regalo, nombres, títulos)
+// antes de interpolarlo en innerHTML, para evitar XSS almacenado.
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 const state = {
   book: null,
   bookId: null,
@@ -757,7 +769,7 @@ function renderPreview() {
     ctaHtml = `
       <div class="cta-card">
         <h3>Continúa la lectura</h3>
-        <p>Has llegado al final de la vista previa de cortesía. Acepta la invitación de <strong>${state.gift.fromName}</strong> para añadir esta obra a tu biblioteca y seguir leyendo.</p>
+        <p>Has llegado al final de la vista previa de cortesía. Acepta la invitación de <strong>${escapeHtml(state.gift.fromName)}</strong> para añadir esta obra a tu biblioteca y seguir leyendo.</p>
         <button onclick="window.location.href='index.html'" class="btn-accept-invitation">
           Aceptar Invitación y Continuar
         </button>
@@ -779,8 +791,8 @@ function renderPreview() {
 
   container.innerHTML = `
     <div class="chapter-heading">
-      <h1 class="chapter-title">${ch.title}</h1>
-      <div class="chapter-desc">${ch.desc || ""}</div>
+      <h1 class="chapter-title">${escapeHtml(ch.title)}</h1>
+      <div class="chapter-desc">${escapeHtml(ch.desc || "")}</div>
     </div>
     <div class="reading-body font-${state.fontFamily} preview-mode">
       ${contentHtml}
@@ -804,10 +816,10 @@ function showInvitationCard(gift) {
         <div class="invitation-label">Invitación de Cortesía</div>
       </div>
       <div class="invitation-body">
-        <img src="${state.book.cover || 'assets/cover.png'}" class="invitation-cover" />
-        <h2 class="invitation-book-title">${state.book.title}</h2>
-        <p class="invitation-sender">Un obsequio personal de <strong>${gift.fromName}</strong></p>
-        ${gift.personalNote ? `<div class="personal-note">&ldquo;${gift.personalNote}&rdquo;</div>` : ''}
+        <img src="${escapeHtml(state.book.cover || 'assets/cover.png')}" class="invitation-cover" />
+        <h2 class="invitation-book-title">${escapeHtml(state.book.title)}</h2>
+        <p class="invitation-sender">Un obsequio personal de <strong>${escapeHtml(gift.fromName)}</strong></p>
+        ${gift.personalNote ? `<div class="personal-note">&ldquo;${escapeHtml(gift.personalNote)}&rdquo;</div>` : ''}
       </div>
       <button class="btn-start-reading" onclick="document.getElementById('invitation-overlay').remove()">
         Empezar a leer
@@ -890,8 +902,8 @@ async function renderChapter(idx) {
   setTimeout(() => {
     container.innerHTML = `
       <div class="chapter-heading">
-        <h1 class="chapter-title">${ch.title}</h1>
-        <div class="chapter-desc">${ch.desc || ""}</div>
+        <h1 class="chapter-title">${escapeHtml(ch.title)}</h1>
+        <div class="chapter-desc">${escapeHtml(ch.desc || "")}</div>
       </div>
       <div class="reading-body font-${state.fontFamily}">
         ${ch.content}
@@ -916,7 +928,7 @@ function renderTOC() {
   $('chapter-list').innerHTML = state.book.chapters.map((ch, i) => `
     <div class="chapter-item" data-idx="${i}">
       <div class="chapter-num">${ch.id}</div>
-      <div class="chapter-name">${ch.title}</div>
+      <div class="chapter-name">${escapeHtml(ch.title)}</div>
     </div>
   `).join('');
   
@@ -1040,7 +1052,7 @@ function renderNotesPanel() {
   
   list.innerHTML = state.highlights.map(h => `
     <div class="note-item" id="note-item-${h.id}">
-      <div style="font-family:var(--font-serif); font-style:italic; font-size:15px; margin-bottom:8px; line-height:1.4;">&ldquo;${h.text}&rdquo;</div>
+      <div style="font-family:var(--font-serif); font-style:italic; font-size:15px; margin-bottom:8px; line-height:1.4;">&ldquo;${escapeHtml(h.text)}&rdquo;</div>
       <div class="note-footer">
         <div class="note-meta">Capítulo ${h.chapter + 1}</div>
         <div style="display:flex; gap:10px;">

@@ -5,6 +5,18 @@ import {
   db, collection, getDocs, query, where, doc, getDoc
 } from '../../firebase_config.js';
 
+// Escapa texto de origen no confiable antes de interpolarlo en innerHTML,
+// para evitar XSS almacenado (emails de miembros de familia, etc.).
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ---- STATE ----
 let currentUser = null;
 let currentCat = 'all';
@@ -1400,7 +1412,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const rows = data.members.map(m => `
         <li style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(200,180,150,0.15);">
-          <span>${m.email || m.uid}${m.uid === currentUser.uid ? ' (vos)' : ''}</span>
+          <span>${escapeHtml(m.email || m.uid)}${m.uid === currentUser.uid ? ' (vos)' : ''}</span>
           ${data.isOwner && m.uid !== currentUser.uid ? `<button class="btn-family-remove" data-uid="${m.uid}" style="background:none; border:1px solid rgba(200,180,150,0.3); color:#EDE8E0; border-radius:6px; padding:4px 10px; font-size:11px; cursor:pointer;">Quitar</button>` : ''}
         </li>
       `).join('');
