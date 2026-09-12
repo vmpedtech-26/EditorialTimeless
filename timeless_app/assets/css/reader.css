@@ -775,10 +775,20 @@ svg { width: 22px; height: 22px; vertical-align: middle; }
   background-color: rgba(212, 175, 55, 0.38); /* slightly stronger gold */
 }
 
-/* DRM Text Selection Protection */
-body, main, #reading-content {
+/* DRM Text Selection Protection
+   #reading-content is intentionally excluded: the highlight/notes feature
+   needs real text selection there, and copying is already blocked by the
+   'copy' event listener in reader.js, so disabling selection added no
+   protection while silently breaking highlighting for every user. */
+body, main {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+#reading-content {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
