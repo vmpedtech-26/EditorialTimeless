@@ -1,5 +1,5 @@
-import { 
-  auth, onAuthStateChanged, db, doc, setDoc, serverTimestamp 
+import {
+  auth, onAuthStateChanged, db, doc, getDoc, setDoc, serverTimestamp
 } from '../../firebase_config.js';
 
 const $ = id => document.getElementById(id);
@@ -171,6 +171,18 @@ $('book-upload-form').onsubmit = async (e) => {
       .replace(/[^a-z0-9\s-]/g, "") // remover caracteres especiales
       .trim()
       .replace(/\s+/g, "-"); // reemplazar espacios con guiones
+
+    // Evitar sobrescribir en silencio una obra ya publicada con el mismo slug
+    const existingSnap = await getDoc(doc(db, "books", bookId));
+    if (existingSnap.exists()) {
+      const confirmOverwrite = confirm(
+        `Ya existe una obra publicada con el ID "${bookId}" (título: "${existingSnap.data().title}"). ` +
+        `¿Querés reemplazarla por esta nueva versión? Esta acción no se puede deshacer.`
+      );
+      if (!confirmOverwrite) {
+        throw new Error("Publicación cancelada: ya existe una obra con ese mismo título/ID.");
+      }
+    }
 
     let kidsData = {};
     if (cat === 'kids') {
