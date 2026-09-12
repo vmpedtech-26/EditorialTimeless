@@ -1295,7 +1295,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
           console.log("  ✦ [Gobernanza] Solicitud de arrepentimiento procesada con éxito:", data);
           formArrepentimiento.style.display = 'none';
-          if (successArrepentimiento) successArrepentimiento.style.display = 'block';
+          if (successArrepentimiento) {
+            const msgEl = successArrepentimiento.querySelector('p');
+            if (msgEl) {
+              msgEl.textContent = `Hemos registrado tu revocación (referencia ${data.ticketId}). Nuestro equipo procesará la baja y se pondrá en contacto con vos a ${email} a la brevedad.`;
+            }
+            successArrepentimiento.style.display = 'block';
+          }
         } catch (err) {
           console.error("  ✗ [Gobernanza] Error al enviar arrepentimiento:", err);
           alert(`Error: ${err.message}`);
