@@ -1,6 +1,7 @@
 import { 
   auth, googleProvider, signInWithPopup, signOut, onAuthStateChanged,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile,
+  sendPasswordResetEmail,
   db, collection, getDocs, query, where, doc, getDoc
 } from '../../firebase_config.js';
 
@@ -688,6 +689,43 @@ function resetToLogin() {
   authSubmitBtn.textContent = 'Entrar';
   authFooter.innerHTML = '¿No tienes cuenta? <button id="btn-switch-auth" style="background:none; border:none; color:var(--gold); font-weight:600; cursor:pointer; text-decoration:underline;">Regístrate</button>';
   document.getElementById('btn-switch-auth').addEventListener('click', switchModeHandler);
+}
+
+// Forgot Password: send a Firebase Auth password reset email
+const btnForgotPassword = document.getElementById('btn-forgot-password');
+if (btnForgotPassword) {
+  btnForgotPassword.addEventListener('click', async () => {
+    if (errorContainer) { errorContainer.textContent = ''; errorContainer.style.color = '#FF5F57'; }
+    const email = document.getElementById('auth-email').value.trim();
+    if (!email) {
+      if (errorContainer) errorContainer.textContent = 'Ingresá tu correo electrónico arriba para poder enviarte el link de recuperación.';
+      return;
+    }
+    const originalText = btnForgotPassword.textContent;
+    btnForgotPassword.textContent = 'Enviando...';
+    btnForgotPassword.disabled = true;
+    try {
+      await sendPasswordResetEmail(auth, email);
+      if (errorContainer) {
+        errorContainer.style.color = 'var(--gold)';
+        errorContainer.textContent = `Te enviamos un correo a ${email} con un link para restablecer tu contraseña.`;
+      }
+    } catch (error) {
+      console.error("Password Reset Error:", error);
+      let friendlyMessage = 'No se pudo enviar el correo de recuperación.';
+      if (error.code === 'auth/invalid-email') {
+        friendlyMessage = 'El correo electrónico no es válido.';
+      } else if (error.code === 'auth/user-not-found') {
+        // No revelamos si el email existe o no en el sistema, por seguridad.
+        errorContainer.style.color = 'var(--gold)';
+        friendlyMessage = `Si ${email} tiene una cuenta en Timeless, vas a recibir un correo con instrucciones.`;
+      }
+      if (errorContainer) errorContainer.textContent = friendlyMessage;
+    } finally {
+      btnForgotPassword.textContent = originalText;
+      btnForgotPassword.disabled = false;
+    }
+  });
 }
 
 // Form Submit: Email & Password Sign-In or Sign-Up
