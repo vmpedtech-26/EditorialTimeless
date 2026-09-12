@@ -1139,7 +1139,18 @@ window.openBookModal = function(bookId) {
         };
         
         await saveBookOffline(book.id, offlineBookData, "offline_license_token_valid");
-        
+
+        // Guardar el salt de DRM localmente: sin esto, el lector no puede
+        // descifrar ningún capítulo descargado una vez que el dispositivo
+        // pierde conexión (la ruta /api/config no funciona sin red).
+        try {
+          const configRes = await fetch('/api/config');
+          const config = await configRes.json();
+          if (config.drmSalt) localStorage.setItem('tl_drm_salt_cache', config.drmSalt);
+        } catch (saltErr) {
+          console.warn("No se pudo guardar el salt de DRM para lectura offline:", saltErr.message);
+        }
+
         if (dlText) dlText.textContent = '✓ Guardado Offline';
         dlBtn.style.background = '#5CB88A';
         dlBtn.style.borderColor = '#5CB88A';

@@ -128,13 +128,26 @@ window.addEventListener('online', syncOfflineTelemetry);
 let readingStartTime = Date.now();
 let telemetryInterval = null;
 
+const DRM_SALT_STORAGE_KEY = 'tl_drm_salt_cache';
 let _drmSaltCache = null;
 async function getDrmSalt() {
   if (_drmSaltCache) return _drmSaltCache;
-  const res = await fetch('/api/config');
-  const config = await res.json();
-  _drmSaltCache = config.drmSalt;
-  return _drmSaltCache;
+  try {
+    const res = await fetch('/api/config');
+    const config = await res.json();
+    _drmSaltCache = config.drmSalt;
+    try { localStorage.setItem(DRM_SALT_STORAGE_KEY, _drmSaltCache); } catch (e) {}
+    return _drmSaltCache;
+  } catch (networkErr) {
+    // Sin conexión (lectura offline): usar el salt guardado la última vez
+    // que se pudo contactar al servidor, en vez de romper el descifrado.
+    const cached = localStorage.getItem(DRM_SALT_STORAGE_KEY);
+    if (cached) {
+      _drmSaltCache = cached;
+      return cached;
+    }
+    throw networkErr;
+  }
 }
 
 async function decryptText(encryptedHex, ivHex) {
