@@ -1,9 +1,15 @@
 // ── TIMELESS EDITORIAL · PROMPT ENGINE ─────────────────────────────
 // Identidad literaria, restricciones y constructores de prompts
 // para el Agente Escritor v4.0 — con Voces de Escritores Reales.
+//
+// Módulo isomorfo: se usa tal cual desde el navegador (como <script>,
+// define window.TIMELESS_WRITERS/TIMELESS_PROMPTS) y desde Node
+// (vía require('./prompts.js'), p. ej. en seed_library_ai.js) sin
+// duplicar ni un carácter de este trabajo de prompt engineering.
+const _global = typeof window !== 'undefined' ? window : globalThis;
 
 // ── CATÁLOGO DE ESCRITORES ──────────────────────────────────────────
-window.TIMELESS_WRITERS = [
+_global.TIMELESS_WRITERS = [
   {
     id: 'libre',
     name: 'LEXIS (Voz Timeless)',
@@ -126,11 +132,11 @@ window.TIMELESS_WRITERS = [
   },
 ];
 
-window.TIMELESS_PROMPTS = {
+_global.TIMELESS_PROMPTS = {
 
   // ── System prompt dinámico según escritor seleccionado ───────────
   buildSystem(writerId) {
-    const writer = window.TIMELESS_WRITERS.find(w => w.id === writerId) || window.TIMELESS_WRITERS[0];
+    const writer = _global.TIMELESS_WRITERS.find(w => w.id === writerId) || _global.TIMELESS_WRITERS[0];
 
     const lexisBase = `Eres LEXIS, un agente escritor literario de élite. Tu misión es escribir, redactar y corregir libros de cualquier género con una calidad indistinguible de la escritura humana excepcional.
 
@@ -297,7 +303,7 @@ ${writer.forbidden.map(f => `- No uses: ${f}`).join('\n')}
       tecnica:   'libro técnico con voz narrativa singular. Prosa precisa con ejemplos concretos, analogías iluminadoras y estructura argumental rigurosa.',
     };
 
-    const writer = window.TIMELESS_WRITERS.find(w => w.id === writerId);
+    const writer = _global.TIMELESS_WRITERS.find(w => w.id === writerId);
     const writerNote = writer && writer.id !== 'libre'
       ? `\nVOZ LITERARIA DE REFERENCIA: ${writer.name} — ${writer.signature}\nEl outline debe reflejar los temas, estructuras y atmósferas que caracterizan a este autor.`
       : '';
@@ -350,7 +356,7 @@ Genera exactamente ${chapterCount} capítulos. El primero debe comenzar in media
       .map((c, i) => `  · Cap ${i + 1} "${c.title}": ${c.arc}`)
       .join('\n');
 
-    const writer = window.TIMELESS_WRITERS.find(w => w.id === writerId);
+    const writer = _global.TIMELESS_WRITERS.find(w => w.id === writerId);
     const styleReminder = writer && writer.id !== 'libre'
       ? `\nRECORDATORIO DE VOZ — ${writer.name.toUpperCase()}:\n${writer.stylePrompt.slice(0, 300)}...\nFirma esencial: ${writer.signature}`
       : '\nRECORDATORIO DE VOZ — LEXIS:\nAplica los principios de escritura Anti-IA: imperfección deliberada, subtexto, ritmo emocional y detalles específicos.';
@@ -411,3 +417,8 @@ CRITERIOS BSC:
 overall = round(coherencia * 0.35 + originalidad * 0.35 + ritmo * 0.30)`;
   },
 };
+
+// En Node (require), exportar además por CommonJS para uso directo sin `window`.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { TIMELESS_WRITERS: _global.TIMELESS_WRITERS, TIMELESS_PROMPTS: _global.TIMELESS_PROMPTS };
+}

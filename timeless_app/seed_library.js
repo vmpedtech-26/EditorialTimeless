@@ -1,11 +1,16 @@
 'use strict';
 
-// ── Seeding Script for Timeless Editorial ──────────────────────────────────
-// Populates Firestore with 100+ exquisite, deeply realistic high-literature books
-// combining combinatorial dynamic catalog metadata and authentic chapter prose.
+// ── [OBSOLETO] Seeding Script for Timeless Editorial ────────────────────────
+// Reemplazado por seed_library_ai.js: este script NO usa ningún modelo de
+// lenguaje — arma cada "libro" mezclando párrafos de bancos de texto fijos y
+// prerredactados (PROSE_POOL/METADATA_POOL más abajo), por lo que la prosa se
+// repite entre libros y no tiene coherencia narrativa real. Se conserva solo
+// como referencia histórica; no lo ejecutes para poblar contenido nuevo.
 //
-// Run using:
-//   node seed_library.js
+// Usar en cambio:
+//   npm run seed          (→ node seed_library_ai.js, genera cada libro con IA real)
+//
+// (Este archivo viejo sigue corriendo si hace falta con: npm run seed:legacy)
 
 const admin = require('firebase-admin');
 require('dotenv').config();
