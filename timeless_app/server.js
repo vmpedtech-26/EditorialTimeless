@@ -19,14 +19,34 @@ require('dotenv').config();
 
 const app  = express();
 
-// Cabeceras de seguridad. El CSP por defecto de helmet bloquea los estilos y
-// scripts inline que usa todo el frontend actual (style="" y onclick=""
-// esparcidos por index.html/admin.js/etc.), así que se desactiva puntualmente
-// para no romper el sitio; el resto de protecciones (HSTS, X-Frame-Options,
-// nosniff, etc.) se mantienen activas.
+// Cabeceras de seguridad. Los onclick="" inline que antes forzaban a desactivar
+// el CSP fueron eliminados (delegación de eventos vía addEventListener), así
+// que script-src ya no necesita 'unsafe-inline': los pocos <script> estáticos
+// que quedan (registro del Service Worker, banner de cookies, IIFE de reveal
+// en architecture.html) se permiten por hash SHA-256 exacto. style-src sí
+// mantiene 'unsafe-inline' porque hay decenas de atributos style="" legítimos
+// (colores/layout dinámicos) cuyo refactor no aporta valor de seguridad real.
 app.set('trust proxy', 1);
+const SW_REGISTER_HASH   = "'sha256-02bmHLdKc5I7lm5BdooABRuv82llZtNQ96BEpm8RF08='";
+const COOKIE_BANNER_HASH = "'sha256-T9/M+rSmnfgaS19VCgA0R1oa8Egt0FGbiFzylWRZuRg='";
+const REVEAL_IIFE_HASH   = "'sha256-eaC1xasMvnBDsbpcC48jK0yMk4F42Mm+cwV0I5Pt5Xg='";
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", 'https://www.gstatic.com', 'https://cdnjs.cloudflare.com', SW_REGISTER_HASH, COOKIE_BANNER_HASH, REVEAL_IIFE_HASH],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:', 'https://images.unsplash.com'],
+      connectSrc: ["'self'", 'https://*.googleapis.com'],
+      workerSrc: ["'self'"],
+      manifestSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"]
+    }
+  },
   crossOriginEmbedderPolicy: false,
   // 'same-origin' (el default de helmet) rompe el login por popup de Google
   // (signInWithPopup) porque aísla la ventana del popup del opener.

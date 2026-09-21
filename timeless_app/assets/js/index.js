@@ -166,6 +166,34 @@ window.scrollRow = function(btn, direction) {
   }
 };
 
+// ---- DELEGATED CLICK HANDLING (CSP-safe: no inline onclick attributes) ----
+document.addEventListener('click', (e) => {
+  const navBtn = e.target.closest('.row-nav-btn');
+  if (navBtn) {
+    window.scrollRow(navBtn, navBtn.classList.contains('prev-btn') ? -1 : 1);
+    return;
+  }
+
+  const card = e.target.closest('.book-card[data-book-id], .kids-card[data-book-id]');
+  if (card) {
+    window.openBookModal(card.dataset.bookId);
+    return;
+  }
+
+  const activeBookLink = e.target.closest('[data-set-active-book]');
+  if (activeBookLink) {
+    const book = BOOK_CATALOG.find(b => b.id === activeBookLink.dataset.setActiveBook);
+    if (book) sessionStorage.setItem('tl_active_book', JSON.stringify(book));
+    return;
+  }
+
+  const loginLink = e.target.closest('[data-action="open-auth"]');
+  if (loginLink) {
+    e.preventDefault();
+    document.getElementById('auth-modal')?.classList.add('visible');
+  }
+});
+
 // ---- RENDER BOOKS IN A GRID LAYOUT (FILTERED MODE) ----
 function renderBooksGrid(books, offlineIds = new Set()) {
   const container = document.getElementById('library-content');
@@ -182,7 +210,7 @@ function renderBooksGrid(books, offlineIds = new Set()) {
         const isDownloaded = offlineIds.has(b.id);
         const coverHtml = createUniqueBookCover(b);
         return `
-          <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}" onclick="openBookModal('${b.id}')">
+          <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}">
             <div class="book-card-cover">
               <div class="book-card-spine"></div>
               ${coverHtml}
@@ -256,7 +284,7 @@ function renderNetflixRows(books, offlineIds = new Set()) {
       const isDownloaded = offlineIds.has(b.id);
       const coverHtml = createUniqueBookCover(b);
       return `
-        <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}" onclick="openBookModal('${b.id}')">
+        <div class="book-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}">
           <div class="book-card-cover">
             <div class="book-card-spine"></div>
             ${coverHtml}
@@ -284,13 +312,13 @@ function renderNetflixRows(books, offlineIds = new Set()) {
       <div class="netflix-row">
         <h3 class="netflix-row-title">${row.title}</h3>
         <div class="netflix-row-scroll-container">
-          <button class="row-nav-btn prev-btn" onclick="scrollRow(this, -1)">
+          <button class="row-nav-btn prev-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <div class="netflix-row-inner">
             ${cardsHtml}
           </div>
-          <button class="row-nav-btn next-btn" onclick="scrollRow(this, 1)">
+          <button class="row-nav-btn next-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
@@ -327,7 +355,7 @@ function renderKidsGrid(books, offlineIds = new Set()) {
       : `<img src="${b.cover}" alt="${b.title}" loading="lazy" />`;
       
     return `
-      <div class="kids-card reveal reveal-delay-${(i % 4) + 1}" onclick="openBookModal('${b.id}')">
+      <div class="kids-card reveal reveal-delay-${(i % 4) + 1}" data-book-id="${b.id}">
         <div class="kids-card-cover" style="--cover-accent: ${accent}; --cover-accent-muted: ${accentMuted};">
           <div class="kids-age-badge">${age}</div>
           <div class="book-card-spine"></div>
@@ -1096,7 +1124,7 @@ window.openBookModal = function(bookId) {
           <div class="bm-cta-row">
             ${isLoggedIn
               ? `<div style="display:flex; gap:10px; flex-wrap:wrap; width:100%; margin-bottom:10px;">
-                  <a class="bm-btn-primary" href="${readUrl}" onclick="sessionStorage.setItem('tl_active_book', JSON.stringify(BOOK_CATALOG.find(b => b.id === '${book.id}')))" style="background:${accent};border-color:${accent};flex:1;min-width:120px;text-align:center;">
+                  <a class="bm-btn-primary" href="${readUrl}" data-set-active-book="${book.id}" style="background:${accent};border-color:${accent};flex:1;min-width:120px;text-align:center;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                     ${isPremiumUser ? 'Leer ahora' : 'Leer vista previa'}
                   </a>

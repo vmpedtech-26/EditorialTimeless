@@ -720,7 +720,7 @@
                 </select>
               </div>
             </div>
-            <button class="btn-generate" id="btn-generate" onclick="startGeneration()">
+            <button class="btn-generate" id="btn-generate">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Iniciar generación
             </button>
@@ -731,9 +731,9 @@
         <div class="panel glass-panel" id="workspace-right">
           <div class="panel-header">
             <div class="workspace-tabs">
-              <button class="w-tab active" id="tab-terminal" onclick="switchWorkspace('terminal')">Consola</button>
-              <button class="w-tab" id="tab-preview" onclick="switchWorkspace('preview')">Vista Previa</button>
-              <button class="w-tab" id="tab-audit" onclick="switchWorkspace('audit')">Auditoría</button>
+              <button class="w-tab active" id="tab-terminal">Consola</button>
+              <button class="w-tab" id="tab-preview">Vista Previa</button>
+              <button class="w-tab" id="tab-audit">Auditoría</button>
             </div>
             <span class="panel-badge pb-green" id="status-badge">En espera</span>
           </div>
@@ -933,8 +933,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn-modal-cancel" onclick="closeExport()">Cancelar</button>
-          <button class="btn-modal-export" onclick="simulateDownload()">
+          <button class="btn-modal-cancel">Cancelar</button>
+          <button class="btn-modal-export">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Exportar obra.tlf
           </button>

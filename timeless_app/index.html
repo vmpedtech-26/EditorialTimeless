@@ -533,11 +533,11 @@
       </div>
 
       <div class="kids-carousel-container">
-        <button class="row-nav-btn prev-btn" onclick="scrollRow(this, -1)">
+        <button class="row-nav-btn prev-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="kids-grid-carousel" id="kids-grid">
-        <div class="kids-card" onclick="openBookModal('kid1')">
+        <div class="kids-card" data-book-id="kid1">
           <div class="kids-card-cover" style="--cover-accent: #d5e3f0; --cover-accent-muted: #a4c2db;">
             <div class="kids-age-badge">4-8 años</div>
             <div class="book-card-spine"></div>
@@ -563,7 +563,7 @@
           <p class="kids-card-author">de Alicia M. Gómez</p>
         </div>
 
-        <div class="kids-card" onclick="openBookModal('kid2')">
+        <div class="kids-card" data-book-id="kid2">
           <div class="kids-card-cover" style="--cover-accent: #f6d365; --cover-accent-muted: #fda085;">
             <div class="kids-age-badge">9-12 años</div>
             <div class="book-card-spine"></div>
@@ -589,7 +589,7 @@
           <p class="kids-card-author">de Javier del Campo</p>
         </div>
 
-        <div class="kids-card" onclick="openBookModal('kid3')">
+        <div class="kids-card" data-book-id="kid3">
           <div class="kids-card-cover" style="--cover-accent: #e0a96d; --cover-accent-muted: #e0a96d;">
             <div class="kids-age-badge">6-10 años</div>
             <div class="book-card-spine"></div>
@@ -615,7 +615,7 @@
           <p class="kids-card-author">de Clara Domínguez</p>
         </div>
 
-        <div class="kids-card" onclick="openBookModal('kid4')">
+        <div class="kids-card" data-book-id="kid4">
           <div class="kids-card-cover" style="--cover-accent: #84a98c; --cover-accent-muted: #a3b18a;">
             <div class="kids-age-badge">8-12 años</div>
             <div class="book-card-spine"></div>
@@ -641,7 +641,7 @@
           <p class="kids-card-author">de Hugo Silva</p>
         </div>
         </div>
-      <button class="row-nav-btn next-btn" onclick="scrollRow(this, 1)">
+      <button class="row-nav-btn next-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
@@ -828,7 +828,7 @@
         <div>
           <div class="footer-col-title">Cuenta</div>
           <ul class="footer-links">
-            <li><a href="#" onclick="document.getElementById('auth-modal')?.classList.add('visible'); return false;">Iniciar sesión</a></li>
+            <li><a href="#" data-action="open-auth">Iniciar sesión</a></li>
             <li><a href="#subscription">Suscripción</a></li>
             <li><a href="reader.html">Leer</a></li>
           </ul>

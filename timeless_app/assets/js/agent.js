@@ -555,6 +555,14 @@ document.getElementById('export-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('export-modal')) closeExport();
 });
 
+// ── STATIC BUTTON WIRING (CSP-safe: no inline onclick attributes) ─────
+document.getElementById('btn-generate')?.addEventListener('click', () => startGeneration());
+document.getElementById('tab-terminal')?.addEventListener('click', () => switchWorkspace('terminal'));
+document.getElementById('tab-preview')?.addEventListener('click', () => switchWorkspace('preview'));
+document.getElementById('tab-audit')?.addEventListener('click', () => switchWorkspace('audit'));
+document.querySelector('.btn-modal-cancel')?.addEventListener('click', () => closeExport());
+document.querySelector('.btn-modal-export')?.addEventListener('click', () => simulateDownload());
+
 // ── BSC COUNTER ANIMATION (on scroll) ─────────────────────────
 const sparks = [
   { id:'sp-1', values:[78,82,85,88,91,90,93,94,95], cls:'sb-gold',  target:'bm-1', end:94 },

@@ -264,6 +264,16 @@ async function sendTelemetryPacket() {
   }
 }
 
+// ---- DELEGATED CLICK HANDLING (CSP-safe: no inline onclick attributes) ----
+document.addEventListener('click', (e) => {
+  const actionEl = e.target.closest('[data-action]');
+  if (!actionEl) return;
+  const action = actionEl.dataset.action;
+  if (action === 'go-index') window.location.href = 'index.html';
+  else if (action === 'go-subscribe') window.location.href = 'index.html?action=subscribe';
+  else if (action === 'close-invitation') document.getElementById('invitation-overlay')?.remove();
+});
+
 // Bloqueos de Copia DRM activos
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('copy', e => e.preventDefault());
@@ -786,7 +796,7 @@ function renderPreview() {
       <div class="cta-card">
         <h3>Continúa la lectura</h3>
         <p>Has llegado al final de la vista previa de cortesía. Acepta la invitación de <strong>${escapeHtml(state.gift.fromName)}</strong> para añadir esta obra a tu biblioteca y seguir leyendo.</p>
-        <button onclick="window.location.href='index.html'" class="btn-accept-invitation">
+        <button data-action="go-index" class="btn-accept-invitation">
           Aceptar Invitación y Continuar
         </button>
         <span class="cta-note">Es gratis para invitados. Timeless Editorial.</span>
@@ -797,7 +807,7 @@ function renderPreview() {
       <div class="cta-card" style="border: 1px solid var(--gold-faint); background: rgba(28, 28, 26, 0.6); backdrop-filter: blur(10px);">
         <h3 style="color: var(--gold); font-family: var(--font-serif); font-size: 22px;">Suscripción Requerida</h3>
         <p style="margin: 10px 0 20px; line-height: 1.5; color: var(--text-secondary);">Esta obra es parte de la colección exclusiva de Timeless. Adquiere una suscripción anual para disfrutar de lectura ilimitada, tomar notas y personalizar tu experiencia.</p>
-        <button onclick="window.location.href='index.html?action=subscribe'" class="btn-accept-invitation" style="background: var(--gold); color: #1C1C1A; font-weight: bold; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase;">
+        <button data-action="go-subscribe" class="btn-accept-invitation" style="background: var(--gold); color: #1C1C1A; font-weight: bold; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase;">
           Suscribirse por $89/año
         </button>
         <span class="cta-note" style="margin-top: 12px; color: var(--ink-faint);">14 días de prueba · Cancela cuando quieras</span>
@@ -837,7 +847,7 @@ function showInvitationCard(gift) {
         <p class="invitation-sender">Un obsequio personal de <strong>${escapeHtml(gift.fromName)}</strong></p>
         ${gift.personalNote ? `<div class="personal-note">&ldquo;${escapeHtml(gift.personalNote)}&rdquo;</div>` : ''}
       </div>
-      <button class="btn-start-reading" onclick="document.getElementById('invitation-overlay').remove()">
+      <button class="btn-start-reading" data-action="close-invitation">
         Empezar a leer
       </button>
     </div>
