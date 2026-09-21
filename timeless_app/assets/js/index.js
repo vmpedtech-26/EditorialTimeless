@@ -1222,7 +1222,7 @@ window.openBookModal = function(bookId) {
         // descifrar ningún capítulo descargado una vez que el dispositivo
         // pierde conexión (la ruta /api/config no funciona sin red).
         try {
-          const configRes = await fetch('/api/config');
+          const configRes = await fetch('/api/config', { headers: { 'Authorization': `Bearer ${token}` } });
           const config = await configRes.json();
           if (config.drmSalt) localStorage.setItem('tl_drm_salt_cache', config.drmSalt);
         } catch (saltErr) {

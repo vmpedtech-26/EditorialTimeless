@@ -95,6 +95,21 @@ if (!DLOCAL_LOGIN || !DLOCAL_TRANS_KEY || !DLOCAL_SECRET_KEY) {
   console.warn('  ⚠  dLocal Go: Credenciales incompletas en el archivo .env. Pasarela dLocal Go inactiva.');
 }
 
+// Compara dos strings en tiempo constante para evitar timing attacks al
+// verificar firmas HMAC (una comparación con !== filtra, byte a byte, en
+// cuánto tarda en fallar, cuántos caracteres iniciales son correctos).
+function safeCompare(a, b) {
+  const bufA = Buffer.from(String(a), 'utf8');
+  const bufB = Buffer.from(String(b), 'utf8');
+  if (bufA.length !== bufB.length) {
+    // Igual comparamos algo de longitud fija para no filtrar la longitud
+    // real de forma aún más barata que un simple .length check.
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
 // Helper para generar firmas de dLocal
 function generateDLocalSignature(xLogin, xDate, requestBody, secretKey) {
   const bodyString = typeof requestBody === 'string' ? requestBody : JSON.stringify(requestBody);
@@ -198,8 +213,8 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
   if (sigHeader && sigHeader.includes('Signature:')) {
     const receivedSig = sigHeader.split('Signature:')[1].trim();
     const computedSig = generateDLocalSignature(DLOCAL_LOGIN, xDate, rawBody, DLOCAL_SECRET_KEY);
-    
-    if (receivedSig !== computedSig) {
+
+    if (!safeCompare(receivedSig, computedSig)) {
       console.error('  ✗ [dLocal Webhook] Firma inválida detectada.');
       if (!DLOCAL_SANDBOX) {
         return res.status(400).send("Firma inválida");
@@ -1227,13 +1242,29 @@ app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
 });
 
 
-app.get('/api/config', (req, res) => {
-  res.json({
+app.get('/api/config', async (req, res) => {
+  const config = {
     stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || null,
     dlocalSmartFieldsApiKey: process.env.DLOCAL_SMARTFIELDS_API_KEY || null,
-    dlocalSandbox: DLOCAL_SANDBOX,
-    drmSalt: DRM_SALT
-  });
+    dlocalSandbox: DLOCAL_SANDBOX
+  };
+
+  // drmSalt es la clave con la que el lector deriva el cifrado "DRM" de los
+  // capítulos; antes se entregaba a cualquier visitante, ni siquiera
+  // logueado. Ahora solo se incluye si viene un token de Firebase válido
+  // (que es, de todos modos, el único caso en que decryptText() lo usa:
+  // la fórmula de la clave incluye auth.currentUser.uid).
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ') && admin.apps.length > 0) {
+    try {
+      await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1]);
+      config.drmSalt = DRM_SALT;
+    } catch (e) {
+      // Token inválido o expirado: se omite el salt.
+    }
+  }
+
+  res.json(config);
 });
 
 // Endpoint liviano para el keep-alive: sin Firestore, sin auth, respuesta inmediata.

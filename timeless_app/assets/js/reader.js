@@ -161,7 +161,11 @@ let _drmSaltCache = null;
 async function getDrmSalt() {
   if (_drmSaltCache) return _drmSaltCache;
   try {
-    const res = await fetch('/api/config');
+    const headers = {};
+    if (auth.currentUser) {
+      headers['Authorization'] = `Bearer ${await auth.currentUser.getIdToken()}`;
+    }
+    const res = await fetch('/api/config', { headers });
     const config = await res.json();
     _drmSaltCache = config.drmSalt;
     try { localStorage.setItem(DRM_SALT_STORAGE_KEY, _drmSaltCache); } catch (e) {}
