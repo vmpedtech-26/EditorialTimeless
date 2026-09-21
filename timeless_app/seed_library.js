@@ -609,9 +609,17 @@ async function seedFirestore() {
       const bookId = book.id;
       const docData = { ...book };
       delete docData.id; // Clean id from document fields
-      
+      const fullChapters = docData.chapters;
+      delete docData.chapters; // La prosa completa no va al doc público — ver books_full
+      docData.previewChapter = (fullChapters[0] || "")
+        .split('\n')
+        .filter(p => p.trim())
+        .slice(0, 3)
+        .join('\n');
+
       try {
         await db.collection("books").doc(bookId).set(docData);
+        await db.collection("books_full").doc(bookId).set({ chapters: fullChapters });
         successCount++;
         process.stdout.write(`  ✔ [${successCount}/100] Cargado: "${book.title.slice(0, 30)}..."\n`);
       } catch (err) {

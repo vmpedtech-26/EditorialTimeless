@@ -508,28 +508,34 @@ function formatBookData(data) {
   }
 
   const isChaptersArray = Array.isArray(data.chapters);
-  
+
   return {
     title: title,
     author: author,
     cover: data.cover || 'assets/cover.png',
+    // Preview corto (primeros párrafos del cap. 0) para lectores sin
+    // suscripción; la prosa completa NUNCA viaja en el doc de 'books' — se
+    // pide bajo demanda y cifrada a /api/book/:id/chunk/:index, que valida
+    // la suscripción en el servidor (ver renderChapter()).
+    previewChapter: data.previewChapter || "",
     chapters: outline.chapters.map((chOutline, i) => {
       let content = "";
       let encryptedContent = "";
       let iv = "";
-      
-      if (isChaptersArray && data.chapters[i]) {
-        if (typeof data.chapters[i] === 'string') {
-          content = data.chapters[i];
-        } else if (typeof data.chapters[i] === 'object') {
-          encryptedContent = data.chapters[i].encryptedContent || "";
-          iv = data.chapters[i].iv || "";
-          content = data.chapters[i].content || "";
-        }
-      } else {
-        content = generateJITProse(category, i + 1, title, author, chOutline.title || '', chOutline.arc || '', themes);
+
+      // Solo la copia offline en IndexedDB llega como objeto cifrado
+      // ({encryptedContent, iv}); eso sí se puede prellenar acá porque ya
+      // pasó por el chunk endpoint (premium-gateado) cuando se descargó.
+      // Un string plano en data.chapters[i] sería prosa completa embebida
+      // en el doc público — ya no debería ocurrir tras la migración a
+      // books_full, pero si un doc viejo todavía la trae, se ignora a
+      // propósito para no reabrir el mismo problema.
+      if (isChaptersArray && data.chapters[i] && typeof data.chapters[i] === 'object') {
+        encryptedContent = data.chapters[i].encryptedContent || "";
+        iv = data.chapters[i].iv || "";
+        content = data.chapters[i].content || "";
       }
-      
+
       return {
         id: i + 1,
         title: chOutline.title || `Capítulo ${i+1}`,
@@ -789,9 +795,10 @@ async function claimGift(token, data) {
 function renderPreview() {
   const ch = state.book.chapters[0];
   const container = $('reading-content');
-  
-  // Tomamos solo los primeros 3 párrafos para el preview
-  const previewParagraphs = ch.content.split('\n').filter(p => p.trim()).slice(0, 3);
+
+  // El preview viene precalculado en el doc público (previewChapter) — nunca
+  // desde el capítulo completo, que ya no llega al cliente sin suscripción.
+  const previewParagraphs = (state.book.previewChapter || "").split('\n').filter(p => p.trim()).slice(0, 3);
   const contentHtml = sanitizeChapterHtml(previewParagraphs.map(p => `<p>${p}</p>`).join(''));
 
   let ctaHtml = '';

@@ -646,17 +646,41 @@ app.get('/api/book/:id/chunk/:index', authMiddleware, async (req, res) => {
     if (!book) {
       return res.status(404).json({ error: { message: "Libro no encontrado" } });
     }
-    
+
     let chapterText = "";
-    if (Array.isArray(book.chapters) && book.chapters[chIndex]) {
-      chapterText = book.chapters[chIndex];
-    } else if (book.chaptersArray && book.chaptersArray[chIndex]) {
-      chapterText = book.chaptersArray[chIndex];
-    } else if (book.outline && book.outline.chapters && book.outline.chapters[chIndex]) {
-      // Simulación de prosa si no está redactado en base
-      chapterText = `<p>Las páginas de <em>${book.title}</em> revelaban una prosa madura y contemplativa.</p><p>El transcurso de los días en la narrativa nos recordaba el peso del tiempo y la levedad de la memoria.</p>`;
-    } else {
-      return res.status(404).json({ error: { message: "Capítulo no encontrado" } });
+
+    // Fuente de verdad para la prosa completa: la colección books_full, que
+    // firestore.rules bloquea por completo del lado del cliente (allow read,
+    // write: if false) — solo el Admin SDK del servidor la lee. Antes la
+    // prosa vivía embebida en el propio doc de books/obras, legible por
+    // cualquier usuario autenticado vía el SDK cliente; se mantiene ese
+    // camino viejo como fallback mientras se migra el catálogo existente.
+    if (admin.apps.length > 0) {
+      try {
+        const fullDb = admin.firestore();
+        const fullSnap = await fullDb.collection('books_full').doc(id).get();
+        if (fullSnap.exists) {
+          const fullChapters = fullSnap.data().chapters;
+          if (Array.isArray(fullChapters) && fullChapters[chIndex]) {
+            chapterText = fullChapters[chIndex];
+          }
+        }
+      } catch (fullErr) {
+        console.warn('  ⚠ [Chunk] Fallo al leer books_full, usando fallback:', fullErr.message);
+      }
+    }
+
+    if (!chapterText) {
+      if (Array.isArray(book.chapters) && book.chapters[chIndex]) {
+        chapterText = book.chapters[chIndex];
+      } else if (book.chaptersArray && book.chaptersArray[chIndex]) {
+        chapterText = book.chaptersArray[chIndex];
+      } else if (book.outline && book.outline.chapters && book.outline.chapters[chIndex]) {
+        // Simulación de prosa si no está redactado en base
+        chapterText = `<p>Las páginas de <em>${book.title}</em> revelaban una prosa madura y contemplativa.</p><p>El transcurso de los días en la narrativa nos recordaba el peso del tiempo y la levedad de la memoria.</p>`;
+      } else {
+        return res.status(404).json({ error: { message: "Capítulo no encontrado" } });
+      }
     }
     
     // Cifrar contenido con AES-256-CBC (DRM Simulation)

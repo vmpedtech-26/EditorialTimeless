@@ -194,7 +194,19 @@ $('book-upload-form').onsubmit = async (e) => {
       };
     }
 
-    // 3. Escribir documento en la colección 'books' de Firestore
+    // 3. Escribir metadata pública en 'books' y prosa completa en
+    //    'books_full' por separado: 'books' es legible por cualquier usuario
+    //    autenticado (incluso gratuito), así que la prosa completa NUNCA va
+    //    ahí — solo un preview corto del capítulo 1. 'books_full' está
+    //    bloqueada por completo del lado del cliente (firestore.rules) y
+    //    solo la lee el servidor, vía /api/book/:id/chunk/:index, que sí
+    //    verifica la suscripción antes de entregar un capítulo.
+    const previewParagraphs = (chapters[0]?.content || "")
+      .split('\n')
+      .filter(p => p.trim())
+      .slice(0, 3)
+      .join('\n');
+
     const bookData = {
       title,
       author,
@@ -206,7 +218,7 @@ $('book-upload-form').onsubmit = async (e) => {
       pages,
       duration,
       desc,
-      chapters: chapters.map(c => c.content), // Formato para indexación rápida
+      previewChapter: previewParagraphs,
       outline: {
         title,
         chapters: chapters.map(c => ({ title: c.title, arc: c.desc }))
@@ -216,6 +228,9 @@ $('book-upload-form').onsubmit = async (e) => {
     };
 
     await setDoc(doc(db, "books", bookId), bookData);
+    await setDoc(doc(db, "books_full", bookId), {
+      chapters: chapters.map(c => c.content)
+    });
 
     // 4. Mostrar Éxito
     $('btn-go-reader').href = `reader.html?id=${bookId}`;

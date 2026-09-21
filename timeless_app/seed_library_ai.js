@@ -285,6 +285,18 @@ async function generateBook(plan, index) {
   const pages = Math.max(32, Math.round(totalWords / 260));
   const durationMinutes = Math.round(totalWords / 200);
 
+  // Preview corto del capítulo 1 para lectores sin suscripción (misma
+  // fórmula que usa renderPreview() en el lector). La prosa completa NUNCA
+  // va al doc público de 'books' — 'books' es legible por cualquier usuario
+  // autenticado, incluso gratuito; la prosa completa vive solo en
+  // 'books_full', bloqueada por completo a nivel de reglas y servida bajo
+  // demanda desde /api/book/:id/chunk/:index, que sí valida suscripción.
+  const previewChapter = (chapters[0] || "")
+    .split('\n')
+    .filter(p => p.trim())
+    .slice(0, 3)
+    .join('\n');
+
   const bookData = {
     title: outline.title,
     author: pick(FICTIONAL_PSEUDONYMS, index),
@@ -298,7 +310,7 @@ async function generateBook(plan, index) {
     desc: outline.premise,
     tagline: outline.premise.split('.')[0] + '.',
     themes: outline.themes || [],
-    chapters,
+    previewChapter,
     outline: {
       title: outline.title,
       chapters: outline.chapters.map(c => ({ title: c.title, arc: c.arc })),
@@ -310,7 +322,8 @@ async function generateBook(plan, index) {
 
   const bookId = `ai-${plan.cat}-${slugify(outline.title)}`;
   await db.collection('books').doc(bookId).set(bookData);
-  console.log(`    ✔ Guardado como books/${bookId}`);
+  await db.collection('books_full').doc(bookId).set({ chapters });
+  console.log(`    ✔ Guardado como books/${bookId} (+ books_full/${bookId})`);
   return bookId;
 }
 

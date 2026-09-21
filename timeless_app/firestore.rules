@@ -50,9 +50,22 @@ service cloud.firestore {
     
     // Colección 'books': biblioteca pública para usuarios de Timeless.
     // Solo el Editor Principal puede subir y modificar obras en el catálogo oficial.
+    // Guarda solo metadata + previewChapter (primeros párrafos del cap. 0):
+    // la prosa completa NO vive acá — ver 'books_full' más abajo.
     match /books/{bookId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.token.email == 'matiaseorejas@gmail.com';
+    }
+
+    // Colección 'books_full': la prosa completa de cada obra. Nadie la lee ni
+    // escribe desde el cliente, ni siquiera el Editor Principal — solo el
+    // servidor (Admin SDK, que ignora estas reglas) la toca, desde
+    // /api/book/:id/chunk/:index, que sí verifica suscripción premium antes
+    // de entregar un capítulo. Separarla de 'books' es lo que impide que
+    // cualquier cuenta autenticada (incluida una gratuita) lea capítulos
+    // completos con un getDoc/getDocs directo del SDK cliente.
+    match /books_full/{bookId} {
+      allow read, write: if false;
     }
 
     // Colección 'families': soporte del Plan Familiar. Solo el titular y sus
