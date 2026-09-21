@@ -44,7 +44,13 @@ app.use(helmet({
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
-      frameAncestors: ["'self'"]
+      frameAncestors: ["'self'"],
+      // El login con Google (signInWithPopup) depende de un iframe oculto
+      // que Firebase Auth carga desde authDomain para comunicar el popup
+      // con la página principal. Sin esto cae a default-src 'self' y el
+      // iframe se bloquea silenciosamente -> signInWithPopup falla con
+      // auth/internal-error (sin ningún error de CSP explícito en consola).
+      frameSrc: ["'self'", 'https://timeless-5d27d.firebaseapp.com']
     }
   },
   crossOriginEmbedderPolicy: false,
