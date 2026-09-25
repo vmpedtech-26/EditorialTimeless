@@ -47,8 +47,12 @@ const state = {
   focusMode: false,
   focusTimeout: null,
   gift: null,
-  highlights: []
+  highlights: [],
 };
+window.__diagState = state;
+window.__diagAuth = auth;
+window.__diagLoadBook = loadBook;
+window.__diagRenderChapter = renderChapter;
 
 // ── INDEXEDDB OFFLINE STORAGE & QUEUE ─────────────────────────────────
 function openOfflineDB() {
