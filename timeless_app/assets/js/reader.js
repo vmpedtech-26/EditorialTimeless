@@ -898,24 +898,29 @@ async function renderChapter(idx) {
     await sendTelemetryPacket();
   }
 
+  document.title = 'DIAG-A';
   state.currentChapter = idx;
   const ch = state.book.chapters[idx];
-  console.log('  🔎 [DIAG] ch=', ch);
+  document.title = 'DIAG-B';
 
   // Update Header/UI
   $('top-title').textContent = state.book.title;
+  document.title = 'DIAG-C';
   $('top-ch').textContent = `Capítulo ${ch.id}`;
   $('nav-info').textContent = `Capítulo ${ch.id} de ${state.book.chapters.length}`;
   $('nav-title').textContent = ch.title;
   $('btn-prev').disabled = idx === 0;
   $('btn-next').disabled = idx === state.book.chapters.length - 1;
+  document.title = 'DIAG-D';
 
   // Content with Animation
   const container = $('reading-content');
   container.style.opacity = '0';
-  
+  document.title = 'DIAG-E';
+
   // Si no se ha cargado el contenido del streaming, solicitarlo al servidor y descifrarlo en memoria (Pilar 1)
   if (!ch.content) {
+    document.title = 'DIAG-F';
     if (ch.encryptedContent && ch.iv) {
       try {
         const decrypted = await decryptText(ch.encryptedContent, ch.iv);
@@ -930,25 +935,32 @@ async function renderChapter(idx) {
       container.style.opacity = '1';
       
       try {
+        document.title = 'DIAG-G';
         const token = auth.currentUser ? await auth.currentUser.getIdToken() : '';
+        document.title = 'DIAG-H';
         const response = await fetch(`/api/book/${state.bookId}/chunk/${idx}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+        document.title = 'DIAG-I-' + response.status;
+
         if (!response.ok) {
           throw new Error(response.status === 403 ? "Suscripción activa requerida para lectura Premium." : "Error en el servidor de streaming.");
         }
-        
+
         const chunk = await response.json();
+        document.title = 'DIAG-J';
         const decrypted = await decryptText(chunk.data, chunk.iv);
         ch.content = decrypted;
+        document.title = 'DIAG-K';
         console.log(`  ✦ [Streaming] Capítulo ${idx + 1} transmitido y descifrado localmente.`);
       } catch (err) {
+        document.title = 'DIAG-ERR-' + (err && err.message);
         console.warn("  ⚠ [Streaming Offline] Fallo de streaming en canal seguro, usando respaldo local:", err.message);
         ch.content = ch.fallbackContent || `<p>Este capítulo no se pudo descargar del canal de streaming seguro. Por favor verifica tu suscripción o conexión a internet.</p>`;
       }
     }
   }
+  document.title = 'DIAG-L';
 
   setTimeout(() => {
     container.innerHTML = `
