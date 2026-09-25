@@ -3,6 +3,9 @@ import { CryptoUtils } from './crypto_utils.js';
 
 const $ = id => document.getElementById(id);
 
+window.addEventListener('unhandledrejection', e => console.error('  🔎 [DIAG] UNHANDLED REJECTION:', e.reason));
+window.addEventListener('error', e => console.error('  🔎 [DIAG] WINDOW ERROR:', e.message, e.filename, e.lineno));
+
 // Escapa texto de origen no confiable (notas de regalo, nombres, títulos)
 // antes de interpolarlo en innerHTML, para evitar XSS almacenado.
 function escapeHtml(str) {
@@ -308,6 +311,7 @@ async function loadBook() {
   }
   
   try {
+    console.log('  🔎 [DIAG] loadBook() iniciado, id=', id, 'gift=', giftToken, 'auth.currentUser=', auth.currentUser && auth.currentUser.uid);
     state.bookId = id;
 
     // Lógica de Regalo e Invitación
@@ -374,7 +378,9 @@ async function loadBook() {
     }
 
     if (!data) {
+      console.log('  🔎 [DIAG] pidiendo getDoc(books/' + state.bookId + ')...');
       let snap = await getDoc(doc(db, "books", state.bookId));
+      console.log('  🔎 [DIAG] getDoc respondió, exists=', snap.exists());
       if (!snap.exists()) snap = await getDoc(doc(db, "obras", state.bookId));
       if (snap.exists()) {
         data = snap.data();
@@ -385,7 +391,9 @@ async function loadBook() {
       throw new Error("Obra no encontrada o acceso restringido.");
     }
 
+    console.log('  🔎 [DIAG] data cargada, outline.chapters.length=', data.outline?.chapters?.length, 'previewChapter len=', (data.previewChapter||'').length);
     state.book = formatBookData(data);
+    console.log('  🔎 [DIAG] formatBookData OK, state.book.chapters.length=', state.book.chapters.length);
 
     // Verificación de Suscripción Premium
     let isUserPremium = false;
@@ -417,18 +425,22 @@ async function loadBook() {
 
     if (state.gift && !state.skipInvitationCard) showInvitationCard(state.gift);
 
+    console.log('  🔎 [DIAG] isUserPremium=', isUserPremium, 'state.isPreview=', state.isPreview, 'state.gift=', !!state.gift);
     renderTOC();
-    
+
     // Si no es un regalo/preview, cargar el progreso guardado y los subrayados
     if (!state.isPreview && auth.currentUser) {
+      console.log('  🔎 [DIAG] rama premium: cargando progreso...');
       await Promise.all([loadProgress(), loadHighlights()]);
+      console.log('  🔎 [DIAG] progreso cargado, llamando renderChapter(', state.currentChapter, ')');
       renderChapter(state.currentChapter);
     } else {
-      if (state.isPreview) renderPreview();
+      if (state.isPreview) { console.log('  🔎 [DIAG] rama preview'); renderPreview(); }
       else renderChapter(0);
     }
 
   } catch (e) {
+    console.error('  🔎 [DIAG] loadBook() CATCH:', e);
     showErrorState(e.message);
   }
 }
@@ -880,6 +892,7 @@ function showErrorState(msg) {
 
 // ── Rendering ────────────────────────────────────────────────────────────────
 async function renderChapter(idx) {
+  console.log('  🔎 [DIAG] renderChapter(', idx, ') iniciado, state.book?', !!state.book, 'chapters.length=', state.book?.chapters?.length);
   // Enviar telemetría del capítulo anterior antes de cambiar (Pilar 2)
   if (state.book) {
     await sendTelemetryPacket();
@@ -887,7 +900,8 @@ async function renderChapter(idx) {
 
   state.currentChapter = idx;
   const ch = state.book.chapters[idx];
-  
+  console.log('  🔎 [DIAG] ch=', ch);
+
   // Update Header/UI
   $('top-title').textContent = state.book.title;
   $('top-ch').textContent = `Capítulo ${ch.id}`;
