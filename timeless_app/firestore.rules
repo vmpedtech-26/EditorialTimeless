@@ -41,11 +41,16 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
     
-    // Colección 'gifts': permite la gestión de invitaciones de lectura
+    // Colección 'gifts': invitaciones de lectura. Se puede LEER un regalo
+    // puntual por su token (el invitado aún sin cuenta ve la invitación antes
+    // de reclamarla), pero no listar la colección. Crear y reclamar regalos se
+    // hace SOLO desde el servidor (/api/gift/create y /api/gift/claim): antes
+    // cualquier usuario autenticado podía escribir acá, fabricarse un regalo
+    // "reclamado" y leer obras sin suscripción ni permiso.
     match /gifts/{giftId} {
-      allow read: if true; // Permite verificar el regalo antes de reclamarlo
-      allow create: if request.auth != null;
-      allow update: if request.auth != null && resource.data.claimed == false;
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
     }
     
     // Colección 'books': biblioteca pública para usuarios de Timeless.

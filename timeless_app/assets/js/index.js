@@ -878,7 +878,7 @@ onAuthStateChanged(auth, async (user) => {
     } else {
       try {
         const userSnap = await getDoc(doc(db, "users", user.uid));
-        if (userSnap.exists() && userSnap.data().isPremium === true) {
+        if (userSnap.exists() && (d => d.isPremium === true && (!d.premiumUntil || d.premiumUntil.toMillis() > Date.now()))(userSnap.data())) {
           isPremiumUser = true;
         } else if (userSnap.exists() && userSnap.data().familyId) {
           const familySnap = await getDoc(doc(db, "families", userSnap.data().familyId));
@@ -1246,6 +1246,15 @@ window.openBookModal = function(bookId) {
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   
+  if (urlParams.get('checkout') === 'success') {
+    const note = document.createElement('div');
+    note.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;max-width:320px;padding:16px 20px;border-radius:8px;background:rgba(22,20,17,0.95);border:1px solid #C9A96E;color:#fff;font-size:13px;line-height:1.5;';
+    note.textContent = 'Recibimos tu pago. Tu membresía se activa en unos segundos: si todavía no ves el acceso, recargá la página.';
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 9000);
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
   if (urlParams.get('checkout') === 'success_sandbox') {
     isPremiumUser = true;
     

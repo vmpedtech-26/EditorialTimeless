@@ -322,7 +322,7 @@ async function loadBook() {
       if (!auth.currentUser) {
         state.isPreview = true;
       } else if (!giftData.claimed && giftData.fromUserId !== auth.currentUser.uid) {
-        await claimGift(giftToken, giftData);
+        await claimGift(giftToken);
       }
     } else if (auth.currentUser) {
       // El usuario puede haber reclamado un regalo de esta obra en una visita
@@ -395,7 +395,7 @@ async function loadBook() {
       } else {
         try {
           const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
-          if (userSnap.exists() && userSnap.data().isPremium === true) {
+          if (userSnap.exists() && (d => d.isPremium === true && (!d.premiumUntil || d.premiumUntil.toMillis() > Date.now()))(userSnap.data())) {
             isUserPremium = true;
           } else if (userSnap.exists() && userSnap.data().familyId) {
             const familySnap = await getDoc(doc(db, "families", userSnap.data().familyId));
@@ -781,15 +781,17 @@ function generateJITProse(category, chapterNum, title, author, chTitle = '', chA
   }
 }
 
-async function claimGift(token, data) {
-  const claimRef = doc(db, "gifts", `gift_${state.bookId}_${auth.currentUser.uid}`);
-  await setDoc(claimRef, {
-    ...data,
-    claimed: true,
-    claimedBy: auth.currentUser.uid,
-    claimedAt: serverTimestamp()
+async function claimGift(token) {
+  const idToken = await auth.currentUser.getIdToken();
+  const res = await fetch('/api/gift/claim', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+    body: JSON.stringify({ token })
   });
-  await updateDoc(doc(db, "gifts", token), { claimed: true });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || "No se pudo reclamar el regalo.");
+  }
 }
 
 function renderPreview() {
@@ -1485,18 +1487,15 @@ async function generateGift() {
   }
 
   try {
-    const giftId = `gift_${state.bookId}_${Math.random().toString(36).substring(2, 9)}`;
-    const giftRef = doc(db, "gifts", giftId);
-    
-    await setDoc(giftRef, {
-      bookId: state.bookId,
-      bookTitle: state.book.title,
-      fromUserId: auth.currentUser.uid,
-      fromName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-      personalNote: note,
-      claimed: false,
-      createdAt: serverTimestamp()
+    const idToken = await auth.currentUser.getIdToken();
+    const res = await fetch('/api/gift/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+      body: JSON.stringify({ bookId: state.bookId, note })
     });
+    const created = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(created.error?.message || "No se pudo generar el regalo.");
+    const giftId = created.token;
 
     const giftUrl = `${window.location.origin}${window.location.pathname}?gift=${giftId}`;
     
@@ -1505,7 +1504,7 @@ async function generateGift() {
 
   } catch (e) {
     console.error("Error generating gift:", e);
-    alert("No se pudo generar el regalo. Inténtalo de nuevo.");
+    alert(e.message || "No se pudo generar el regalo. Inténtalo de nuevo.");
   } finally {
     if (btn) {
       btn.disabled = false;

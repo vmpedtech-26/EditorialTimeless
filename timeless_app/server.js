@@ -62,6 +62,12 @@ app.use(helmet({
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const KEY  = process.env.GEMINI_API_KEY || '';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+// Atajos de desarrollo (webhooks sin firma, checkout simulado, premium ante
+// errores de Firestore) SOLO con TIMELESS_DEV=true explícito. Antes dependían de
+// DLOCAL_SANDBOX/NODE_ENV: producción corría con DLOCAL_SANDBOX sin definir
+// (=sandbox), así que cualquiera podía mandar un webhook "PAID" falso y quedar
+// premium gratis.
+const DEV_MODE = process.env.TIMELESS_DEV === 'true';
 const ADMIN_EMAIL = 'matiaseorejas@gmail.com';
 // Salto DRM: se expone a través de /api/config porque el cliente descifra en el navegador
 // y necesita el mismo valor para derivar la llave. Ver assets/js/reader.js.
@@ -99,6 +105,12 @@ const DLOCAL_BASE_URL = DLOCAL_SANDBOX
 
 if (!DLOCAL_LOGIN || !DLOCAL_TRANS_KEY || !DLOCAL_SECRET_KEY) {
   console.warn('  ⚠  dLocal Go: Credenciales incompletas en el archivo .env. Pasarela dLocal Go inactiva.');
+}
+
+// En producción no se devuelven mensajes internos de excepciones (rutas,
+// detalles de Firestore/Gemini) al cliente; en local sí, para depurar.
+function publicErr(err) {
+  return DEV_MODE ? ((err && err.message) || "Error") : "Error interno del servidor.";
 }
 
 // Compara dos strings en tiempo constante para evitar timing attacks al
@@ -215,23 +227,20 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
     return res.status(400).send("JSON de payload inválido");
   }
 
-  // Verificar la firma si se provee
+  // La firma es obligatoria y se compara en tiempo constante. Solo en modo
+  // desarrollo explícito (TIMELESS_DEV=true) se toleran webhooks sin firmar.
+  let signatureOk = false;
   if (sigHeader && sigHeader.includes('Signature:')) {
     const receivedSig = sigHeader.split('Signature:')[1].trim();
     const computedSig = generateDLocalSignature(DLOCAL_LOGIN, xDate, rawBody, DLOCAL_SECRET_KEY);
-
-    if (!safeCompare(receivedSig, computedSig)) {
-      console.error('  ✗ [dLocal Webhook] Firma inválida detectada.');
-      if (!DLOCAL_SANDBOX) {
-        return res.status(400).send("Firma inválida");
-      } else {
-        console.warn('  ⚠ [dLocal Webhook] Tolerando firma inválida en modo Sandbox.');
-      }
+    signatureOk = safeCompare(receivedSig, computedSig);
+  }
+  if (!signatureOk) {
+    console.error('  ✗ [dLocal Webhook] Firma ausente o inválida.');
+    if (!DEV_MODE) {
+      return res.status(400).send("Firma inválida");
     }
-  } else {
-    if (!DLOCAL_SANDBOX) {
-      return res.status(400).send("Falta firma de autorización");
-    }
+    console.warn('  ⚠ [dLocal Webhook] TIMELESS_DEV=true: se tolera la firma inválida.');
   }
 
   const status = payload.status;
@@ -242,30 +251,54 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
 
   if ((status === 'PAID' || status === 'APPROVED') && orderId) {
     // order_id se arma como `${userId}_${planId}_${timestamp}` en /api/create-checkout-session
-    const orderParts = orderId.split('_');
+    const orderParts = String(orderId).split('_');
     const userId = orderParts[0];
     const planId = ['monthly', 'annual', 'family'].includes(orderParts[1]) ? orderParts[1] : 'annual';
+
+    const plan = PLAN_CATALOG[planId];
+    const paidAmount = Number(payload.amount);
+    if (Number.isFinite(paidAmount) && paidAmount > 0 && paidAmount < plan.price) {
+      console.error(`  ✗ [dLocal Webhook] Monto insuficiente (${paidAmount} < ${plan.price}) para ${planId}. No se activa premium. Pago: ${paymentId}`);
+      return res.json({ received: true });
+    }
 
     console.log(`  ✦ [dLocal Webhook] Pago APROBADO. Activando premium para usuario: ${userId} (plan: ${planId})`);
 
     if (admin.apps.length > 0) {
       try {
         const db = admin.firestore();
-        await db.collection('users').doc(userId).set({
+        const userRef = db.collection('users').doc(userId);
+        const current = await userRef.get();
+        if (current.exists && current.data().lastPaymentId === paymentId) {
+          // dLocal reintenta las notificaciones: no extender el plan dos veces.
+          return res.json({ received: true });
+        }
+        // Si todavía tiene días vigentes, la renovación se suma al final.
+        const prev = current.exists ? current.data() : {};
+        const prevUntil = subscriptionActive(prev) && prev.premiumUntil && prev.premiumUntil.toMillis ? prev.premiumUntil.toMillis() : 0;
+        const baseMs = Math.max(Date.now(), prevUntil);
+        const premiumUntil = admin.firestore.Timestamp.fromMillis(baseMs + plan.days * 86400000);
+
+        await userRef.set({
           isPremium: true,
           subscriptionDate: admin.firestore.FieldValue.serverTimestamp(),
+          premiumUntil,
           lastPaymentId: paymentId,
           plan: `${planId}_dlocal`
         }, { merge: true });
-        console.log(`  ✦ [Firestore] Suscripción dLocal Go activada para ${userId}`);
+        localPremiumUsers.add(userId);
+        console.log(`  ✦ [Firestore] Suscripción dLocal Go activada para ${userId} hasta ${premiumUntil.toDate().toISOString()}`);
         if (planId === 'family') {
           await ensureFamilyForOwner(userId, null);
         }
       } catch (dbErr) {
         console.error('  ✗ [dLocal Webhook Error] Fallo al escribir en Firestore:', dbErr);
+        // 500 para que dLocal reintente la notificación: un pago cobrado no puede quedar sin activar.
+        return res.status(500).send("Error interno");
       }
     } else {
       console.warn('  ⚠ [dLocal Webhook] ERROR: Firebase Admin no inicializado.');
+      return res.status(500).send("Error interno");
     }
   }
 
@@ -308,37 +341,41 @@ const checkoutLimiter = rateLimit({
   message: { error: { message: "Demasiados intentos de pago. Por favor, intenta de nuevo más tarde." } }
 });
 
-// express.static sirve TODO el directorio del proyecto, no solo los assets
-// públicos del sitio. Bloquear explícitamente lo que nunca debería ser
-// descargable (reglas de seguridad, specs internas, scripts de backend,
-// manifiestos de dependencias, el prototipo de app móvil sin terminar).
-const STATIC_DENY_PATTERNS = [
-  /^\/specs\//,
-  /^\/mobile_app\//,
-  /^\/firestore\.rules$/,
-  /^\/seed_library\.js$/,
-  /^\/apply_local_catalog\.js$/,
-  /^\/package(-lock)?\.json$/,
-  /^\/firebase\.json$/,
-  /^\/\.firebaserc$/,
-  /^\/render\.yaml$/,
-  /^\/\.env(\.|$)/,
-  /^\/serviceAccountKey\.json$/,
-  /^\/agent_placeholder\.html$/
-];
+// El proyecto vive en un solo directorio junto con el backend, así que servir
+// todo con express.static expone también código de servidor, scripts de seed y
+// configuración. En vez de una lista de bloqueo (que siempre se queda corta
+// cuando aparece un archivo nuevo — así quedaron server.js y seed_library_ai.js
+// descargables), se sirve SOLO una lista de permitidos explícita.
+const PUBLIC_STATIC = /^\/(assets\/.+|(index|reader|agent|admin|architecture|privacy|terms)\.html|sw\.js|manifest\.json|firebase_config\.js|agent_service\.js|prompts\.js|fallback_catalog\.json|kids_fallback_catalog\.json)$/;
+const staticHandler = express.static(path.join(__dirname), { dotfiles: 'deny', index: 'index.html' });
 app.use((req, res, next) => {
-  const p = req.path;
-  if (STATIC_DENY_PATTERNS.some(re => re.test(p))) {
-    return res.status(404).send('Not found');
-  }
+  if (req.path === '/' || PUBLIC_STATIC.test(req.path)) return staticHandler(req, res, next);
   next();
 });
 
-// Sirve todos los archivos estáticos de timeless_app
-app.use(express.static(path.join(__dirname)));
+// Precios y duración de cada plan: los define el servidor. Antes el monto del
+// pago salía de `unit_price` que mandaba el navegador, así que cualquiera podía
+// pagar $0,01 por el plan anual. Debe coincidir con index.html y terms.html.
+const PLAN_CATALOG = {
+  monthly: { price: 12, days: 31,  label: 'Plan Mensual' },
+  annual:  { price: 89, days: 366, label: 'Plan Anual' },
+  family:  { price: 18, days: 31,  label: 'Plan Familiar' }
+};
+
+// ¿Sigue vigente la suscripción de este doc de usuario? Los usuarios
+// anteriores al control de vencimiento (sin premiumUntil) siguen vigentes.
+function subscriptionActive(userData) {
+  if (!userData || !userData.isPremium) return false;
+  if (!userData.premiumUntil) return true;
+  const until = typeof userData.premiumUntil.toMillis === 'function' ? userData.premiumUntil.toMillis() : Number(userData.premiumUntil);
+  return !Number.isFinite(until) || until > Date.now();
+}
 
 // Caché local para usuarios Premium (evita relecturas repetidas a Firestore)
 const localPremiumUsers = new Set();
+// El caché evita releer Firestore en cada request, pero se vacía seguido para
+// que vencimientos y revocaciones se apliquen en minutos.
+setInterval(() => localPremiumUsers.clear(), 10 * 60 * 1000).unref();
 
 // Middleware que solo verifica el token de Firebase, sin exigir estado Premium.
 // Para endpoints a los que un usuario no-premium debe poder llegar, como el
@@ -372,7 +409,12 @@ async function isPremiumViaFamily(uid) {
     const familyId = userSnap.exists ? userSnap.data().familyId : null;
     if (!familyId) return false;
     const familySnap = await db.collection('families').doc(familyId).get();
-    return familySnap.exists && Array.isArray(familySnap.data().memberIds) && familySnap.data().memberIds.includes(uid);
+    if (!familySnap.exists) return false;
+    const fam = familySnap.data();
+    if (!Array.isArray(fam.memberIds) || !fam.memberIds.includes(uid)) return false;
+    // Los miembros solo tienen acceso mientras el titular tenga el plan vigente.
+    const ownerSnap = await db.collection('users').doc(fam.ownerId).get();
+    return ownerSnap.exists && subscriptionActive(ownerSnap.data());
   } catch (e) {
     return false;
   }
@@ -396,6 +438,64 @@ async function ensureFamilyForOwner(uid, ownerEmail) {
   return familyRef.id;
 }
 
+// ¿Tiene este usuario acceso premium? (titular, familiar o editor). En
+// producción un error de Firestore nunca otorga acceso; en desarrollo local sí.
+async function checkPremium(decodedToken) {
+  const uid = decodedToken.uid;
+  let isPremium = localPremiumUsers.has(uid) || decodedToken.email === ADMIN_EMAIL;
+
+  if (!isPremium) {
+    try {
+      const userSnap = await admin.firestore().collection('users').doc(uid).get();
+      if (userSnap.exists && subscriptionActive(userSnap.data())) {
+        isPremium = true;
+      } else {
+        if (userSnap.exists && userSnap.data().isPremium) {
+          // Suscripción vencida: se baja el flag para que la UI también lo refleje.
+          admin.firestore().collection('users').doc(uid).set({ isPremium: false }, { merge: true })
+            .catch(e => console.warn('  ⚠ [checkPremium] No se pudo marcar vencida:', e.message));
+        }
+        if (userSnap.exists && userSnap.data().familyId) {
+          isPremium = await isPremiumViaFamily(uid);
+        }
+      }
+      if (isPremium) localPremiumUsers.add(uid);
+    } catch (dbErr) {
+      console.error(`  ✗ [checkPremium] Error al leer Firestore (${dbErr.message}).`);
+      if (DEV_MODE) {
+        console.warn('  ⚠ [checkPremium] Modo desarrollo: habilitando acceso temporal pese al error.');
+        isPremium = true;
+        localPremiumUsers.add(uid);
+      }
+    }
+  }
+  return isPremium;
+}
+
+// Acceso a los capítulos de un libro: premium, o un regalo ya reclamado de
+// ESE libro (gifts/gift_<libro>_<uid>, que escribe claimGift en el lector).
+async function chunkAccessMiddleware(req, res, next) {
+  if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: { message: "Falta token de autorización Bearer" }});
+  }
+  try {
+    const decoded = await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1]);
+    if (await checkPremium(decoded)) { req.user = decoded; return next(); }
+
+    const giftSnap = await admin.firestore().collection('gifts').doc(`gift_${req.params.id}_${decoded.uid}`).get();
+    if (giftSnap.exists && giftSnap.data().claimed === true && giftSnap.data().bookId === req.params.id) {
+      req.user = decoded;
+      return next();
+    }
+    return res.status(403).json({ error: { message: "Suscripción activa requerida para lectura Premium." }});
+  } catch (err) {
+    console.error("  ✗ [ChunkAccess] Token inválido o error:", err.message);
+    return res.status(401).json({ error: { message: "Token inválido o expirado" }});
+  }
+}
+
 // Middleware para verificar token de Firebase y estado Premium
 async function authMiddleware(req, res, next) {
   if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
@@ -410,30 +510,8 @@ async function authMiddleware(req, res, next) {
     const decodedToken = await admin.auth().verifyIdToken(token);
     const uid = decodedToken.uid;
     
-    // Verificar si es premium en caché local o en Firestore
-    let isPremium = localPremiumUsers.has(uid) || decodedToken.email === ADMIN_EMAIL;
+    let isPremium = await checkPremium(decodedToken);
 
-    if (!isPremium) {
-      try {
-        const userSnap = await admin.firestore().collection('users').doc(uid).get();
-        if (userSnap.exists && userSnap.data().isPremium) {
-          isPremium = true;
-        } else if (userSnap.exists && userSnap.data().familyId) {
-          isPremium = await isPremiumViaFamily(uid);
-        }
-        if (isPremium) localPremiumUsers.add(uid);
-      } catch (dbErr) {
-        console.error(`  ✗ [AuthMiddleware] Error al leer Firestore (${dbErr.message}).`);
-        // Solo se tolera en desarrollo local: nunca otorgar premium por un error
-        // de Firestore en producción, o cualquier usuario quedaría con acceso gratis.
-        if (!IS_PRODUCTION) {
-          console.warn('  ⚠ [AuthMiddleware] Modo desarrollo: habilitando acceso temporal pese al error.');
-          isPremium = true;
-          localPremiumUsers.add(uid);
-        }
-      }
-    }
-    
     // Si sigue sin ser premium, denegar
     if (!isPremium) {
       return res.status(403).json({ error: { message: "Requiere suscripción activa para usar Timeless Agent" }});
@@ -497,7 +575,7 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
 
   } catch (err) {
     console.error('[/api/generate]', err.message);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
@@ -569,7 +647,7 @@ app.post('/api/stream', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('[/api/stream]', err.message);
     try {
-      res.write(`data: ${JSON.stringify({ error: { message: err.message } })}\n\n`);
+      res.write(`data: ${JSON.stringify({ error: { message: publicErr(err) } })}\n\n`);
     } catch(e) {}
     res.end();
   }
@@ -608,7 +686,8 @@ async function getCachedCatalog() {
 
 // ── IN-MEMORY TELEMETRÍA Y BUFFER (Pilar 2) ──────────────────────────────────
 const telemetryBuffer = [];
-const telemetryFLUSH_LIMIT = 5; // Flush cada 5 eventos para pruebas locales rápidas
+const telemetryFLUSH_LIMIT = IS_PRODUCTION ? 25 : 5; // en local se vacía rápido para probar
+const TELEMETRY_BUFFER_MAX = 2000; // si Firestore falla en bucle, no crecer sin límite
 
 async function flushTelemetry() {
   if (telemetryBuffer.length === 0 || admin.apps.length === 0) return;
@@ -617,24 +696,27 @@ async function flushTelemetry() {
   
   try {
     const db = admin.firestore();
-    const batch = db.batch();
-    eventsToFlush.forEach(evt => {
-      const docRef = db.collection('telemetry_logs').doc();
-      batch.set(docRef, {
-        ...evt,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
+    // Firestore admite máx. 500 operaciones por batch.
+    for (let i = 0; i < eventsToFlush.length; i += 400) {
+      const batch = db.batch();
+      eventsToFlush.slice(i, i + 400).forEach(evt => {
+        batch.set(db.collection('telemetry_logs').doc(), {
+          ...evt,
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
       });
-    });
-    await batch.commit();
+      await batch.commit();
+    }
     console.log(`  ✦ [Telemetría] Flusheados ${eventsToFlush.length} eventos a Firestore.`);
   } catch (err) {
     console.error("  ✗ [Telemetría Error] Fallo al vaciar buffer de telemetría:", err.message);
     telemetryBuffer.push(...eventsToFlush); // Re-encolar en caso de fallo
+    if (telemetryBuffer.length > TELEMETRY_BUFFER_MAX) telemetryBuffer.splice(0, telemetryBuffer.length - TELEMETRY_BUFFER_MAX);
   }
 }
 
 // ── Endpoint: Streaming & Cifrado AES-256-CBC (Pilar 1) ───────────────────────
-app.get('/api/book/:id/chunk/:index', authMiddleware, async (req, res) => {
+app.get('/api/book/:id/chunk/:index', chunkAccessMiddleware, async (req, res) => {
   try {
     const { id, index } = req.params;
     const chIndex = parseInt(index, 10);
@@ -709,95 +791,90 @@ app.get('/api/book/:id/chunk/:index', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     console.error('[/api/book/:id/chunk/:index]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
+
+// Valida y acota un evento de telemetría: bookId usable como ID de documento
+// y números en rangos razonables. Devuelve null si el evento no sirve.
+function sanitizeTelemetryEvent(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const bookId = typeof raw.bookId === 'string' ? raw.bookId : '';
+  if (!bookId || bookId.length > 120 || bookId.includes('/')) return null;
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+  return {
+    bookId,
+    chapterIndex: clamp(parseInt(raw.chapterIndex, 10) || 0, 0, 500),
+    timeSpent: clamp(parseInt(raw.timeSpent, 10) || 0, 0, 86400),
+    scrollDepth: clamp(parseFloat(raw.scrollDepth) || 0, 0, 1),
+    exitPoint: String(raw.exitPoint || '').slice(0, 100)
+  };
+}
 
 // ── Endpoint: Telemetría de Lectura (Pilar 2) ────────────────────────────────
 app.post('/api/telemetry', authMiddleware, async (req, res) => {
   try {
-    const { bookId, chapterIndex, timeSpent, scrollDepth, exitPoint } = req.body;
+    const clean = sanitizeTelemetryEvent(req.body);
+    if (!clean) return res.status(400).json({ error: { message: "Evento de telemetría inválido." } });
     const userId = req.user.uid;
-    
-    const event = {
-      userId,
-      bookId,
-      chapterIndex: parseInt(chapterIndex, 10),
-      timeSpent: parseInt(timeSpent, 10) || 0,
-      scrollDepth: parseFloat(scrollDepth) || 0,
-      exitPoint: exitPoint || '',
-      receivedAt: new Date().toISOString()
-    };
-    
+    const event = { userId, ...clean, receivedAt: new Date().toISOString() };
+
     telemetryBuffer.push(event);
-    console.log(`  ✦ [Telemetría Recibida] Usuario: ${userId.slice(0, 6)}..., Libro: ${bookId.slice(0, 10)}... (Tiempo: ${timeSpent}s, Scroll: ${Math.round(scrollDepth * 100)}%)`);
-    
     if (telemetryBuffer.length >= telemetryFLUSH_LIMIT) {
       flushTelemetry();
     }
-    
+
     // Guardar posición de lectura rápida en Firestore
     if (admin.apps.length > 0) {
-      const db = admin.firestore();
-      db.collection('users').doc(userId).collection('reading_progress').doc(bookId).set({
-        chapterIndex: parseInt(chapterIndex, 10),
-        scrollDepth: parseFloat(scrollDepth) || 0,
+      admin.firestore().collection('users').doc(userId).collection('reading_progress').doc(clean.bookId).set({
+        chapterIndex: clean.chapterIndex,
+        scrollDepth: clean.scrollDepth,
         lastReadAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true }).catch(e => console.error("Error actualizando progreso:", e.message));
     }
-    
+
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: { message: err.message } });
+    console.error('[/api/telemetry]', err);
+    res.status(500).json({ error: { message: "Error procesando telemetría." } });
   }
 });
 
 // ── Endpoint: Telemetría de Lectura Masiva (Bulk Offline Sync - Pilar 2) ──────
 app.post('/api/telemetry/bulk', authMiddleware, async (req, res) => {
   try {
-    const events = req.body.events;
-    if (!Array.isArray(events)) {
+    if (!Array.isArray(req.body.events)) {
       return res.status(400).json({ error: { message: "Se esperaba un array de eventos en 'events'." } });
     }
-    
+    // Tope por request: cada evento puede implicar una escritura a Firestore.
+    const events = req.body.events.slice(0, 100);
     const userId = req.user.uid;
     const db = admin.apps.length > 0 ? admin.firestore() : null;
-    
-    console.log(`  ✦ [Telemetría Masiva] Procesando ${events.length} eventos para el usuario: ${userId.slice(0, 6)}...`);
-    
+
+    let accepted = 0;
     for (const rawEv of events) {
-      const { bookId, chapterIndex, timeSpent, scrollDepth, exitPoint } = rawEv;
-      
-      const event = {
-        userId,
-        bookId,
-        chapterIndex: parseInt(chapterIndex, 10),
-        timeSpent: parseInt(timeSpent, 10) || 0,
-        scrollDepth: parseFloat(scrollDepth) || 0,
-        exitPoint: exitPoint || '',
-        receivedAt: new Date().toISOString(),
-        isOfflineSync: true
-      };
-      
-      telemetryBuffer.push(event);
-      
-      // Guardar posición de lectura rápida en Firestore (para el último evento de cada libro)
+      const clean = sanitizeTelemetryEvent(rawEv);
+      if (!clean) continue;
+      accepted++;
+      telemetryBuffer.push({ userId, ...clean, receivedAt: new Date().toISOString(), isOfflineSync: true });
+
       if (db) {
-        db.collection('users').doc(userId).collection('reading_progress').doc(bookId).set({
-          chapterIndex: parseInt(chapterIndex, 10),
-          scrollDepth: parseFloat(scrollDepth) || 0,
+        db.collection('users').doc(userId).collection('reading_progress').doc(clean.bookId).set({
+          chapterIndex: clean.chapterIndex,
+          scrollDepth: clean.scrollDepth,
           lastReadAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).catch(e => console.error("Error actualizando progreso en bulk:", e.message));
       }
     }
-    
+
     if (telemetryBuffer.length >= telemetryFLUSH_LIMIT) {
       flushTelemetry();
     }
-    
-    res.json({ success: true, count: events.length });
+
+    res.json({ success: true, count: accepted });
   } catch (err) {
-    res.status(500).json({ error: { message: err.message } });
+    console.error('[/api/telemetry/bulk]', err);
+    res.status(500).json({ error: { message: "Error procesando telemetría." } });
   }
 });
 
@@ -870,7 +947,8 @@ app.get('/api/recommendations', authMiddleware, async (req, res) => {
     
     res.json(abRecommendations);
   } catch (err) {
-    res.status(500).json({ error: { message: err.message } });
+    console.error('[server]', err.message);
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
@@ -895,7 +973,7 @@ app.post('/api/experiment/click', authMiddleware, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error("Error al registrar click del test A/B:", err.message);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
@@ -978,14 +1056,14 @@ ${textToAudit}
     res.json(parsedResult);
   } catch (err) {
     console.error('[/api/agent/qa-check]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
 app.post('/api/create-checkout-session', checkoutLimiter, verifyToken, async (req, res) => {
   if (!DLOCAL_LOGIN || !DLOCAL_TRANS_KEY || !DLOCAL_SECRET_KEY) {
-    if (IS_PRODUCTION) {
-      console.error('  ✗ [Checkout] dLocal Go no configurado en producción. Rechazando checkout (no se otorga premium gratis).');
+    if (!DEV_MODE) {
+      console.error('  ✗ [Checkout] dLocal Go no configurado. Rechazando checkout (no se otorga premium gratis).');
       return res.status(500).json({ error: { message: "Servicio de pagos temporalmente no disponible (dLocal Go no configurado en el servidor)" }});
     }
     const userId = req.user.uid;
@@ -1016,17 +1094,16 @@ app.post('/api/create-checkout-session', checkoutLimiter, verifyToken, async (re
     return res.json({ id: "sandbox_payment_ok", url: "/index.html?checkout=success_sandbox" });
   }
   try {
-    const { items } = req.body;
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: { message: "Falta el detalle de la compra (items)" } });
+    const planId = String(req.body.planId || '');
+    const plan = PLAN_CATALOG[planId];
+    if (!plan) {
+      return res.status(400).json({ error: { message: "Plan inválido." } });
     }
     const userId = req.user.uid;
-    const planId = ['monthly', 'annual', 'family'].includes(req.body.planId) ? req.body.planId : 'annual';
     const payerEmail = req.user.email || 'cliente@timeless.com';
     const payerName = req.user.name || 'Cliente Timeless';
-
-    // Calcular monto total
-    const totalAmount = items.reduce((acc, item) => acc + (Number(item.unit_price) * Number(item.quantity)), 0);
+    const totalAmount = plan.price;
+    const baseUrl = process.env.PUBLIC_BASE_URL || `https://${req.headers.host || 'localhost:' + PORT}`;
     const xDate = new Date().toISOString();
 
     const payload = {
@@ -1041,9 +1118,9 @@ app.post('/api/create-checkout-session', checkoutLimiter, verifyToken, async (re
         document: "20123456789",
         document_type: "CUIT"
       },
-      notification_url: `https://${req.headers.host || 'localhost:'+PORT}/api/webhook/dlocal`,
-      callback_url: `https://${req.headers.host || 'localhost:'+PORT}/success.html`,
-      back_to_user_url: `https://${req.headers.host || 'localhost:'+PORT}/index.html`
+      notification_url: `${baseUrl}/api/webhook/dlocal`,
+      callback_url: `${baseUrl}/index.html?checkout=success`,
+      back_to_user_url: `${baseUrl}/index.html`
     };
 
     const signature = generateDLocalSignature(DLOCAL_LOGIN, xDate, payload, DLOCAL_SECRET_KEY);
@@ -1075,7 +1152,7 @@ app.post('/api/create-checkout-session', checkoutLimiter, verifyToken, async (re
 
   } catch (err) {
     console.error('[/api/create-checkout-session]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
@@ -1116,7 +1193,7 @@ app.get('/api/family/status', verifyToken, async (req, res) => {
     });
   } catch (err) {
     console.error('[/api/family/status]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
@@ -1152,7 +1229,7 @@ app.post('/api/family/invite', verifyToken, async (req, res) => {
     res.json({ inviteId });
   } catch (err) {
     console.error('[/api/family/invite]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
@@ -1198,7 +1275,7 @@ app.post('/api/family/join', verifyToken, async (req, res) => {
     res.json({ success: true, familyId: invite.familyId });
   } catch (err) {
     console.error('[/api/family/join]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
   }
 });
 
@@ -1233,28 +1310,112 @@ app.post('/api/family/remove', verifyToken, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('[/api/family/remove]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+// ── Regalos de lectura ───────────────────────────────────────────────────────
+// Antes el cliente escribía directo en 'gifts' (y las reglas dejaban a
+// cualquier usuario autenticado crear/editar), lo que permitía a una cuenta
+// gratuita fabricarse un regalo "reclamado" y leer cualquier libro. Ahora solo
+// el servidor crea y reclama regalos, y solo un usuario premium puede regalar.
+const GIFT_TOKEN_RE = /^gift_[A-Za-z0-9_-]{1,120}_[a-f0-9]{10}$/;
+
+app.post('/api/gift/create', verifyToken, async (req, res) => {
+  try {
+    const bookId = String(req.body.bookId || '');
+    const note = String(req.body.note || '').slice(0, 280);
+    if (!bookId || bookId.length > 120 || bookId.includes('/')) {
+      return res.status(400).json({ error: { message: "Obra inválida." } });
+    }
+    if (!(await checkPremium(req.user))) {
+      return res.status(403).json({ error: { message: "Solo los suscriptores pueden regalar obras." } });
+    }
+
+    const db = admin.firestore();
+    let title = '';
+    const bookSnap = await db.collection('books').doc(bookId).get();
+    if (bookSnap.exists) {
+      title = bookSnap.data().title || '';
+    } else {
+      const obraSnap = await db.collection('obras').doc(bookId).get();
+      if (!obraSnap.exists || obraSnap.data().userId !== req.user.uid) {
+        return res.status(404).json({ error: { message: "Obra no encontrada." } });
+      }
+      title = obraSnap.data().title || '';
+    }
+
+    const token = `gift_${bookId}_${crypto.randomBytes(5).toString('hex')}`;
+    await db.collection('gifts').doc(token).set({
+      bookId,
+      bookTitle: title,
+      fromUserId: req.user.uid,
+      fromName: req.user.name || (req.user.email ? req.user.email.split('@')[0] : 'Un lector'),
+      personalNote: note,
+      claimed: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    res.json({ token });
+  } catch (err) {
+    console.error('[/api/gift/create]', err);
+    res.status(500).json({ error: { message: "No se pudo generar el regalo." } });
+  }
+});
+
+app.post('/api/gift/claim', verifyToken, async (req, res) => {
+  try {
+    const token = String(req.body.token || '');
+    if (!GIFT_TOKEN_RE.test(token)) {
+      return res.status(400).json({ error: { message: "Link de invitación inválido." } });
+    }
+    const uid = req.user.uid;
+    const db = admin.firestore();
+    const ref = db.collection('gifts').doc(token);
+
+    const bookId = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) { const e = new Error("El link de invitación ha expirado."); e.status = 404; throw e; }
+      const d = snap.data();
+      if (d.fromUserId === uid) { const e = new Error("No podés reclamar tu propio regalo."); e.status = 400; throw e; }
+      if (d.claimed && d.claimedBy && d.claimedBy !== uid) { const e = new Error("Este regalo ya fue reclamado."); e.status = 409; throw e; }
+      tx.set(db.collection('gifts').doc(`gift_${d.bookId}_${uid}`), {
+        ...d, claimed: true, claimedBy: uid, sourceToken: token,
+        claimedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      tx.update(ref, { claimed: true, claimedBy: uid });
+      return d.bookId;
+    });
+    res.json({ bookId });
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ error: { message: err.message } });
+    console.error('[/api/gift/claim]', err);
+    res.status(500).json({ error: { message: "No se pudo reclamar el regalo." } });
   }
 });
 
 app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
   try {
-    const { email, name, reason } = req.body;
+    const email = String(req.body.email || '').trim().slice(0, 200);
+    const name = String(req.body.name || '').trim().slice(0, 150);
+    const reason = String(req.body.reason || '').trim().slice(0, 1000);
     if (!email || !name) {
       return res.status(400).json({ error: { message: "El nombre y el correo electrónico son obligatorios." } });
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: { message: "El correo electrónico no es válido." } });
+    }
 
-    const ticketId = `ticket_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const ticketId = `ticket_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
     const ticketData = {
       ticketId,
       email,
       name,
-      reason: reason || "",
+      reason,
       timestamp: new Date().toISOString(),
       status: "pending"
     };
 
-    console.log(`  ✦ [Gobernanza] Solicitud de arrepentimiento registrada:`, ticketData);
+    console.log(`  ✦ [Gobernanza] Solicitud de arrepentimiento registrada: ${ticketId}`);
 
     if (admin.apps.length > 0) {
       const db = admin.firestore();
@@ -1267,7 +1428,7 @@ app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
     res.json({ success: true, ticketId });
   } catch (err) {
     console.error('[/api/arrepentimiento]', err);
-    res.status(500).json({ error: { message: err.message } });
+    res.status(500).json({ error: { message: "No se pudo registrar la solicitud." } });
   }
 });
 
@@ -1318,6 +1479,7 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 // ── Fallback: SPA redirect ────────────────────────────────────────────────────
 app.get('*', (req, res) => {
+  if (path.extname(req.path)) return res.status(404).send('Not found');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
