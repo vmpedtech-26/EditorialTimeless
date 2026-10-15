@@ -81,19 +81,6 @@ try {
   console.warn("  ⚠  No se pudo cargar el archivo fallback_catalog.json en el servidor.");
 }
 
-// Configuración Stripe
-let stripe = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  try {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-  } catch (err) {
-    console.warn('  ⚠  Error al inicializar Stripe:', err.message);
-  }
-} else {
-  console.warn('  ⚠  Stripe: STRIPE_SECRET_KEY no configurado en el archivo .env. Pasarela de pagos inactiva.');
-}
-const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
-
 // Configuración dLocal Go
 const DLOCAL_LOGIN = process.env.DLOCAL_LOGIN || '';
 const DLOCAL_TRANS_KEY = process.env.DLOCAL_TRANS_KEY || '';
@@ -165,51 +152,7 @@ if (!KEY || KEY === 'pega_tu_api_key_aqui') {
   process.exit(1);
 }
 
-// ── Endpoint: Stripe Webhook ───────────────────────────────────────────────
-// Debe ir ANTES de express.json() para leer el body en raw format
-app.post('/api/webhook/stripe', express.raw({type: 'application/json'}), async (req, res) => {
-  if (!stripe) {
-    console.warn('  ⚠ [Stripe Webhook] Recibido webhook de Stripe, pero Stripe no está configurado.');
-    return res.status(500).send("Stripe no configurado en el servidor");
-  }
-  const sig = req.headers['stripe-signature'];
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    console.error('  ✗ [Stripe Webhook] Error de firma:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  // Manejar el evento de pago completado
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const userId = session.metadata?.userId;
-    
-    console.log(`  ✦ [Webhook] Pago Stripe APROBADO: ${session.id} (Usuario: ${userId})`);
-    
-    if (userId && admin.apps.length > 0) {
-      try {
-        const db = admin.firestore();
-        await db.collection('users').doc(userId).set({
-          isPremium: true,
-          subscriptionDate: admin.firestore.FieldValue.serverTimestamp(),
-          lastPaymentId: session.id,
-          plan: 'annual_stripe'
-        }, { merge: true });
-        console.log(`  ✦ [Firestore] Suscripción activada para ${userId}`);
-      } catch (dbErr) {
-        console.error('  ✗ [Webhook Error] Fallo al escribir en Firestore:', dbErr);
-      }
-    } else {
-      console.warn('  ⚠ [Webhook] ERROR CRÍTICO: Firebase Admin no inicializado o userId faltante.');
-    }
-  }
-
-  res.json({received: true});
-});
-
+// ── Endpoint: webhook de dLocal Go (debe ir ANTES de express.json() para leer el body crudo)
 app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (req, res) => {
   const xDate = req.headers['x-date'] || req.headers['X-Date'] || '';
   const sigHeader = req.headers['authorization'] || req.headers['Authorization'] || '';
@@ -311,7 +254,7 @@ app.use(express.json({ limit: '2mb' }));
 
 // Rate limiting general para la API (los webhooks ya quedaron registrados
 // arriba, antes de este middleware, así que no les aplica: no queremos
-// descartar entregas legítimas de dLocal/Stripe por límite de tasa).
+// descartar entregas legítimas de dLocal por límite de tasa).
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 100,
@@ -1598,7 +1541,6 @@ app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
 
 app.get('/api/config', async (req, res) => {
   const config = {
-    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || null,
     dlocalSmartFieldsApiKey: process.env.DLOCAL_SMARTFIELDS_API_KEY || null,
     dlocalSandbox: DLOCAL_SANDBOX
   };
