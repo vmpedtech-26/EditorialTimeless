@@ -255,3 +255,136 @@ $('book-upload-form').onsubmit = async (e) => {
 $('btn-close-success-ui').onclick = () => {
   $('success-overlay').classList.remove('visible');
 };
+
+// ── Operación del negocio (pestañas) ─────────────────────────────────────────
+// Todo se pinta con textContent/createElement: los datos (tickets, nombres)
+// vienen de usuarios y nunca deben interpretarse como HTML.
+async function adminApi(path, options = {}) {
+  const token = await auth.currentUser.getIdToken();
+  const res = await fetch(path, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...(options.headers || {}) }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error?.message || `Error ${res.status}`);
+  return data;
+}
+
+function el(tag, text, cls) {
+  const n = document.createElement(tag);
+  if (text !== undefined && text !== null) n.textContent = text;
+  if (cls) n.className = cls;
+  return n;
+}
+const fmtDate = iso => iso ? new Date(iso).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+
+const loaders = { 'panel-overview': loadOverview, 'panel-catalog': loadCatalog, 'panel-tickets': loadTickets };
+
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.admin-panel').forEach(p => p.classList.toggle('active', p.id === tab.dataset.panel));
+    loaders[tab.dataset.panel]?.();
+  });
+});
+
+async function loadOverview() {
+  const list = $('health-list');
+  try {
+    const o = await adminApi('/api/admin/overview');
+    $('st-books').textContent = o.books;
+    $('st-premium').textContent = o.premiumUsers;
+    $('st-tickets').textContent = o.pendingTickets;
+    const rows = [
+      [o.dlocalConfigured ? 'ok' : 'bad', o.dlocalConfigured ? 'Pagos (dLocal Go): credenciales cargadas' : 'Pagos (dLocal Go): FALTAN credenciales — nadie puede pagar'],
+      [o.dlocalSandbox ? 'warn' : 'ok', o.dlocalSandbox ? 'Pagos en modo SANDBOX (definí DLOCAL_SANDBOX=false al usar credenciales reales)' : 'Pagos en modo producción'],
+      [o.geminiConfigured ? 'ok' : 'bad', o.geminiConfigured ? 'IA (Gemini): clave cargada' : 'IA (Gemini): FALTA la clave — el Agente Escritor no funciona'],
+      [o.devMode ? 'bad' : 'ok', o.devMode ? 'MODO DESARROLLO ACTIVO (TIMELESS_DEV): quitar en producción' : 'Modo desarrollo desactivado'],
+      [o.pendingTickets > 0 ? 'warn' : 'ok', o.pendingTickets > 0 ? `${o.pendingTickets} solicitud(es) de arrepentimiento sin resolver` : 'Sin arrepentimientos pendientes']
+    ];
+    list.replaceChildren(...rows.map(([cls, txt]) => el('li', (cls === 'ok' ? '✓ ' : cls === 'warn' ? '! ' : '✗ ') + txt, cls)));
+  } catch (e) {
+    list.replaceChildren(el('li', 'No se pudo cargar el resumen: ' + e.message, 'bad'));
+  }
+}
+
+async function loadCatalog() {
+  const body = $('catalog-body'); const msg = $('catalog-msg');
+  msg.textContent = 'Cargando…';
+  try {
+    const { books } = await adminApi('/api/admin/books');
+    msg.textContent = `${books.length} obras`;
+    body.replaceChildren(...books.sort((a, b) => a.title.localeCompare(b.title)).map(b => {
+      const tr = document.createElement('tr');
+      const actions = el('td'); const wrap = el('div', null, 'row-actions');
+      const read = el('a', 'Abrir', 'btn-mini'); read.href = `reader.html?id=${encodeURIComponent(b.id)}`; read.style.textDecoration = 'none';
+      const del = el('button', 'Eliminar', 'btn-mini danger'); del.type = 'button';
+      del.addEventListener('click', async () => {
+        if (!confirm(`¿Eliminar "${b.title}" del catálogo? Esta acción no se puede deshacer.`)) return;
+        try { await adminApi(`/api/admin/books/${encodeURIComponent(b.id)}`, { method: 'DELETE' }); tr.remove(); }
+        catch (e) { alert(e.message); }
+      });
+      wrap.append(read, del); actions.append(wrap);
+      tr.append(el('td', b.title), el('td', b.author), el('td', b.cat), actions);
+      return tr;
+    }));
+  } catch (e) { msg.textContent = 'Error: ' + e.message; }
+}
+
+async function loadTickets() {
+  const body = $('tickets-body'); const msg = $('tickets-msg');
+  msg.textContent = 'Cargando…';
+  try {
+    const { tickets } = await adminApi('/api/admin/tickets');
+    msg.textContent = tickets.length ? '' : 'No hay solicitudes registradas.';
+    body.replaceChildren(...tickets.map(t => {
+      const tr = document.createElement('tr');
+      const pill = el('span', t.status === 'resolved' ? 'Resuelto' : 'Pendiente', `badge-pill ${t.status === 'resolved' ? 'resolved' : 'pending'}`);
+      const who = el('td'); who.append(el('div', t.name), el('div', t.email, 'admin-msg'));
+      const act = el('td'); const btn = el('button', t.status === 'resolved' ? 'Reabrir' : 'Marcar resuelto', 'btn-mini'); btn.type = 'button';
+      btn.addEventListener('click', async () => {
+        try { await adminApi(`/api/admin/tickets/${encodeURIComponent(t.ticketId)}`, { method: 'POST', body: JSON.stringify({ status: t.status === 'resolved' ? 'pending' : 'resolved' }) }); loadTickets(); }
+        catch (e) { alert(e.message); }
+      });
+      act.append(btn);
+      const status = el('td'); status.append(pill);
+      tr.append(el('td', fmtDate(t.timestamp)), who, el('td', t.reason || '—'), status, act);
+      return tr;
+    }));
+  } catch (e) { msg.textContent = 'Error: ' + e.message; }
+}
+
+$('user-lookup-form').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const msg = $('user-msg'); const out = $('user-result');
+  msg.textContent = 'Buscando…'; out.replaceChildren();
+  try {
+    const u = await adminApi('/api/admin/users/lookup?email=' + encodeURIComponent($('user-email').value.trim()));
+    msg.textContent = '';
+    const card = el('table', null, 'admin-table'); const tb = document.createElement('tbody');
+    [['Email', u.email], ['UID', u.uid], ['Nombre', u.displayName || '—'], ['Acceso', u.providers.join(', ') || '—'],
+     ['Alta', fmtDate(u.createdAt)], ['Último ingreso', fmtDate(u.lastSignIn)],
+     ['Premium', u.active ? 'Activo' : (u.isPremium ? 'Vencido' : 'No')], ['Plan', u.plan || '—'],
+     ['Vence', u.premiumUntil ? fmtDate(u.premiumUntil) : (u.active ? 'Sin vencimiento (anterior al control)' : '—')]
+    ].forEach(([k, v]) => { const tr = document.createElement('tr'); tr.append(el('td', k), el('td', v)); tb.append(tr); });
+    card.append(tb); out.append(card);
+
+    const form = el('div', null, 'inline-form'); form.style.marginTop = '20px';
+    const plan = document.createElement('select');
+    [['courtesy', 'Cortesía (días a elegir)'], ['monthly', 'Plan Mensual (31 días)'], ['annual', 'Plan Anual (366 días)'], ['family', 'Plan Familiar (31 días)']]
+      .forEach(([v, t]) => { const o = el('option', t); o.value = v; plan.append(o); });
+    const days = document.createElement('input'); days.type = 'number'; days.min = 1; days.max = 366; days.value = 30; days.style.minWidth = '90px';
+    plan.addEventListener('change', () => { days.style.display = plan.value === 'courtesy' ? '' : 'none'; });
+    const grant = el('button', 'Otorgar / extender premium', 'btn-mini'); grant.type = 'button';
+    const revoke = el('button', 'Revocar premium', 'btn-mini danger'); revoke.type = 'button';
+    const run = async (payload, okText) => {
+      try { await adminApi('/api/admin/users/premium', { method: 'POST', body: JSON.stringify({ uid: u.uid, ...payload }) }); msg.textContent = okText; $('user-lookup-form').requestSubmit(); }
+      catch (e) { msg.textContent = 'Error: ' + e.message; }
+    };
+    grant.addEventListener('click', () => run({ planId: plan.value, days: parseInt(days.value, 10) }, 'Premium actualizado.'));
+    revoke.addEventListener('click', () => { if (confirm(`¿Revocar el acceso premium de ${u.email}?`)) run({ revoke: true }, 'Premium revocado.'); });
+    form.append(plan, days, grant, revoke); out.append(form);
+  } catch (e) { msg.textContent = e.message; }
+});
+
+onAuthStateChanged(auth, user => { if (user && user.email === 'matiaseorejas@gmail.com') loadOverview(); });

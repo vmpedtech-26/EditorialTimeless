@@ -330,6 +330,32 @@
       font-size: 12px;
       text-decoration: underline;
     }
+
+    /* Pestañas de la consola */
+    .admin-tabs { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:0 0 36px; }
+    .admin-tab { background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:10px 20px; border-radius:999px; font-family:var(--font-sans); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all .2s; }
+    .admin-tab:hover { color:var(--ink); border-color:var(--gold); }
+    .admin-tab.active { background:var(--gold); color:#000; border-color:var(--gold); font-weight:600; }
+    .admin-panel { display:none; }
+    .admin-panel.active { display:block; }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:16px; margin-bottom:24px; }
+    .stat { background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:22px; }
+    .stat b { display:block; font-family:var(--font-serif); font-size:34px; color:var(--gold); font-weight:400; }
+    .stat span { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); }
+    .health-list { list-style:none; padding:0; margin:0; font-size:13px; line-height:2; }
+    .health-list .ok { color:#5CB88A; } .health-list .bad { color:#FF5F57; } .health-list .warn { color:#E0A96D; }
+    .admin-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .admin-table th { text-align:left; padding:10px 12px; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid var(--border); }
+    .admin-table td { padding:12px; border-bottom:1px solid var(--border); vertical-align:top; word-break:break-word; }
+    .row-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .btn-mini { background:transparent; border:1px solid var(--gold); color:var(--gold); padding:6px 12px; border-radius:8px; font-size:12px; cursor:pointer; font-family:var(--font-sans); }
+    .btn-mini:hover { background:var(--gold); color:#000; }
+    .btn-mini.danger { border-color:#FF5F57; color:#FF5F57; } .btn-mini.danger:hover { background:#FF5F57; color:#000; }
+    .inline-form { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:20px; }
+    .inline-form input, .inline-form select { background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--ink); font-family:var(--font-sans); font-size:14px; min-width:220px; }
+    .admin-msg { font-size:13px; margin:10px 0; min-height:18px; color:var(--text-muted); }
+    .badge-pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:11px; border:1px solid var(--border); }
+    .badge-pill.pending { color:#E0A96D; border-color:#E0A96D; } .badge-pill.resolved { color:#5CB88A; border-color:#5CB88A; }
   </style>
 </head>
 <body>
@@ -346,6 +372,27 @@
       <div class="console-title">Consola de Carga Editorial</div>
     </header>
 
+    <nav class="admin-tabs" id="admin-tabs">
+      <button type="button" class="admin-tab active" data-panel="panel-overview">Resumen</button>
+      <button type="button" class="admin-tab" data-panel="panel-publish">Publicar obra</button>
+      <button type="button" class="admin-tab" data-panel="panel-catalog">Catálogo</button>
+      <button type="button" class="admin-tab" data-panel="panel-users">Usuarios</button>
+      <button type="button" class="admin-tab" data-panel="panel-tickets">Arrepentimientos</button>
+    </nav>
+
+    <section class="admin-panel active" id="panel-overview">
+      <div class="stat-grid">
+        <div class="stat"><b id="st-books">–</b><span>Obras publicadas</span></div>
+        <div class="stat"><b id="st-premium">–</b><span>Usuarios premium</span></div>
+        <div class="stat"><b id="st-tickets">–</b><span>Arrepentimientos pendientes</span></div>
+      </div>
+      <div class="form-card">
+        <h3 class="form-section-title">Estado del sistema</h3>
+        <ul class="health-list" id="health-list"><li>Cargando…</li></ul>
+      </div>
+    </section>
+
+    <section class="admin-panel" id="panel-publish">
     <main>
       <form id="book-upload-form">
         <!-- SECCIÓN 1: METADATOS DE LA OBRA -->
@@ -467,6 +514,35 @@
         </div>
       </form>
     </main>
+    </section>
+
+    <section class="admin-panel" id="panel-catalog">
+      <div class="form-card">
+        <h3 class="form-section-title">Catálogo</h3>
+        <p class="admin-msg" id="catalog-msg"></p>
+        <table class="admin-table"><thead><tr><th>Título</th><th>Autor</th><th>Categoría</th><th></th></tr></thead><tbody id="catalog-body"></tbody></table>
+      </div>
+    </section>
+
+    <section class="admin-panel" id="panel-users">
+      <div class="form-card">
+        <h3 class="form-section-title">Gestión de usuarios</h3>
+        <form class="inline-form" id="user-lookup-form">
+          <input type="email" id="user-email" placeholder="email del usuario" required />
+          <button type="submit" class="btn-mini">Buscar</button>
+        </form>
+        <p class="admin-msg" id="user-msg"></p>
+        <div id="user-result"></div>
+      </div>
+    </section>
+
+    <section class="admin-panel" id="panel-tickets">
+      <div class="form-card">
+        <h3 class="form-section-title">Botón de arrepentimiento</h3>
+        <p class="admin-msg" id="tickets-msg"></p>
+        <table class="admin-table"><thead><tr><th>Fecha</th><th>Solicitante</th><th>Motivo</th><th>Estado</th><th></th></tr></thead><tbody id="tickets-body"></tbody></table>
+      </div>
+    </section>
   </div>
 
   <!-- Success Modal Overlay -->

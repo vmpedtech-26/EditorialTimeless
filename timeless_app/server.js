@@ -1393,6 +1393,169 @@ app.post('/api/gift/claim', verifyToken, async (req, res) => {
   }
 });
 
+// ── Consola del editor: operación del negocio ──────────────────────────────
+// Solo el editor (ADMIN_EMAIL) con el correo verificado. Cada acción que
+// cambia datos deja un registro en admin_audit.
+async function adminMiddleware(req, res, next) {
+  await verifyToken(req, res, async () => {
+    if (req.user.email !== ADMIN_EMAIL || req.user.email_verified !== true) {
+      return res.status(403).json({ error: { message: "Acceso exclusivo del editor." } });
+    }
+    next();
+  });
+}
+
+function adminAudit(req, action, detail) {
+  if (admin.apps.length === 0) return;
+  admin.firestore().collection('admin_audit').add({
+    by: req.user.email, action, detail: detail || {},
+    at: admin.firestore.FieldValue.serverTimestamp()
+  }).catch(e => console.warn('  ⚠ [admin_audit]', e.message));
+}
+
+app.get('/api/admin/overview', adminMiddleware, async (req, res) => {
+  try {
+    const db = admin.firestore();
+    const [books, premium, pending] = await Promise.all([
+      db.collection('books').count().get(),
+      db.collection('users').where('isPremium', '==', true).count().get(),
+      db.collection('arrepentimiento_tickets').where('status', '==', 'pending').count().get()
+    ]);
+    res.json({
+      books: books.data().count,
+      premiumUsers: premium.data().count,
+      pendingTickets: pending.data().count,
+      dlocalConfigured: !!(DLOCAL_LOGIN && DLOCAL_TRANS_KEY && DLOCAL_SECRET_KEY),
+      dlocalSandbox: DLOCAL_SANDBOX,
+      geminiConfigured: !!KEY && KEY !== 'pega_tu_api_key_aqui',
+      devMode: DEV_MODE
+    });
+  } catch (err) {
+    console.error('[/api/admin/overview]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+app.get('/api/admin/tickets', adminMiddleware, async (req, res) => {
+  try {
+    const snap = await admin.firestore().collection('arrepentimiento_tickets')
+      .orderBy('timestamp', 'desc').limit(100).get();
+    res.json({ tickets: snap.docs.map(d => d.data()) });
+  } catch (err) {
+    console.error('[/api/admin/tickets]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+app.post('/api/admin/tickets/:id', adminMiddleware, async (req, res) => {
+  try {
+    const status = req.body.status === 'resolved' ? 'resolved' : 'pending';
+    const id = String(req.params.id);
+    if (!/^ticket_[A-Za-z0-9_]+$/.test(id)) return res.status(400).json({ error: { message: "Ticket inválido." } });
+    await admin.firestore().collection('arrepentimiento_tickets').doc(id).set({
+      status, resolvedAt: status === 'resolved' ? new Date().toISOString() : null
+    }, { merge: true });
+    adminAudit(req, 'ticket_status', { id, status });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[/api/admin/tickets/:id]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+app.get('/api/admin/users/lookup', adminMiddleware, async (req, res) => {
+  try {
+    const email = String(req.query.email || '').trim().toLowerCase();
+    if (!email) return res.status(400).json({ error: { message: "Falta el email." } });
+    let user;
+    try { user = await admin.auth().getUserByEmail(email); }
+    catch (e) { return res.status(404).json({ error: { message: "No existe un usuario con ese email." } }); }
+    const snap = await admin.firestore().collection('users').doc(user.uid).get();
+    const d = snap.exists ? snap.data() : {};
+    res.json({
+      uid: user.uid, email: user.email, displayName: user.displayName || '',
+      providers: user.providerData.map(p => p.providerId),
+      createdAt: user.metadata.creationTime, lastSignIn: user.metadata.lastSignInTime,
+      isPremium: !!d.isPremium, active: subscriptionActive(d), plan: d.plan || null,
+      premiumUntil: d.premiumUntil && d.premiumUntil.toDate ? d.premiumUntil.toDate().toISOString() : null,
+      familyId: d.familyId || null
+    });
+  } catch (err) {
+    console.error('[/api/admin/users/lookup]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+// Otorga (cortesía o plan) o revoca el acceso premium de un usuario.
+app.post('/api/admin/users/premium', adminMiddleware, async (req, res) => {
+  try {
+    const uid = String(req.body.uid || '');
+    if (!uid) return res.status(400).json({ error: { message: "Falta el usuario." } });
+    const ref = admin.firestore().collection('users').doc(uid);
+
+    if (req.body.revoke === true) {
+      await ref.set({ isPremium: false, premiumUntil: admin.firestore.Timestamp.now() }, { merge: true });
+      localPremiumUsers.delete(uid);
+      adminAudit(req, 'premium_revoke', { uid });
+      return res.json({ ok: true });
+    }
+
+    const planId = String(req.body.planId || 'courtesy');
+    const days = planId === 'courtesy'
+      ? Math.min(366, Math.max(1, parseInt(req.body.days, 10) || 30))
+      : (PLAN_CATALOG[planId] && PLAN_CATALOG[planId].days);
+    if (!days) return res.status(400).json({ error: { message: "Plan inválido." } });
+
+    const snap = await ref.get();
+    const prev = snap.exists ? snap.data() : {};
+    const prevUntil = subscriptionActive(prev) && prev.premiumUntil && prev.premiumUntil.toMillis ? prev.premiumUntil.toMillis() : 0;
+    const premiumUntil = admin.firestore.Timestamp.fromMillis(Math.max(Date.now(), prevUntil) + days * 86400000);
+    await ref.set({
+      isPremium: true, premiumUntil, plan: `${planId}_admin`,
+      subscriptionDate: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    localPremiumUsers.add(uid);
+    if (planId === 'family') {
+      const u = await admin.auth().getUser(uid);
+      await ensureFamilyForOwner(uid, u.email);
+    }
+    adminAudit(req, 'premium_grant', { uid, planId, days });
+    res.json({ ok: true, premiumUntil: premiumUntil.toDate().toISOString() });
+  } catch (err) {
+    console.error('[/api/admin/users/premium]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+app.get('/api/admin/books', adminMiddleware, async (req, res) => {
+  try {
+    const snap = await admin.firestore().collection('books')
+      .select('title', 'author', 'cat', 'genre', 'badge', 'createdAt').get();
+    res.json({ books: snap.docs.map(d => {
+      const x = d.data();
+      return { id: d.id, title: x.title || '', author: x.author || '', cat: x.cat || '', genre: x.genre || '', badge: x.badge || '' };
+    }) });
+  } catch (err) {
+    console.error('[/api/admin/books]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+app.delete('/api/admin/books/:id', adminMiddleware, async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    if (!id || id.includes('/')) return res.status(400).json({ error: { message: "Obra inválida." } });
+    const db = admin.firestore();
+    await Promise.all([db.collection('books').doc(id).delete(), db.collection('books_full').doc(id).delete()]);
+    serverCache.catalog = null;
+    adminAudit(req, 'book_delete', { id });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[/api/admin/books/:id]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
 app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
   try {
     const email = String(req.body.email || '').trim().slice(0, 200);
