@@ -1213,7 +1213,8 @@ app.post('/api/family/join', verifyToken, async (req, res) => {
     await familyRef.update({ memberIds: admin.firestore.FieldValue.arrayUnion(uid) });
     await db.collection('users').doc(uid).set({ familyId: invite.familyId }, { merge: true });
     await inviteRef.update({ claimed: true, claimedBy: uid, claimedAt: admin.firestore.FieldValue.serverTimestamp() });
-    localPremiumUsers.add(uid);
+    // No se cachea como premium acá: checkPremium decide según el plan vigente del titular.
+    localPremiumUsers.delete(uid);
 
     res.json({ success: true, familyId: invite.familyId });
   } catch (err) {
