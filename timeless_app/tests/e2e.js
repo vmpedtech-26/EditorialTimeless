@@ -235,6 +235,7 @@ async function run() {
 
   // ── Reglas de Firestore como cliente autenticado
   rec('Atacante no escribe gifts directo (403)', (await fsForgeGift(`gift_${BOOK}_${C.uid}`, C.token)) === 403);
+  rec('Ningún cliente escribe el catálogo directo (403)', (await fetch(`${FS}/books/${BOOK}`, { method: 'PATCH', headers: { Authorization: `Bearer ${C.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { title: { stringValue: 'hack' } } }) })).status === 403);
   rec('Atacante no lee books_full (403)', (await fsGet(`books_full/${BOOK}`, C.token)) === 403);
   rec('Atacante no lista gifts (403)', (await fsGet('gifts?pageSize=1', C.token)) === 403);
   rec('Un token de regalo se lee individualmente (200)', (await fsGet(`gifts/${token}`, C.token)) === 200);
