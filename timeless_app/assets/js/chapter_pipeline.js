@@ -6,6 +6,8 @@
 // continuidad) -> evaluar con el BSC -> si el puntaje no llega al umbral,
 // reescribir con la nota del editor -> quedarse con la mejor versión.
 
+import { lintProse, lintToEditorNote } from './prose_lint.js';
+
 export const BSC_THRESHOLD = 82;
 export const CONTINUITY_CHARS = 1800;
 
@@ -34,17 +36,23 @@ export function averageBsc(list) {
   return { coherencia: avg('coherencia'), originalidad: avg('originalidad'), ritmo: avg('ritmo'), overall: avg('overall'), chapters: ok.length };
 }
 
+// Puntaje combinado de una versión: BSC (si hay) y detector de prosa automática.
+function combinedScore(bsc, lint) {
+  return bsc ? Math.round((bsc.overall + lint.score) / 2) : lint.score;
+}
+
 /**
  * @param {object}   o
  * @param {Function} o.stream     ({previousText, editorNote}) => async iterable de fragmentos de texto
  * @param {Function} o.evaluate   (text) => Promise<bsc|null>
  * @param {string}   [o.previousText] texto completo del capítulo anterior
- * @param {boolean}  [o.review]   false = calidad "standard" (sin BSC)
- * @yields {{type:'chunk',text:string}|{type:'review',attempt:number,bsc:object|null}|
+ * @param {boolean}  [o.review]   false = calidad "standard" (sin BSC; el detector de prosa igual corre, es gratis)
+ * @param {'narrative'|'expository'} [o.kind] tipo de obra, para el detector
+ * @yields {{type:'chunk',text:string}|{type:'review',attempt:number,bsc:object|null,lint:object}|
  *          {type:'rewrite',attempt:number,note:string}|{type:'kept-original'}|
- *          {type:'done',text:string,bsc:object|null,rewrites:number}}
+ *          {type:'done',text:string,bsc:object|null,lint:object,rewrites:number}}
  */
-export async function* produceChapter({ stream, evaluate, previousText = '', review = true, threshold = BSC_THRESHOLD, maxRewrites = 1 }) {
+export async function* produceChapter({ stream, evaluate, previousText = '', review = true, threshold = BSC_THRESHOLD, maxRewrites = 1, kind = 'narrative' }) {
   const tail = previousText ? previousText.slice(-CONTINUITY_CHARS) : '';
 
   let text = '';
@@ -53,35 +61,46 @@ export async function* produceChapter({ stream, evaluate, previousText = '', rev
     yield { type: 'chunk', text };
   }
 
-  let bsc = null;
+  const assess = async t => {
+    const lint = lintProse(t, { kind });
+    const bsc = review ? normalizeBsc(await evaluate(t)) : null;
+    return { lint, bsc };
+  };
+  const needsWork = ({ lint, bsc }) => !lint.pass || (bsc && bsc.overall < threshold);
+
+  let cur = await assess(text);
+  yield { type: 'review', attempt: 0, bsc: cur.bsc, lint: cur.lint };
+
   let rewrites = 0;
-  if (review) {
-    bsc = normalizeBsc(await evaluate(text));
-    yield { type: 'review', attempt: 0, bsc };
+  while (needsWork(cur) && rewrites < maxRewrites) {
+    rewrites++;
+    const parts = [];
+    if (cur.bsc && cur.bsc.nota_editorial) parts.push(`- Editor: ${cur.bsc.nota_editorial}`);
+    const lintNote = lintToEditorNote(cur.lint);
+    if (lintNote) parts.push(lintNote);
+    const note = parts.join('\n') || 'Elevá el nivel literario general: más concreción, subtexto y variación de ritmo.';
+    yield { type: 'rewrite', attempt: rewrites, note };
 
-    while (bsc && bsc.overall < threshold && rewrites < maxRewrites) {
-      rewrites++;
-      yield { type: 'rewrite', attempt: rewrites, note: bsc.nota_editorial };
+    let candidate = '';
+    for await (const chunk of stream({ previousText: tail, editorNote: note })) {
+      candidate += chunk;
+      yield { type: 'chunk', text: candidate };
+    }
+    const cand = await assess(candidate);
+    yield { type: 'review', attempt: rewrites, bsc: cand.bsc, lint: cand.lint };
 
-      let candidate = '';
-      for await (const chunk of stream({ previousText: tail, editorNote: bsc.nota_editorial || 'Elevá el nivel literario general: más concreción, subtexto y variación de ritmo.' })) {
-        candidate += chunk;
-        yield { type: 'chunk', text: candidate };
-      }
-      const candBsc = normalizeBsc(await evaluate(candidate));
-      yield { type: 'review', attempt: rewrites, bsc: candBsc };
-
-      if (candBsc && candBsc.overall >= bsc.overall) {
-        text = candidate;
-        bsc = candBsc;
-      } else {
-        // La reescritura no mejoró (o no se pudo evaluar): se conserva la original.
-        yield { type: 'kept-original' };
-        yield { type: 'chunk', text };
-        break;
-      }
+    // Si se evalúa con BSC y la reescritura no se pudo evaluar, no se acepta a ciegas.
+    const evaluable = !review || !cur.bsc || cand.bsc;
+    if (evaluable && combinedScore(cand.bsc, cand.lint) >= combinedScore(cur.bsc, cur.lint) && cand.lint.pass >= cur.lint.pass) {
+      text = candidate;
+      cur = cand;
+    } else {
+      // La reescritura no mejoró: se conserva la original.
+      yield { type: 'kept-original' };
+      yield { type: 'chunk', text };
+      break;
     }
   }
 
-  yield { type: 'done', text, bsc, rewrites };
+  yield { type: 'done', text, bsc: cur.bsc, lint: cur.lint, rewrites };
 }

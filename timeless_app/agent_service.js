@@ -109,13 +109,13 @@ window.AgentService = class AgentService {
   // ── Pipeline: generate outline ───────────────────────────────────
   async generateOutline(params) {
     const writerId = params.writerId || 'libre';
-    const systemPrompt = window.TIMELESS_PROMPTS.buildSystem(writerId);
+    const systemPrompt = window.TIMELESS_PROMPTS.buildSystem(writerId, window.TIMELESS_FORMAT_FOR[params.genre]);
     const userPrompt = window.TIMELESS_PROMPTS.buildOutline(
       params.prompt, params.genre, params.chapters, params.tone, writerId
     );
     const raw = await this.generate(systemPrompt, userPrompt, {
       temperature: 0.80,
-      maxTokens:   2048,
+      maxTokens:   3500,
     });
 
     const match = raw.match(/\{[\s\S]*\}/);
@@ -128,11 +128,11 @@ window.AgentService = class AgentService {
   // editorNote (crítica del BSC al reescribir).
   streamChapter(outline, chapterIndex, params, extra = {}) {
     const writerId = params.writerId || 'libre';
-    const systemPrompt = window.TIMELESS_PROMPTS.buildSystem(writerId);
+    const systemPrompt = window.TIMELESS_PROMPTS.buildSystem(writerId, window.TIMELESS_FORMAT_FOR[params.genre]);
     const userPrompt = window.TIMELESS_PROMPTS.buildChapter(outline, chapterIndex, { ...params, ...extra });
     return this.stream(systemPrompt, userPrompt, {
       temperature: 0.92,
-      maxTokens:   2500,
+      maxTokens:   4096,
     });
   }
 

@@ -14,16 +14,16 @@ function updateKeyUI() {
 
   if (agent.isLocal) {
     // Corriendo en servidor local — API Key gestionada en .env
-    labelText.innerHTML = 'Servidor local activo &middot; API Key gestionada en <strong>.env</strong>';
+    labelText.innerHTML = 'Estudio de escritura conectado';
     inputWrap.innerHTML = `
       <div class="key-status">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Conectado &middot; localhost
+        Conectado
       </div>`;
 
   } else if (agent.hasKey()) {
     // Modo directo con key manual
-    labelText.innerHTML = 'Agente conectado a <strong>Gemini</strong> &middot; Generaci&oacute;n real activa';
+    labelText.innerHTML = 'Agente conectado &middot; Redacci&oacute;n real activa';
     inputWrap.innerHTML = `
       <div class="key-status">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -37,7 +37,7 @@ function updateKeyUI() {
 
   } else {
     // Sin key — modo simulación
-    labelText.innerHTML = 'Para generaci&oacute;n <strong>real</strong>, configura tu <strong>Gemini API Key</strong>:';
+    labelText.innerHTML = 'Para redacci&oacute;n <strong>real</strong>, configur&aacute; tu <strong>clave de servicio</strong>:';
     inputWrap.innerHTML = `
       <input type="password" class="api-key-field" id="api-key-field" placeholder="AIzaSy..." autocomplete="off" />
       <button class="btn-save-key" id="btn-save-key">Guardar</button>`;
@@ -327,6 +327,7 @@ window.startGeneration = async function() {
         evaluate: (text) => agent.evaluateBSC(text, params.genre),
         previousText: currentObra.chapters[i - 1] || '',
         review: reviewEnabled,
+        kind: window.TIMELESS_FORMATS?.[window.TIMELESS_FORMAT_FOR?.[params.genre]]?.expository ? 'expository' : 'narrative',
       });
 
       for await (const ev of events) {

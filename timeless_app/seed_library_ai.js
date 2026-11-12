@@ -24,7 +24,7 @@
 require('dotenv').config();
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
-const { TIMELESS_WRITERS, TIMELESS_PROMPTS } = require('./prompts.js');
+const { TIMELESS_WRITERS, TIMELESS_PROMPTS, TIMELESS_FORMATS, TIMELESS_FORMAT_FOR } = require('./prompts.js');
 
 // ── Firebase Admin Init ──────────────────────────────────────────────────
 try {
@@ -240,11 +240,12 @@ addPlans('kids', 'Aventura Ecológica', [
 // ── Generación de un libro ───────────────────────────────────────────────
 async function generateBook(plan, index) {
   const writer = TIMELESS_WRITERS.find(w => w.id === plan.writerId) || TIMELESS_WRITERS[0];
-  const systemPrompt = TIMELESS_PROMPTS.buildSystem(writer.id);
+  const formatId = TIMELESS_FORMAT_FOR[plan.cat] || 'novela';
+  const systemPrompt = TIMELESS_PROMPTS.buildSystem(writer.id, formatId);
 
   console.log(`\n  ✦ [${index}] Generando outline · categoría=${plan.cat} · voz=${writer.name} · premisa="${plan.premise.slice(0, 60)}..."`);
   const outlineUser = TIMELESS_PROMPTS.buildOutline(plan.premise, plan.cat, plan.chapters, plan.tone, writer.id);
-  const rawOutline = await callGemini(systemPrompt, outlineUser, { temperature: 0.80, maxTokens: 2048 });
+  const rawOutline = await callGemini(systemPrompt, outlineUser, { temperature: 0.80, maxTokens: 3500 });
   const outline = extractJson(rawOutline);
   console.log(`    → título generado: "${outline.title}"`);
 
@@ -260,11 +261,12 @@ async function generateBook(plan, index) {
     for await (const ev of produceChapter({
       stream: async function* (extra) {
         const user = TIMELESS_PROMPTS.buildChapter(outline, i, { genre: plan.cat, tone: plan.tone, writerId: writer.id, ...extra });
-        yield await callGemini(systemPrompt, user, { temperature: 0.92, maxTokens: 2500 });
+        yield await callGemini(systemPrompt, user, { temperature: 0.92, maxTokens: 4096 });
       },
       evaluate: (text) => evaluateBSC(text, plan.cat),
       previousText: previousRaw,
       review: true,
+      kind: TIMELESS_FORMATS[formatId].expository ? 'expository' : 'narrative',
     })) {
       if (ev.type === 'rewrite') process.stdout.write(`\n      ⚠ bajo el umbral ("${ev.note}") — reescribiendo... `);
       if (ev.type === 'done') { finalText = ev.text; finalBsc = ev.bsc; rewrites = ev.rewrites; }
@@ -301,7 +303,8 @@ async function generateBook(plan, index) {
 
   const bookData = {
     title: outline.title,
-    author: pick(FICTIONAL_PSEUDONYMS, index),
+    // Sello editorial de la casa: no se inventan autores humanos.
+    author: 'Timeless Editorial',
     cat: plan.cat,
     genre: plan.genreLabel,
     cover: isKids ? pick(KIDS_EMOJIS, index) : pick(COVER_PRESETS, index),
@@ -318,13 +321,13 @@ async function generateBook(plan, index) {
       chapters: outline.chapters.map(c => ({ title: c.title, arc: c.arc })),
     },
     createdAt: FieldValue.serverTimestamp(),
-    generatedBy: `gemini-ai:${writer.id}`,
     ...kidsExtra,
   };
 
-  const bookId = `ai-${plan.cat}-${slugify(outline.title)}`;
+  const bookId = `tl-${plan.cat}-${slugify(outline.title)}`;
   await db.collection('books').doc(bookId).set(bookData);
-  await db.collection('books_full').doc(bookId).set({ chapters });
+  // La procedencia de producción es interna: vive en books_full (cerrada a clientes), nunca en el documento público.
+  await db.collection('books_full').doc(bookId).set({ chapters, production: { voice: writer.id, format: formatId } });
   console.log(`    ✔ Guardado como books/${bookId} (+ books_full/${bookId})`);
   return bookId;
 }

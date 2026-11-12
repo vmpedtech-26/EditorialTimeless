@@ -61,13 +61,13 @@ function sanitizeGeminiRequest(body) {
 // Los errores de Gemini no se reenvían tal cual (pueden traer detalles de la
 // cuenta o del proyecto): el cliente recibe solo un mensaje y un código.
 function publicUpstreamError(status, data) {
-  if (status === 429) return { status: 429, message: 'El servicio de IA está saturado. Probá de nuevo en un momento.' };
-  if (status >= 500) return { status: 502, message: 'El servicio de IA no está disponible ahora.' };
+  if (status === 429) return { status: 429, message: 'El servicio de redacción está saturado. Probá de nuevo en un momento.' };
+  if (status >= 500) return { status: 502, message: 'El servicio de redacción no está disponible ahora.' };
   const raw = data && data.error && typeof data.error.message === 'string' ? data.error.message : '';
   if (/api key|permission|credential|unauthenticated|billing/i.test(raw) || status === 401 || status === 403) {
-    return { status: 502, message: 'El servicio de IA no está configurado correctamente. Avisale al editor.' };
+    return { status: 502, message: 'El servicio de redacción no está configurado correctamente. Avisale al editor.' };
   }
-  return { status: 400, message: 'La IA rechazó el pedido.' };
+  return { status: 400, message: 'El pedido fue rechazado.' };
 }
 
 module.exports = { sanitizeGeminiRequest, publicUpstreamError, BadAiRequest, MAX_OUTPUT_TOKENS };

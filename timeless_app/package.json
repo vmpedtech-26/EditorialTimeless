@@ -1,7 +1,7 @@
 {
   "name": "timeless-agent-server",
   "version": "1.0.0",
-  "description": "Servidor local para Timeless Editorial — Agente Escritor con Gemini AI",
+  "description": "Servidor de Timeless Editorial",
   "engines": {
     "node": ">=22.0.0"
   },

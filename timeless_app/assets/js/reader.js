@@ -17,7 +17,7 @@ function escapeHtml(str) {
 
 // El contenido de los capítulos guarda HTML "de verdad" (párrafos con <p>),
 // no solo texto plano, y no siempre viene del catálogo curado por el editor:
-// una obra generada por otro usuario (Agente IA) y regalada también pasa por
+// una obra generada por otro usuario (Agente Escritor) y regalada también pasa por
 // acá. Se permite el formato básico de prosa y se elimina cualquier otra
 // etiqueta o atributo (scripts, manejadores de eventos, iframes, etc.).
 function sanitizeChapterHtml(html) {

@@ -4,7 +4,6 @@ const ASSETS_TO_CACHE = [
   '/index.html',
   '/reader.html',
   '/agent.html',
-  '/architecture.html',
   '/assets/css/reader.css',
   '/assets/css/agent.css',
   '/assets/css/index.css',
