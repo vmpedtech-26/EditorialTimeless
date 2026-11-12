@@ -876,6 +876,45 @@ function showExpiryNotice(st) {
   document.body.appendChild(note);
 }
 
+// ── Instalar la app (PWA) ────────────────────────────────────────────────────
+// Chrome/Edge/Android avisan con `beforeinstallprompt` cuando la app es
+// instalable; iPhone/iPad no tienen ese evento, así que se muestran los pasos
+// manuales. Si ya está instalada (modo standalone) los botones no aparecen.
+(function setupInstall() {
+  const buttons = [document.getElementById('btn-install'), document.getElementById('btn-install-menu')].filter(Boolean);
+  const modal = document.getElementById('install-modal');
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let deferred = null;
+
+  const setVisible = (on) => buttons.forEach(b => { b.style.display = on ? '' : 'none'; });
+  if (standalone || buttons.length === 0) return;
+  if (isIOS) setVisible(true);
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferred = e;
+    setVisible(true);
+  });
+  window.addEventListener('appinstalled', () => { deferred = null; setVisible(false); });
+
+  buttons.forEach(b => b.addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (deferred) {
+      deferred.prompt();
+      try { await deferred.userChoice; } catch (err) { /* el usuario cerró el diálogo */ }
+      deferred = null;
+      setVisible(false);
+    } else if (modal) {
+      modal.style.display = 'flex';
+    }
+  }));
+  if (modal) {
+    document.getElementById('close-install-modal')?.addEventListener('click', () => { modal.style.display = 'none'; });
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+  }
+})();
+
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   isPremiumUser = false;

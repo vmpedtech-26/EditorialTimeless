@@ -15,6 +15,8 @@ const ASSETS_TO_CACHE = [
   '/prompts.js',
   '/agent_service.js',
   '/firebase_config.js',
+  '/assets/icon-192.png',
+  '/assets/icon-512.png',
   '/assets/cover.png',
   '/assets/cover_arquitecto.png',
   '/assets/cover_contemplacion.png',
