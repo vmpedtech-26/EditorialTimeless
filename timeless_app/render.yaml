@@ -11,6 +11,8 @@ services:
         value: 10000
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: 22
       - key: PUBLIC_BASE_URL
         value: https://timeless-editorial.onrender.com
       - key: GEMINI_API_KEY
