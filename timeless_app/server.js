@@ -68,7 +68,8 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 // (=sandbox), así que cualquiera podía mandar un webhook "PAID" falso y quedar
 // premium gratis.
 const DEV_MODE = process.env.TIMELESS_DEV === 'true';
-const ADMIN_EMAIL = 'matiaseorejas@gmail.com';
+// El editor. Configurable solo para poder probar la consola con una cuenta descartable; en producción no se define.
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'matiaseorejas@gmail.com';
 // Salto DRM: se expone a través de /api/config porque el cliente descifra en el navegador
 // y necesita el mismo valor para derivar la llave. Ver assets/js/reader.js.
 const DRM_SALT = process.env.DRM_MASTER_SECRET || 'Timeless_Editorial_Premium_Ecosystem_2024';
@@ -100,6 +101,30 @@ function publicErr(err) {
   return DEV_MODE ? ((err && err.message) || "Error") : "Error interno del servidor.";
 }
 
+// Aviso por correo al editor. Es opcional: sin RESEND_API_KEY no hace nada y el
+// aviso queda solo en la consola del editor. Pensado para eventos que exigen
+// respuesta (p. ej. una solicitud del botón de arrepentimiento).
+async function notifyEditor(subject, text) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return false;
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: process.env.NOTIFY_FROM || 'Timeless <onboarding@resend.dev>',
+        to: [process.env.NOTIFY_TO || ADMIN_EMAIL],
+        subject, text
+      })
+    });
+    if (!res.ok) console.warn('  ⚠ [notifyEditor] El proveedor respondió', res.status);
+    return res.ok;
+  } catch (e) {
+    console.warn('  ⚠ [notifyEditor]', e.message);
+    return false;
+  }
+}
+
 // Compara dos strings en tiempo constante para evitar timing attacks al
 // verificar firmas HMAC (una comparación con !== filtra, byte a byte, en
 // cuánto tarda en fallar, cuántos caracteres iniciales son correctos).
@@ -126,7 +151,8 @@ function generateDLocalSignature(xLogin, xDate, requestBody, secretKey) {
 }
 
 
-const MODEL = 'gemini-2.5-flash';
+// GEMINI_MODEL permite subir a un modelo más capaz (p. ej. gemini-2.5-pro) sin tocar código.
+const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}`;
 
 // ── Firebase Admin Init ──────────────────────────────────────────────────────
@@ -669,8 +695,10 @@ app.get('/api/book/:id/chunk/:index', chunkAccessMiddleware, async (req, res) =>
     let book = catalog.find(b => b.id === id);
     
     if (!book && admin.apps.length > 0) {
+      // Fuera de la caché (obra recién publicada, o borrador de un usuario): lectura directa.
       const db = admin.firestore();
-      const docSnap = await db.collection('obras').doc(id).get();
+      let docSnap = await db.collection('books').doc(id).get();
+      if (!docSnap.exists) docSnap = await db.collection('obras').doc(id).get();
       if (docSnap.exists) book = docSnap.data();
     }
     
@@ -1258,6 +1286,35 @@ app.post('/api/family/remove', verifyToken, async (req, res) => {
   }
 });
 
+// ── Estado de la suscripción del usuario (pantalla "Mi suscripción") ─────────
+app.get('/api/subscription/status', verifyToken, async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    const snap = await admin.firestore().collection('users').doc(uid).get();
+    const d = snap.exists ? snap.data() : {};
+    const isEditor = req.user.email === ADMIN_EMAIL;
+    const own = subscriptionActive(d);
+    const viaFamily = !own && !!d.familyId && await isPremiumViaFamily(uid);
+    const untilMs = d.premiumUntil && typeof d.premiumUntil.toMillis === 'function' ? d.premiumUntil.toMillis() : null;
+    const daysLeft = own && untilMs ? Math.max(0, Math.ceil((untilMs - Date.now()) / 86400000)) : null;
+    const planKey = String(d.plan || '').split('_')[0];
+    res.json({
+      active: own || viaFamily || isEditor,
+      isEditor,
+      viaFamily,
+      plan: planKey || null,
+      planLabel: PLAN_CATALOG[planKey] ? PLAN_CATALOG[planKey].label : null,
+      premiumUntil: untilMs ? new Date(untilMs).toISOString() : null,
+      daysLeft,
+      expiringSoon: daysLeft !== null && daysLeft <= 7,
+      expired: !own && untilMs !== null && untilMs <= Date.now()
+    });
+  } catch (err) {
+    console.error('[/api/subscription/status]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
 // ── Regalos de lectura ───────────────────────────────────────────────────────
 // Antes el cliente escribía directo en 'gifts' (y las reglas dejaban a
 // cualquier usuario autenticado crear/editar), lo que permitía a una cuenta
@@ -1485,6 +1542,95 @@ app.get('/api/admin/books', adminMiddleware, async (req, res) => {
   }
 });
 
+app.get('/api/admin/books/:id', adminMiddleware, async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    if (!id || id.includes('/')) return res.status(400).json({ error: { message: "Obra inválida." } });
+    const db = admin.firestore();
+    const [pub, full] = await Promise.all([db.collection('books').doc(id).get(), db.collection('books_full').doc(id).get()]);
+    if (!pub.exists) return res.status(404).json({ error: { message: "Obra no encontrada." } });
+    const book = pub.data();
+    const chapters = full.exists && Array.isArray(full.data().chapters) ? full.data().chapters : (Array.isArray(book.chapters) ? book.chapters : []);
+    delete book.chapters; delete book.createdAt;
+    res.json({ id, book, chapters });
+  } catch (err) {
+    console.error('[/api/admin/books/:id GET]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
+// Publicar o editar una obra. Escribe el doc público (metadata + preview) y
+// books_full (texto completo) en un solo lote: desde el navegador no se puede
+// escribir books_full (las reglas lo bloquean), y así nunca queda una obra a medias.
+const BOOK_CATEGORIES = ['ficcion', 'novela', 'ensayo', 'biografia', 'tecnica', 'comedia', 'thriller', 'neurociencia', 'finanzas', 'kids'];
+const slugify = (t) => String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 100);
+
+app.post('/api/admin/books', adminMiddleware, async (req, res) => {
+  try {
+    const b = req.body.book || {};
+    const rawChapters = Array.isArray(req.body.chapters) ? req.body.chapters : [];
+    const str = (v, max) => String(v === undefined || v === null ? '' : v).trim().slice(0, max);
+    const bad = (m) => res.status(400).json({ error: { message: m } });
+
+    const title = str(b.title, 200), author = str(b.author, 120), genre = str(b.genre, 120);
+    if (!title || !author || !genre) return bad("Título, autor y género son obligatorios.");
+    if (!BOOK_CATEGORIES.includes(b.cat)) return bad("Categoría inválida.");
+    const badge = ['new', 'excl'].includes(b.badge) ? b.badge : '';
+    const pages = parseInt(b.pages, 10);
+    if (!Number.isInteger(pages) || pages < 1 || pages > 5000) return bad("Cantidad de páginas inválida.");
+    if (rawChapters.length < 1 || rawChapters.length > 60) return bad("La obra debe tener entre 1 y 60 capítulos.");
+
+    const chapters = rawChapters.map((c, i) => {
+      const lines = String(c.content || '').split('\n').map(l => l.trim()).filter(Boolean);
+      return { title: str(c.title, 200) || `Capítulo ${i + 1}`, arc: str(c.desc, 500), content: lines.map(l => `<p>${l}</p>`).join('\n') };
+    });
+    if (chapters.some(c => !c.content || c.content.length > 200000)) return bad("Cada capítulo necesita texto (máx. 200.000 caracteres).");
+
+    const editing = typeof req.body.id === 'string' && req.body.id.length > 0;
+    const bookId = editing ? String(req.body.id) : slugify(title);
+    if (!bookId || bookId.includes('/')) return bad("No se pudo generar un ID válido para la obra.");
+
+    const db = admin.firestore();
+    const ref = db.collection('books').doc(bookId);
+    const existing = await ref.get();
+    if (editing && !existing.exists) return res.status(404).json({ error: { message: "La obra a editar no existe." } });
+    if (!editing && existing.exists && req.body.overwrite !== true) {
+      return res.status(409).json({ error: { message: `Ya existe una obra con el ID "${bookId}".`, exists: true, title: existing.data().title } });
+    }
+
+    const data = {
+      title, author, cat: b.cat, genre,
+      cover: str(b.cover, 300) || 'assets/cover.png',
+      badge, badgeText: badge ? str(b.badgeText, 40) : '',
+      pages, duration: str(b.duration, 40), desc: str(b.desc, 3000),
+      previewChapter: chapters[0].content.split('\n').slice(0, 3).join('\n'),
+      outline: { title, chapters: chapters.map(c => ({ title: c.title, arc: c.arc })) }
+    };
+    if (b.cat === 'kids') {
+      const hex = (v, d) => /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : d;
+      data.ageBadge = str(b.ageBadge, 30) || '4-8 años';
+      data.collectionTitle = (str(b.collectionTitle, 60) || 'COLECCIÓN INFANTIL').toUpperCase();
+      data.coverAccent = hex(b.coverAccent, '#d5e3f0');
+      data.coverAccentMuted = hex(b.coverAccentMuted, '#a4c2db');
+    }
+    if (!existing.exists) data.createdAt = admin.firestore.FieldValue.serverTimestamp();
+
+    // merge: al editar se conservan campos que el formulario no expone (tagline, themes, openingQuote…).
+    // Se elimina el campo `chapters` heredado de los docs previos a la separación del texto.
+    const batch = db.batch();
+    batch.set(ref, { ...data, chapters: admin.firestore.FieldValue.delete() }, { merge: true });
+    batch.set(db.collection('books_full').doc(bookId), { chapters: chapters.map(c => c.content) });
+    await batch.commit();
+
+    serverCache.catalog = null;
+    adminAudit(req, editing ? 'book_edit' : 'book_publish', { id: bookId, chapters: chapters.length });
+    res.json({ ok: true, id: bookId });
+  } catch (err) {
+    console.error('[/api/admin/books POST]', err);
+    res.status(500).json({ error: { message: publicErr(err) } });
+  }
+});
+
 app.delete('/api/admin/books/:id', adminMiddleware, async (req, res) => {
   try {
     const id = String(req.params.id);
@@ -1532,6 +1678,7 @@ app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
       console.log(`  ⚠ [Gobernanza] Modo local: Ticket no persistido en Firestore (Firebase Admin no inicializado).`);
     }
 
+    notifyEditor('Timeless: solicitud de arrepentimiento', `Nueva solicitud ${ticketId}\nNombre: ${name}\nEmail: ${email}\nMotivo: ${reason || '(sin motivo)'}\n\nResolvela desde la consola del editor → Arrepentimientos.`);
     res.json({ success: true, ticketId });
   } catch (err) {
     console.error('[/api/arrepentimiento]', err);

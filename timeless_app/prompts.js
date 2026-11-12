@@ -377,7 +377,7 @@ MISIÓN DE ESTE CAPÍTULO:
 
 CAPÍTULOS PREVIOS (para mantener coherencia):
 ${prev || '  (Este es el primer capítulo)'}
-
+${params.previousText ? `\nFINAL DEL CAPÍTULO ANTERIOR (texto real; retomá desde acá con la misma voz, tiempo verbal y ritmo, sin repetirlo ni resumirlo):\n<<<\n${params.previousText}\n>>>\n` : ''}${params.editorNote ? `\nNOTA DEL EDITOR SOBRE UN INTENTO ANTERIOR DE ESTE CAPÍTULO (corregí exactamente esto en la nueva versión, sin mencionar que hubo un intento previo): "${params.editorNote}"\n` : ''}
 ${outline.characters?.length ? `PERSONAJES ESTABLECIDOS:\n${outline.characters.map(c => `  · ${c.name} (${c.role}): ${c.arc}`).join('\n')}` : ''}
 ${styleReminder}
 

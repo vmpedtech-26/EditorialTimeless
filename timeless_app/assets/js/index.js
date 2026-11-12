@@ -848,9 +848,38 @@ function saveAuthTokenToIndexedDB(token) {
   });
 }
 
+let subscriptionStatus = null;
+
+async function fetchSubscriptionStatus(user) {
+  const token = await user.getIdToken();
+  const res = await fetch('/api/subscription/status', { headers: { 'Authorization': `Bearer ${token}` } });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'Error al consultar la suscripción');
+  return data;
+}
+
+// Aviso discreto cuando faltan 7 días o menos (una vez por sesión).
+function showExpiryNotice(st) {
+  if (!st || !st.expiringSoon) return;
+  try { if (sessionStorage.getItem('tl_expiry_notice')) return; sessionStorage.setItem('tl_expiry_notice', '1'); } catch (e) { /* sin sessionStorage */ }
+  const note = document.createElement('div');
+  note.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;max-width:340px;padding:16px 20px;border-radius:8px;background:rgba(22,20,17,0.95);border:1px solid #C9A96E;color:#fff;font-size:13px;line-height:1.5;';
+  note.append(document.createTextNode(`Tu suscripción ${st.planLabel ? '(' + st.planLabel + ') ' : ''}vence en ${st.daysLeft} día${st.daysLeft === 1 ? '' : 's'}. `));
+  const link = document.createElement('a');
+  link.href = '#subscription'; link.textContent = 'Renovar'; link.style.cssText = 'color:#C9A96E;font-weight:600;';
+  link.addEventListener('click', () => note.remove());
+  const close = document.createElement('button');
+  close.textContent = '×'; close.setAttribute('aria-label', 'Cerrar aviso');
+  close.style.cssText = 'position:absolute;top:4px;right:10px;background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;';
+  close.addEventListener('click', () => note.remove());
+  note.append(link, close);
+  document.body.appendChild(note);
+}
+
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   isPremiumUser = false;
+  subscriptionStatus = null;
   const btnAdmin = document.getElementById('btn-admin-console');
   if (user) {
     // Toggle body classes for member view
@@ -872,25 +901,27 @@ onAuthStateChanged(auth, async (user) => {
       console.warn("No se pudo guardar el token JWT en IndexedDB:", tokenErr.message);
     }
     
-    // Verificar si es premium en Firestore
-    if (user.email === 'matiaseorejas@gmail.com') {
-      isPremiumUser = true;
-    } else {
-      try {
-        const userSnap = await getDoc(doc(db, "users", user.uid));
-        if (userSnap.exists() && (d => d.isPremium === true && (!d.premiumUntil || d.premiumUntil.toMillis() > Date.now()))(userSnap.data())) {
-          isPremiumUser = true;
-        } else if (userSnap.exists() && userSnap.data().familyId) {
-          const familySnap = await getDoc(doc(db, "families", userSnap.data().familyId));
-          if (familySnap.exists() && (familySnap.data().memberIds || []).includes(user.uid)) {
-            isPremiumUser = true;
-          }
-        }
-      } catch (err) {
-        console.warn("  ⚠ [Auth] No se pudo verificar el estado premium en Firestore. Denegando acceso por seguridad:", err.message);
+    // El estado premium lo decide el servidor (vencimiento, familia, regalos de
+    // editor): el navegador ya no replica esa lógica leyendo Firestore.
+    try {
+      subscriptionStatus = await fetchSubscriptionStatus(user);
+      isPremiumUser = !!subscriptionStatus.active;
+      showExpiryNotice(subscriptionStatus);
+      try { localStorage.setItem('tl_premium_hint', JSON.stringify({ uid: user.uid, active: isPremiumUser, at: Date.now() })); } catch (e) { /* sin storage */ }
+    } catch (err) {
+      subscriptionStatus = null;
+      // Sin conexión solo se ajusta la interfaz con el último estado conocido
+      // (30 días); el acceso real al contenido lo sigue decidiendo el servidor.
+      if (!navigator.onLine) {
+        try {
+          const hint = JSON.parse(localStorage.getItem('tl_premium_hint') || 'null');
+          if (hint && hint.uid === user.uid && Date.now() - hint.at < 30 * 86400000) isPremiumUser = !!hint.active;
+        } catch (e) { /* sin hint */ }
+      } else {
+        console.warn("  ⚠ [Auth] No se pudo verificar la suscripción. Denegando acceso por seguridad:", err.message);
       }
     }
-    
+
     // Fetch library only when authenticated
     fetchLibrary(currentCat);
     if (typeof window.__tryJoinFamilyFromUrl === 'function') window.__tryJoinFamilyFromUrl();
@@ -1144,7 +1175,7 @@ window.openBookModal = function(bookId) {
           </div>
           ${!isLoggedIn ? `<p class="bm-access-note">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            14 días gratis · Sin tarjeta de crédito · Cancela cuando quieras
+            Sin renovación automática · Arrepentimiento dentro de los 10 días
           </p>` : ''}
         </div>
       </div>
@@ -1418,6 +1449,75 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       };
     }
+  }
+
+  // ── Mi suscripción: plan, vencimiento y renovación ──────────────────────
+  const subModal = document.getElementById('subscription-modal');
+  const subBody = document.getElementById('subscription-modal-body');
+  const fmtDay = iso => new Date(iso).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  function subRow(label, value) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(200,180,150,0.15);';
+    const l = document.createElement('span'); l.textContent = label; l.style.color = 'var(--ink-faint)';
+    const v = document.createElement('span'); v.textContent = value; v.style.textAlign = 'right';
+    row.append(l, v);
+    return row;
+  }
+  function subButton(text, onClick) {
+    const b = document.createElement('button');
+    b.textContent = text;
+    b.style.cssText = 'margin-top:18px;width:100%;padding:12px;border-radius:8px;border:none;background:#C9A96E;color:#1C1C1A;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;';
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  async function renderSubscriptionPanel() {
+    if (!subBody) return;
+    subBody.replaceChildren(document.createTextNode('Cargando...'));
+    if (!currentUser) { subBody.replaceChildren(document.createTextNode('Iniciá sesión para ver tu suscripción.')); return; }
+    try {
+      const st = await fetchSubscriptionStatus(currentUser);
+      const goPlans = () => { subModal.style.display = 'none'; location.hash = '#subscription'; };
+      const nodes = [];
+      if (st.isEditor) {
+        nodes.push(subRow('Cuenta', 'Editor · acceso total'));
+      } else if (st.viaFamily) {
+        nodes.push(subRow('Estado', 'Activa'), subRow('Acceso', 'Incluido por un Plan Familiar'));
+        const p = document.createElement('p'); p.style.color = 'var(--ink-faint)';
+        p.textContent = 'Tu acceso depende de que el titular del Plan Familiar mantenga su plan vigente.';
+        nodes.push(p);
+      } else if (st.active) {
+        nodes.push(subRow('Estado', 'Activa'), subRow('Plan', st.planLabel || 'Premium'));
+        nodes.push(subRow('Vence', st.premiumUntil ? `${fmtDay(st.premiumUntil)} (${st.daysLeft} día${st.daysLeft === 1 ? '' : 's'})` : 'Sin fecha de vencimiento'));
+        const p = document.createElement('p'); p.style.color = 'var(--ink-faint)';
+        p.textContent = 'Cada plan es un pago por período: al vencer, vas a poder renovarlo desde acá. No hay cobros automáticos.';
+        nodes.push(p);
+        if (st.expiringSoon) nodes.push(subButton('Renovar ahora', goPlans));
+      } else {
+        nodes.push(subRow('Estado', st.expired ? 'Vencida' : 'Sin suscripción'));
+        if (st.expired && st.premiumUntil) nodes.push(subRow('Venció el', fmtDay(st.premiumUntil)));
+        const p = document.createElement('p'); p.style.color = 'var(--ink-faint)';
+        p.textContent = st.expired ? 'Renová tu plan para volver a leer todo el catálogo.' : 'Elegí un plan para leer todo el catálogo, descargar libros y regalar obras.';
+        nodes.push(p, subButton(st.expired ? 'Renovar plan' : 'Ver planes', goPlans));
+      }
+      const help = document.createElement('p');
+      help.style.cssText = 'margin-top:22px;font-size:12px;color:var(--ink-faint);';
+      help.append(document.createTextNode('¿Dudas con un pago o querés ejercer tu derecho de arrepentimiento (10 días)? Escribinos a '));
+      const mail = document.createElement('a'); mail.href = 'mailto:matiaseorejas@gmail.com'; mail.textContent = 'matiaseorejas@gmail.com'; mail.style.color = '#C9A96E';
+      help.append(mail, document.createTextNode('.'));
+      nodes.push(help);
+      subBody.replaceChildren(...nodes);
+    } catch (err) {
+      subBody.replaceChildren(document.createTextNode('No pudimos consultar tu suscripción. Probá de nuevo en unos minutos.'));
+    }
+  }
+
+  const btnSubPanel = document.getElementById('btn-subscription-panel');
+  if (btnSubPanel && subModal) {
+    btnSubPanel.addEventListener('click', (e) => { e.preventDefault(); subModal.style.display = 'flex'; renderSubscriptionPanel(); });
+    document.getElementById('close-subscription-modal')?.addEventListener('click', () => { subModal.style.display = 'none'; });
+    subModal.addEventListener('click', (e) => { if (e.target === subModal) subModal.style.display = 'none'; });
   }
 
   // ── Plan Familiar: panel de gestión ─────────────────────────────────────

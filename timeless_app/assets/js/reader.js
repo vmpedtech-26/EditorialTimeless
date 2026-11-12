@@ -387,24 +387,23 @@ async function loadBook() {
 
     state.book = formatBookData(data);
 
-    // Verificación de Suscripción Premium
+    // Verificación de Suscripción Premium: la decide el servidor (vencimiento,
+    // plan familiar con titular vigente, editor); acá no se replica esa lógica.
     let isUserPremium = false;
     if (auth.currentUser) {
-      if (auth.currentUser.email === 'matiaseorejas@gmail.com') {
-        isUserPremium = true; // El editor tiene acceso total
-      } else {
-        try {
-          const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
-          if (userSnap.exists() && (d => d.isPremium === true && (!d.premiumUntil || d.premiumUntil.toMillis() > Date.now()))(userSnap.data())) {
-            isUserPremium = true;
-          } else if (userSnap.exists() && userSnap.data().familyId) {
-            const familySnap = await getDoc(doc(db, "families", userSnap.data().familyId));
-            if (familySnap.exists() && (familySnap.data().memberIds || []).includes(auth.currentUser.uid)) {
-              isUserPremium = true;
-            }
-          }
-        } catch (dbErr) {
-          console.warn("  ⚠ [Reader] No se pudo verificar el estado premium en Firestore. Denegando acceso por seguridad:", dbErr.message);
+      try {
+        const idToken = await auth.currentUser.getIdToken();
+        const stRes = await fetch('/api/subscription/status', { headers: { 'Authorization': `Bearer ${idToken}` } });
+        if (!stRes.ok) throw new Error(`HTTP ${stRes.status}`);
+        isUserPremium = !!(await stRes.json()).active;
+      } catch (dbErr) {
+        // Sin conexión, una copia descargada se puede leer: se bajó siendo
+        // premium y getBookOffline() ya valida su licencia y vencimiento.
+        if (isOfflineCopy && !navigator.onLine) {
+          isUserPremium = true;
+          console.log("  ✦ [Reader] Sin conexión: lectura permitida por licencia offline vigente.");
+        } else {
+          console.warn("  ⚠ [Reader] No se pudo verificar la suscripción. Denegando acceso por seguridad:", dbErr.message);
         }
       }
     } else {
@@ -823,7 +822,7 @@ function renderPreview() {
         <button data-action="go-subscribe" class="btn-accept-invitation" style="background: var(--gold); color: #1C1C1A; font-weight: bold; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase;">
           Suscribirse por $89/año
         </button>
-        <span class="cta-note" style="margin-top: 12px; color: var(--ink-faint);">14 días de prueba · Cancela cuando quieras</span>
+        <span class="cta-note" style="margin-top: 12px; color: var(--ink-faint);">Pago por período · Sin renovación automática</span>
       </div>
     `;
   }

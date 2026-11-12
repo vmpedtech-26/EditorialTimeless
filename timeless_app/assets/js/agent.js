@@ -2,6 +2,7 @@
 
 // ── IMPORTS ───────────────────────────────────────────────────
 import { db, collection, addDoc, auth, onAuthStateChanged, signOut } from '../../firebase_config.js';
+import { produceChapter, averageBsc, BSC_THRESHOLD } from './chapter_pipeline.js';
 
 // ── AGENT INSTANCE ────────────────────────────────────────────
 const agent = new AgentService();
@@ -255,7 +256,7 @@ window.startGeneration = async function() {
     setPhase(2);
     setProgress(5, 'Inicializando agente…');
     log(`<span class="out-dim">// timeless.agent &mdash; g&eacute;nero: ${params.genre} &middot; tono: ${params.tone}</span>`);
-    log(`<span class="out-gold">agent.init</span><span class="out-dim"> --model=gemini-2.0-flash --quality=bsc</span>`);
+    log(`<span class="out-gold">agent.init</span><span class="out-dim"> --engine=gemini --quality=${(document.getElementById('quality-select')?.value || 'bsc')}</span>`);
     await sleep(300);
     log(`<span class="out-green">✓</span> Motor literario v4.0 conectado &middot; Gemini API activa`);
     // Show selected writer voice in terminal
@@ -305,35 +306,64 @@ window.startGeneration = async function() {
     
     let totalWordCount = 0;
     const totalChapters = outline.chapters.length;
+    const reviewEnabled = (document.getElementById('quality-select')?.value || 'bsc') === 'bsc';
+    const chapterScores = [];
+    currentObra.bscChapters = chapterScores;
 
     for (let i = 0; i < totalChapters; i++) {
       const ch = outline.chapters[i];
       const startPct = 20 + (i * (60 / totalChapters));
-      
+
       setProgress(startPct, `Redactando Cap ${ch.index}: ${ch.title}…`);
-      log(`<span class="out-gold">draft.chapter</span><span class="out-dim">(${ch.index}) --mode=streaming</span>`);
-      
+      log(`<span class="out-gold">draft.chapter</span><span class="out-dim">(${ch.index}) --mode=streaming${i > 0 ? ' --continuity=real' : ''}</span>`);
+
       chapterText = '';
       updateLivePreview('');
-
       let chapterWordCount = 0;
-      for await (const chunk of agent.streamChapter(outline, i, params)) {
+      let finalBsc = null;
+
+      const events = produceChapter({
+        stream: (extra) => agent.streamChapter(outline, i, params, extra),
+        evaluate: (text) => agent.evaluateBSC(text, params.genre),
+        previousText: currentObra.chapters[i - 1] || '',
+        review: reviewEnabled,
+      });
+
+      for await (const ev of events) {
         if (!generating) break;
-        chapterText += chunk;
-        chapterWordCount = chapterText.split(/\s+/).filter(Boolean).length;
-        updateLivePreview(chapterText);
-        
-        const subPct = (chapterWordCount / 1200) * (60 / totalChapters);
-        setProgress(startPct + Math.min(60 / totalChapters, subPct), `Cap ${ch.index}: ${chapterWordCount} palabras`);
+        if (ev.type === 'chunk') {
+          chapterText = ev.text;
+          chapterWordCount = chapterText.split(/\s+/).filter(Boolean).length;
+          updateLivePreview(chapterText);
+          const subPct = (chapterWordCount / 1200) * (60 / totalChapters);
+          setProgress(startPct + Math.min(60 / totalChapters, subPct), `Cap ${ch.index}: ${chapterWordCount} palabras`);
+        } else if (ev.type === 'review') {
+          if (ev.bsc) {
+            log(`<span class="out-amber">  BSC cap ${ch.index} &rarr; <span class="${ev.bsc.overall >= BSC_THRESHOLD ? 'out-green' : 'out-gold'}">${ev.bsc.overall} / 100</span></span>`);
+          } else {
+            log(`<span class="out-dim">  BSC cap ${ch.index}: no se pudo evaluar (se conserva el texto)</span>`);
+          }
+        } else if (ev.type === 'rewrite') {
+          setProgress(startPct, `Reescribiendo Cap ${ch.index} con la nota del editor…`);
+          log(`<span class="out-gold">draft.rewrite</span><span class="out-dim"> bajo el umbral ${BSC_THRESHOLD}</span> <span class="out-dim">&mdash; Editor: &ldquo;${esc(ev.note || 'elevar el nivel general')}&rdquo;</span>`);
+          chapterText = '';
+        } else if (ev.type === 'kept-original') {
+          log(`<span class="out-dim">  La reescritura no mejoró el puntaje: se conserva la versión original.</span>`);
+        } else if (ev.type === 'done') {
+          chapterText = ev.text;
+          finalBsc = ev.bsc;
+          chapterWordCount = chapterText.split(/\s+/).filter(Boolean).length;
+        }
       }
 
       if (!generating) break;
 
       currentObra.chapters.push(chapterText);
+      chapterScores.push(finalBsc);
       totalWordCount += chapterWordCount;
       log(`<span class="out-green">✓</span> Cap ${ch.index} redactado &rarr; <span class="out-cream">${chapterWordCount.toLocaleString('es')} palabras</span>`);
       logBlank();
-      
+
       await sleep(500);
     }
 
@@ -345,24 +375,25 @@ window.startGeneration = async function() {
     setProgress(85, 'Evaluaci&oacute;n BSC final…');
     log(`<span class="out-gold">quality.check</span><span class="out-dim"> --standard=bsc --total=${totalWordCount}w</span>`);
 
-    // Evaluamos el primer capítulo para el score
-    const bsc = await agent.evaluateBSC(currentObra.chapters[0], params.genre);
-    await sleep(250);
-    log(`<span class="out-amber">  coherencia   &rarr; <span class="out-green">${bsc.coherencia} / 100</span></span>`);
-    await sleep(180);
-    log(`<span class="out-amber">  originalidad &rarr; <span class="out-green">${bsc.originalidad} / 100</span></span>`);
-    await sleep(180);
-    log(`<span class="out-amber">  ritmo        &rarr; <span class="out-green">${bsc.ritmo} / 100</span></span>`);
-    
-    const overall = bsc.overall || Math.round(bsc.coherencia * 0.35 + bsc.originalidad * 0.35 + bsc.ritmo * 0.30);
-    currentObra.bscScore = overall;
+    // Puntaje de la obra = promedio de los capítulos efectivamente evaluados
+    // (antes se evaluaba solo el primero y el resultado no tenía consecuencias).
+    const bsc = averageBsc(chapterScores);
     currentObra.wordCount = totalWordCount;
 
-    log(`<span class="out-green">✓</span> <span class="out-cream">BSC Score: <strong>${overall} / 100</strong> &middot; ${overall >= 82 ? 'APROBADO' : 'REQUIERE REVISIÓN'}</span>`);
-    if (bsc.nota_editorial) {
-      logBlank();
-      log(`<span class="out-dim">  Editor: &ldquo;${esc(bsc.nota_editorial)}&rdquo;</span>`);
+    if (bsc) {
+      await sleep(250);
+      log(`<span class="out-amber">  coherencia   &rarr; <span class="out-green">${bsc.coherencia} / 100</span></span>`);
+      await sleep(180);
+      log(`<span class="out-amber">  originalidad &rarr; <span class="out-green">${bsc.originalidad} / 100</span></span>`);
+      await sleep(180);
+      log(`<span class="out-amber">  ritmo        &rarr; <span class="out-green">${bsc.ritmo} / 100</span></span>`);
+      currentObra.bscScore = bsc.overall;
+      log(`<span class="out-green">✓</span> <span class="out-cream">BSC Score: <strong>${bsc.overall} / 100</strong> &middot; ${bsc.overall >= BSC_THRESHOLD ? 'APROBADO' : 'REQUIERE REVISIÓN'} &middot; ${bsc.chapters} de ${totalChapters} cap&iacute;tulos evaluados</span>`);
+    } else {
+      currentObra.bscScore = null;
+      log(`<span class="out-dim">  Sin evaluación BSC (calidad Standard o el modelo no devolvió puntajes).</span>`);
     }
+    const overall = bsc ? bsc.overall : null;
     logBlank();
 
     // ── FASE 4: EXPORT & PERSISTENCE ────────────────────────────
@@ -380,14 +411,14 @@ window.startGeneration = async function() {
     setStatus('Completado ✓', 'pb-green');
 
     // Update BSC cards with real values
-    updateBSCMetrics(bsc);
+    if (bsc) updateBSCMetrics(bsc);
 
     await sleep(800);
     const modalCoverImg = document.getElementById('modal-cover-img');
     if (modalCoverImg && currentObra && currentObra.cover) {
       modalCoverImg.src = currentObra.cover;
     }
-    document.getElementById('modal-bsc').textContent   = `${overall} / 100`;
+    document.getElementById('modal-bsc').textContent   = overall === null ? '—' : `${overall} / 100`;
     document.getElementById('modal-words').textContent = `${totalWordCount.toLocaleString('es')} palabras (Obra completa)`;
     document.getElementById('export-modal').classList.add('visible');
 

@@ -141,6 +141,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
               Biblioteca
             </a>
+            <a href="#" class="menu-item" id="btn-subscription-panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              Mi suscripción
+            </a>
             <a href="#" class="menu-item" id="btn-family-panel">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               Mi Familia
@@ -179,7 +183,7 @@
       </h1>
 
       <p class="hero-subtitle">
-        Lee donde quieras. Cancela en cualquier momento.
+        Lee donde quieras. Sin cobros automáticos: renovás cuando vos quieras.
       </p>
 
       <div class="hero-email-gate">
@@ -380,12 +384,12 @@
 
         <div class="faq-row">
           <button class="faq-trigger">
-            <span>¿Cómo cancelo mi suscripción?</span>
+            <span>¿Cómo cancelo o renuevo mi suscripción?</span>
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-content">
             <div class="faq-content-inner">
-              Timeless es totalmente flexible. No hay contratos de permanencia ni cargos por cancelación. Puedes dar de baja tu membresía online con un solo clic desde tu panel de ajustes en cualquier momento. Mantendrás el acceso hasta el final del periodo facturado.
+              No hay cobros automáticos ni contratos de permanencia: cada plan es un pago por período (31 días el Mensual y el Familiar, 366 días el Anual) y vence solo, sin trámites ni cargos. Mantenés el acceso hasta la fecha de vencimiento, que ves en «Mi suscripción» dentro del menú de tu cuenta, y desde ahí podés renovar cuando quieras. Si te arrepentís dentro de los 10 días de tu compra, usá el Botón de Arrepentimiento del pie de página; pasado ese plazo, escribinos a matiaseorejas@gmail.com.
             </div>
           </div>
         </div>
@@ -748,8 +752,8 @@
           </div>
         </div>
 
-        <button class="sub-btn" id="sub-cta-btn">Comenzar período de prueba gratuito</button>
-        <p class="sub-note" style="margin-top:16px;">14 días gratis · Sin tarjeta de crédito · Cancela cuando quieras</p>
+        <button class="sub-btn" id="sub-cta-btn">Suscribirme ahora</button>
+        <p class="sub-note" style="margin-top:16px;">Pago por período · Sin renovación automática · Arrepentimiento dentro de los 10 días</p>
       </div>
     </div>
   </section>
@@ -995,6 +999,21 @@
         <button id="close-family-modal" style="background: none; border: none; color: var(--ink-faint); font-size: 28px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
       </div>
       <div id="family-modal-body" style="font-size: 13px; line-height: 1.6; color: #EDE8E0;">
+        Cargando...
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MI SUSCRIPCIÓN
+  ============================================================ -->
+  <div id="subscription-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 8, 6, 0.7); backdrop-filter: blur(10px); z-index: 10000; align-items: center; justify-content: center;">
+    <div role="dialog" aria-labelledby="subscription-modal-title" style="background: rgba(30, 27, 24, 0.95); border: 1px solid rgba(200, 180, 150, 0.2); border-radius: 12px; padding: 30px; width: 90%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); font-family: var(--font-sans); color: var(--ink); max-height: 85vh; overflow-y: auto; box-sizing: border-box;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 id="subscription-modal-title" style="font-family: var(--font-serif); font-size: 24px; color: var(--gold); margin: 0; font-weight: 500;">Mi suscripción</h2>
+        <button id="close-subscription-modal" aria-label="Cerrar" style="background: none; border: none; color: var(--ink-faint); font-size: 28px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+      </div>
+      <div id="subscription-modal-body" style="font-size: 13px; line-height: 1.6; color: #EDE8E0;">
         Cargando...
       </div>
     </div>

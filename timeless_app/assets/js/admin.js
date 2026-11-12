@@ -1,6 +1,4 @@
-import {
-  auth, onAuthStateChanged, db, doc, getDoc, setDoc, serverTimestamp
-} from '../../firebase_config.js';
+import { auth, onAuthStateChanged } from '../../firebase_config.js';
 
 const $ = id => document.getElementById(id);
 
@@ -106,150 +104,153 @@ function recalculateChapterNumbers() {
 createChapterBlock();
 btnAddChapter.onclick = createChapterBlock;
 
-// ── Form Submission to Firestore ────────────────────────────────────────────
+// ── Publicar / editar obra (vía servidor) ───────────────────────────────────
+// El servidor escribe el doc público y books_full en un solo lote; desde el
+// navegador books_full no es escribible (reglas de Firestore).
+let editingId = null;
+
+function readForm() {
+  const coverType = $('book-cover').value;
+  const badge = $('book-badge').value === 'none' ? '' : $('book-badge').value;
+  const book = {
+    title: $('book-title').value.trim(),
+    author: $('book-author').value.trim(),
+    cat: $('book-cat').value,
+    genre: $('book-genre').value.trim(),
+    cover: coverType === 'custom' ? $('book-cover-custom').value.trim() : coverType,
+    badge,
+    badgeText: badge ? $('book-badge-text').value.trim() : '',
+    pages: parseInt($('book-pages').value, 10),
+    duration: $('book-duration').value.trim(),
+    desc: $('book-desc').value.trim()
+  };
+  if (book.cat === 'kids') {
+    book.ageBadge = $('kids-age-badge').value.trim();
+    book.collectionTitle = $('kids-collection-title').value.trim();
+    book.coverAccent = $('kids-cover-accent').value;
+    book.coverAccentMuted = $('kids-cover-accent-muted').value;
+  }
+  const chapters = Array.from(chaptersContainer.querySelectorAll('.chapter-block')).map(block => ({
+    title: block.querySelector('.ch-title').value.trim(),
+    desc: block.querySelector('.ch-desc').value.trim(),
+    content: block.querySelector('.ch-content').value
+  }));
+  return { book, chapters };
+}
+
+function resetForm() {
+  $('book-upload-form').reset();
+  chaptersContainer.innerHTML = '';
+  chapterCount = 0;
+  createChapterBlock();
+  $('book-cover').onchange();
+  $('book-cat').onchange();
+  setEditing(null, '');
+}
+
+function setEditing(id, title) {
+  editingId = id;
+  const banner = $('edit-banner');
+  banner.hidden = !id;
+  banner.replaceChildren();
+  if (id) {
+    banner.append(document.createTextNode(`Editando «${title}» (${id}). Se conservan sus datos no visibles en este formulario. `));
+    const cancel = document.createElement('button');
+    cancel.type = 'button'; cancel.className = 'btn-mini'; cancel.textContent = 'Cancelar edición';
+    cancel.addEventListener('click', resetForm);
+    banner.append(cancel);
+  }
+  $('btn-publish-submit').textContent = id ? 'Guardar cambios' : 'Publicar en Timeless';
+}
+
 $('book-upload-form').onsubmit = async (e) => {
   e.preventDefault();
-  
   if (!auth.currentUser || auth.currentUser.email !== 'matiaseorejas@gmail.com') {
     alert("Operación denegada: Sesión no autorizada.");
     return;
   }
-
   const btnSubmit = $('btn-publish-submit');
   btnSubmit.disabled = true;
-  btnSubmit.textContent = "Publicando obra en Timeless...";
+  btnSubmit.textContent = editingId ? "Guardando cambios..." : "Publicando obra en Timeless...";
 
   try {
-    const title = $('book-title').value.trim();
-    const author = $('book-author').value.trim();
-    const cat = $('book-cat').value;
-    const genre = $('book-genre').value.trim();
-    const coverType = $('book-cover').value;
-    const cover = coverType === 'custom' ? $('book-cover-custom').value.trim() : coverType;
-    
-    const badgeType = $('book-badge').value;
-    const badge = badgeType === 'none' ? '' : badgeType;
-    const badgeText = badge ? $('book-badge-text').value.trim() : '';
-    
-    const pages = parseInt($('book-pages').value, 10);
-    const duration = $('book-duration').value.trim();
-    const desc = $('book-desc').value.trim();
+    const { book, chapters } = readForm();
+    if (chapters.length === 0) throw new Error("La obra debe contener al menos un capítulo.");
 
-    // 1. Recopilar y procesar capítulos
-    const chBlocks = chaptersContainer.querySelectorAll('.chapter-block');
-    if (chBlocks.length === 0) {
-      throw new Error("La obra debe contener al menos un capítulo.");
-    }
-
-    const chapters = [];
-    chBlocks.forEach((block, idx) => {
-      const chTitle = block.querySelector('.ch-title').value.trim();
-      const chDesc = block.querySelector('.ch-desc').value.trim();
-      const chRawContent = block.querySelector('.ch-content').value.trim();
-      
-      // Formatear párrafos convirtiendo \n en <p> de lujo
-      const formattedContent = chRawContent
-        .split('\n')
-        .map(p => p.trim())
-        .filter(p => p.length > 0)
-        .map(p => `<p>${p}</p>`)
-        .join('\n');
-
-      chapters.push({
-        id: idx + 1,
-        title: chTitle,
-        desc: chDesc,
-        content: formattedContent
-      });
+    const send = (overwrite) => adminApi('/api/admin/books', {
+      method: 'POST',
+      body: JSON.stringify({ id: editingId || undefined, book, chapters, overwrite })
     });
-
-    // 2. Generar identificador único (Slug legible)
-    const bookId = title
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // remover acentos
-      .replace(/[^a-z0-9\s-]/g, "") // remover caracteres especiales
-      .trim()
-      .replace(/\s+/g, "-"); // reemplazar espacios con guiones
-
-    // Evitar sobrescribir en silencio una obra ya publicada con el mismo slug
-    const existingSnap = await getDoc(doc(db, "books", bookId));
-    if (existingSnap.exists()) {
-      const confirmOverwrite = confirm(
-        `Ya existe una obra publicada con el ID "${bookId}" (título: "${existingSnap.data().title}"). ` +
-        `¿Querés reemplazarla por esta nueva versión? Esta acción no se puede deshacer.`
-      );
-      if (!confirmOverwrite) {
+    let result;
+    try {
+      result = await send(false);
+    } catch (err) {
+      if (!/Ya existe una obra/.test(err.message)) throw err;
+      if (!confirm(`${err.message} ¿Querés reemplazarla por esta nueva versión? Esta acción no se puede deshacer.`)) {
         throw new Error("Publicación cancelada: ya existe una obra con ese mismo título/ID.");
       }
+      result = await send(true);
     }
 
-    let kidsData = {};
-    if (cat === 'kids') {
-      kidsData = {
-        ageBadge: $('kids-age-badge').value.trim() || '4-8 años',
-        collectionTitle: ($('kids-collection-title').value.trim() || 'COLECCIÓN INFANTIL').toUpperCase(),
-        coverAccent: $('kids-cover-accent').value,
-        coverAccentMuted: $('kids-cover-accent-muted').value
-      };
-    }
-
-    // 3. Escribir metadata pública en 'books' y prosa completa en
-    //    'books_full' por separado: 'books' es legible por cualquier usuario
-    //    autenticado (incluso gratuito), así que la prosa completa NUNCA va
-    //    ahí — solo un preview corto del capítulo 1. 'books_full' está
-    //    bloqueada por completo del lado del cliente (firestore.rules) y
-    //    solo la lee el servidor, vía /api/book/:id/chunk/:index, que sí
-    //    verifica la suscripción antes de entregar un capítulo.
-    const previewParagraphs = (chapters[0]?.content || "")
-      .split('\n')
-      .filter(p => p.trim())
-      .slice(0, 3)
-      .join('\n');
-
-    const bookData = {
-      title,
-      author,
-      cat,
-      genre,
-      cover,
-      badge,
-      badgeText,
-      pages,
-      duration,
-      desc,
-      previewChapter: previewParagraphs,
-      outline: {
-        title,
-        chapters: chapters.map(c => ({ title: c.title, arc: c.desc }))
-      },
-      createdAt: serverTimestamp(),
-      ...kidsData
-    };
-
-    await setDoc(doc(db, "books", bookId), bookData);
-    await setDoc(doc(db, "books_full", bookId), {
-      chapters: chapters.map(c => c.content)
-    });
-
-    // 4. Mostrar Éxito
-    $('btn-go-reader').href = `reader.html?id=${bookId}`;
+    $('btn-go-reader').href = `reader.html?id=${encodeURIComponent(result.id)}`;
+    $('success-message').textContent = editingId ? 'Los cambios de la obra se guardaron.' : 'La obra ha sido incorporada al catálogo dinámico de Timeless de forma segura.';
     $('success-overlay').classList.add('visible');
-    
-    // Resetear formulario
-    $('book-upload-form').reset();
-    chaptersContainer.innerHTML = '';
-    chapterCount = 0;
-    createChapterBlock();
-
+    resetForm();
   } catch (error) {
     console.error("Error al publicar:", error);
     alert(`Error al publicar la obra: ${error.message}`);
   } finally {
     btnSubmit.disabled = false;
-    btnSubmit.textContent = "Publicar en Timeless";
+    btnSubmit.textContent = editingId ? "Guardar cambios" : "Publicar en Timeless";
   }
 };
+
+// Cargar una obra existente en el formulario para editarla.
+async function startEdit(id) {
+  const { book, chapters } = await adminApi(`/api/admin/books/${encodeURIComponent(id)}`);
+  resetForm();
+  const setSelect = (sel, value, label) => {
+    if (![...sel.options].some(o => o.value === value)) { const o = document.createElement('option'); o.value = value; o.textContent = label || value; sel.append(o); }
+    sel.value = value;
+  };
+  $('book-title').value = book.title || '';
+  $('book-author').value = book.author || '';
+  setSelect($('book-cat'), book.cat || 'ficcion');
+  $('book-cat').onchange();
+  $('book-genre').value = book.genre || '';
+  const knownCover = [...$('book-cover').options].some(o => o.value === book.cover);
+  $('book-cover').value = knownCover ? book.cover : 'custom';
+  $('book-cover').onchange();
+  if (!knownCover) $('book-cover-custom').value = book.cover || '';
+  $('book-badge').value = book.badge === 'new' || book.badge === 'excl' ? book.badge : 'none';
+  $('book-badge-text').value = book.badgeText || '';
+  $('book-pages').value = book.pages || '';
+  $('book-duration').value = book.duration || '';
+  $('book-desc').value = book.desc || '';
+  if (book.cat === 'kids') {
+    $('kids-age-badge').value = book.ageBadge || '';
+    $('kids-collection-title').value = book.collectionTitle || '';
+    if (book.coverAccent) $('kids-cover-accent').value = book.coverAccent;
+    if (book.coverAccentMuted) $('kids-cover-accent-muted').value = book.coverAccentMuted;
+  }
+
+  chaptersContainer.innerHTML = '';
+  chapterCount = 0;
+  const outline = (book.outline && book.outline.chapters) || [];
+  const count = Math.max(chapters.length, outline.length, 1);
+  for (let i = 0; i < count; i++) {
+    createChapterBlock();
+    const block = chaptersContainer.lastElementChild;
+    block.querySelector('.ch-title').value = (outline[i] && outline[i].title) || `Capítulo ${i + 1}`;
+    block.querySelector('.ch-desc').value = (outline[i] && (outline[i].arc || outline[i].desc)) || '';
+    const html = typeof chapters[i] === 'string' ? chapters[i] : '';
+    // Se quitan solo las etiquetas de párrafo: el formato en línea (cursivas, etc.) se conserva.
+    block.querySelector('.ch-content').value = html.split(/<\/p>\s*/i).map(p => p.replace(/^\s*<p>/i, '').trim()).filter(Boolean).join('\n');
+  }
+  setEditing(id, book.title || id);
+  document.querySelector('.admin-tab[data-panel="panel-publish"]').click();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 // ── Close Success Modal ──────────────────────────────────────────────────────
 $('btn-close-success-ui').onclick = () => {
@@ -318,13 +319,15 @@ async function loadCatalog() {
       const tr = document.createElement('tr');
       const actions = el('td'); const wrap = el('div', null, 'row-actions');
       const read = el('a', 'Abrir', 'btn-mini'); read.href = `reader.html?id=${encodeURIComponent(b.id)}`; read.style.textDecoration = 'none';
+      const edit = el('button', 'Editar', 'btn-mini'); edit.type = 'button';
+      edit.addEventListener('click', async () => { try { await startEdit(b.id); } catch (e) { alert(e.message); } });
       const del = el('button', 'Eliminar', 'btn-mini danger'); del.type = 'button';
       del.addEventListener('click', async () => {
         if (!confirm(`¿Eliminar "${b.title}" del catálogo? Esta acción no se puede deshacer.`)) return;
         try { await adminApi(`/api/admin/books/${encodeURIComponent(b.id)}`, { method: 'DELETE' }); tr.remove(); }
         catch (e) { alert(e.message); }
       });
-      wrap.append(read, del); actions.append(wrap);
+      wrap.append(read, edit, del); actions.append(wrap);
       tr.append(el('td', b.title), el('td', b.author), el('td', b.cat), actions);
       return tr;
     }));

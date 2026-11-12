@@ -247,29 +247,30 @@ async function generateBook(plan, index) {
   const outline = extractJson(rawOutline);
   console.log(`    → título generado: "${outline.title}"`);
 
+  // Mismo pipeline que el Agente del sitio (assets/js/chapter_pipeline.js):
+  // continuidad con el final real del capítulo anterior y BSC con reescritura
+  // en TODOS los capítulos, no solo en el primero.
+  const { produceChapter } = await import('./assets/js/chapter_pipeline.js');
   const chapters = [];
+  let previousRaw = '';
   for (let i = 0; i < outline.chapters.length; i++) {
     process.stdout.write(`    · capítulo ${i + 1}/${outline.chapters.length}... `);
-    const chapterUser = TIMELESS_PROMPTS.buildChapter(outline, i, { genre: plan.cat, tone: plan.tone, writerId: writer.id });
-    let rawChapter = await callGemini(systemPrompt, chapterUser, { temperature: 0.92, maxTokens: 2500 });
-
-    // Control de calidad real: si el primer capítulo reprueba el BSC, se
-    // reescribe una vez pasándole la nota editorial como corrección — a
-    // diferencia del Agente del sitio, acá el puntaje si tiene consecuencia.
-    if (i === 0) {
-      const bsc = await evaluateBSC(rawChapter, plan.cat);
-      if (bsc.overall < 82) {
-        console.log(`\n      ⚠ BSC ${bsc.overall}/100 ("${bsc.nota_editorial}") — reescribiendo con la crítica...`);
-        const retryPrompt = `${chapterUser}\n\nNOTA DEL EDITOR SOBRE UN INTENTO ANTERIOR (corregí esto en la nueva versión): "${bsc.nota_editorial}"`;
-        rawChapter = await callGemini(systemPrompt, retryPrompt, { temperature: 0.92, maxTokens: 2500 });
-      } else {
-        console.log(`(BSC ${bsc.overall}/100 ✓)`);
-      }
-    } else {
-      console.log('ok');
+    let finalText = '', finalBsc = null, rewrites = 0;
+    for await (const ev of produceChapter({
+      stream: async function* (extra) {
+        const user = TIMELESS_PROMPTS.buildChapter(outline, i, { genre: plan.cat, tone: plan.tone, writerId: writer.id, ...extra });
+        yield await callGemini(systemPrompt, user, { temperature: 0.92, maxTokens: 2500 });
+      },
+      evaluate: (text) => evaluateBSC(text, plan.cat),
+      previousText: previousRaw,
+      review: true,
+    })) {
+      if (ev.type === 'rewrite') process.stdout.write(`\n      ⚠ bajo el umbral ("${ev.note}") — reescribiendo... `);
+      if (ev.type === 'done') { finalText = ev.text; finalBsc = ev.bsc; rewrites = ev.rewrites; }
     }
-
-    chapters.push(toParagraphHtml(rawChapter));
+    console.log(finalBsc ? `(BSC ${finalBsc.overall}/100${rewrites ? `, reescrito ${rewrites}x` : ''})` : '(sin BSC)');
+    previousRaw = finalText;
+    chapters.push(toParagraphHtml(finalText));
     await sleep(600); // margen amistoso contra rate limits
   }
 
@@ -334,8 +335,8 @@ async function evaluateBSC(text, genre) {
     const raw = await callGemini(SYSTEM, userPrompt, { temperature: 0.20, maxTokens: 300 });
     return extractJson(raw);
   } catch (e) {
-    console.warn('    ⚠ No se pudo evaluar BSC, se omite la reescritura:', e.message);
-    return { overall: 100, nota_editorial: '' };
+    console.warn('    ⚠ No se pudo evaluar BSC, se conserva el texto:', e.message);
+    return null;
   }
 }
 

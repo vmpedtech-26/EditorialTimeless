@@ -3,9 +3,9 @@ import { CryptoUtils } from './assets/js/crypto_utils.js';
 
 window.AgentService = class AgentService {
 
-  constructor() {
-    this.model   = 'gemini-2.0-flash';
-  }
+  // El modelo lo define el servidor (variable GEMINI_MODEL): la clave y la
+  // elección de modelo nunca están en el navegador.
+  constructor() {}
 
   // En producción, siempre se tiene acceso a la API a través del proxy del servidor
   hasKey() {
@@ -124,10 +124,12 @@ window.AgentService = class AgentService {
   }
 
   // ── Pipeline: stream chapter ─────────────────────────────────────
-  streamChapter(outline, chapterIndex, params) {
+  // `extra` puede traer previousText (final real del capítulo anterior) y
+  // editorNote (crítica del BSC al reescribir).
+  streamChapter(outline, chapterIndex, params, extra = {}) {
     const writerId = params.writerId || 'libre';
     const systemPrompt = window.TIMELESS_PROMPTS.buildSystem(writerId);
-    const userPrompt = window.TIMELESS_PROMPTS.buildChapter(outline, chapterIndex, params);
+    const userPrompt = window.TIMELESS_PROMPTS.buildChapter(outline, chapterIndex, { ...params, ...extra });
     return this.stream(systemPrompt, userPrompt, {
       temperature: 0.92,
       maxTokens:   2500,
@@ -135,20 +137,19 @@ window.AgentService = class AgentService {
   }
 
   // ── Pipeline: evaluate BSC ───────────────────────────────────────
+  // Devuelve null si el modelo no entrega un JSON usable: nunca se inventan
+  // puntajes (antes un fallo devolvía 87/100 y la obra "aprobaba" sin evaluarse).
   async evaluateBSC(text, genre) {
     const SYSTEM = 'Eres un crítico literario de una editorial de lujo. Devuelves solo JSON.';
     const userPrompt = window.TIMELESS_PROMPTS.buildBSC(text, genre);
 
-    const raw = await this.generate(SYSTEM, userPrompt, {
-      temperature: 0.20,
-      maxTokens:   300,
-    });
-
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) return { coherencia: 88, originalidad: 85, ritmo: 87, overall: 87, nota_editorial: '' };
-
-    try { return JSON.parse(match[0]); }
-    catch { return { coherencia: 88, originalidad: 85, ritmo: 87, overall: 87, nota_editorial: '' }; }
+    try {
+      const raw = await this.generate(SYSTEM, userPrompt, { temperature: 0.20, maxTokens: 300 });
+      const match = raw.match(/\{[\s\S]*\}/);
+      return match ? JSON.parse(match[0]) : null;
+    } catch {
+      return null;
+    }
   }
 
   // ── Export: generate encrypted .tlf file ──────────────────────────
