@@ -22,7 +22,8 @@
 // Gemini por libro — tenlo en cuenta para el volumen total que generes.
 
 require('dotenv').config();
-const admin = require('firebase-admin');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { TIMELESS_WRITERS, TIMELESS_PROMPTS } = require('./prompts.js');
 
 // ── Firebase Admin Init ──────────────────────────────────────────────────
@@ -33,13 +34,13 @@ try {
   } else {
     serviceAccount = require('./serviceAccountKey.json');
   }
-  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  initializeApp({ credential: cert(serviceAccount) });
   console.log('  ✦ [Firebase] Admin inicializado con éxito.');
 } catch (err) {
   console.error('  ✗ [Firebase Error] Fallo crítico al inicializar Firebase Admin:', err.message);
   process.exit(1);
 }
-const db = admin.firestore();
+const db = getFirestore();
 
 // ── Gemini config ────────────────────────────────────────────────────────
 const GEMINI_KEY = process.env.GEMINI_API_KEY || '';
@@ -316,7 +317,7 @@ async function generateBook(plan, index) {
       title: outline.title,
       chapters: outline.chapters.map(c => ({ title: c.title, arc: c.arc })),
     },
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
     generatedBy: `gemini-ai:${writer.id}`,
     ...kidsExtra,
   };

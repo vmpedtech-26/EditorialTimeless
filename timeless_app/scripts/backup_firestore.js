@@ -9,14 +9,16 @@
 // fuera de tu equipo (el workflow de GitHub ya lo hace).
 const fs = require('fs');
 const path = require('path');
-const admin = require('firebase-admin');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore, Timestamp, GeoPoint } = require('firebase-admin/firestore');
+const { getAuth } = require('firebase-admin/auth');
 
 const out = process.argv[2] || `respaldo-timeless-${new Date().toISOString().slice(0, 10)}.json`;
 const sa = process.env.FIREBASE_SERVICE_ACCOUNT
   ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
   : require(path.join(__dirname, '..', 'serviceAccountKey.json'));
-admin.initializeApp({ credential: admin.credential.cert(sa) });
-const db = admin.firestore();
+initializeApp({ credential: cert(sa) });
+const db = getFirestore();
 
 // Los Timestamp/GeoPoint/referencias no son JSON: se guardan con una marca de tipo.
 function plain(v) {
@@ -56,7 +58,7 @@ async function dumpCollection(colRef, counts) {
   const authUsers = [];
   let token;
   do {
-    const page = await admin.auth().listUsers(1000, token);
+    const page = await getAuth().listUsers(1000, token);
     for (const u of page.users) {
       authUsers.push({
         uid: u.uid, email: u.email, emailVerified: u.emailVerified, displayName: u.displayName || null,

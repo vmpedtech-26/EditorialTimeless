@@ -11,7 +11,9 @@
 // esto SIEMPRE crea y borra datos reales de prueba: por eso exige E2E_CONFIRM.
 const crypto = require('crypto');
 const path = require('path');
-const admin = require('firebase-admin');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore, Timestamp } = require('firebase-admin/firestore');
+const { getAuth } = require('firebase-admin/auth');
 
 if (process.env.E2E_CONFIRM !== 'yes') {
   console.error('Esta prueba crea y borra cuentas en el Firebase real. Reintentá con E2E_CONFIRM=yes');
@@ -22,8 +24,8 @@ const BASE = (process.env.E2E_BASE || 'http://localhost:3000').replace(/\/$/, ''
 const BOOK = process.env.E2E_BOOK || 'fb2';
 const OTHER_BOOK = process.env.E2E_OTHER_BOOK || 'fb1';
 const serviceAccount = require(path.join(__dirname, '..', 'serviceAccountKey.json'));
-admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-const db = admin.firestore();
+initializeApp({ credential: cert(serviceAccount) });
+const db = getFirestore();
 
 const API_KEY = require('fs').readFileSync(path.join(__dirname, '..', 'firebase_config.js'), 'utf8').match(/apiKey:\s*"([^"]+)"/)[1];
 const FS = `https://firestore.googleapis.com/v1/projects/${serviceAccount.project_id}/databases/(default)/documents`;
@@ -46,12 +48,12 @@ const fsForgeGift = async (docId, token) => (await fetch(`${FS}/gifts/${docId}`,
   method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
   body: JSON.stringify({ fields: { claimed: { booleanValue: true }, bookId: { stringValue: BOOK } } })
 })).status;
-const days = n => admin.firestore.Timestamp.fromMillis(Date.now() + n * 86400000);
+const days = n => Timestamp.fromMillis(Date.now() + n * 86400000);
 
 async function mkUser(name) {
   const email = `claude-e2e-${RUN}-${name}@example.com`;
-  const u = await admin.auth().createUser({ email, password: crypto.randomBytes(12).toString('hex') + 'Aa1!', emailVerified: true });
-  const ct = await admin.auth().createCustomToken(u.uid);
+  const u = await getAuth().createUser({ email, password: crypto.randomBytes(12).toString('hex') + 'Aa1!', emailVerified: true });
+  const ct = await getAuth().createCustomToken(u.uid);
   const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${API_KEY}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: ct, returnSecureToken: true })
   });
@@ -316,7 +318,7 @@ async function cleanup() {
   try {
     for (const uid of uids) {
       await db.recursiveDelete(db.collection('users').doc(uid)).catch(() => {});
-      await admin.auth().deleteUser(uid).catch(() => {});
+      await getAuth().deleteUser(uid).catch(() => {});
       for (const f of ['fromUserId', 'claimedBy']) {
         const s = await db.collection('gifts').where(f, '==', uid).get(); for (const d of s.docs) await d.ref.delete();
       }

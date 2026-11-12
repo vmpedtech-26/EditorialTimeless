@@ -12,7 +12,8 @@
 //
 // (Este archivo viejo sigue corriendo si hace falta con: npm run seed:legacy)
 
-const admin = require('firebase-admin');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 require('dotenv').config();
 
 // ── Firebase Admin Initialization ──────────────────────────────────────────
@@ -23,8 +24,8 @@ try {
   } else {
     serviceAccount = require('./serviceAccountKey.json');
   }
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+  initializeApp({
+    credential: cert(serviceAccount)
   });
   console.log("  ✦ [Firebase] Admin inicializado con éxito.");
 } catch (err) {
@@ -32,7 +33,7 @@ try {
   process.exit(1);
 }
 
-const db = admin.firestore();
+const db = getFirestore();
 
 // ── High Literature Combinatorial Matrix ────────────────────────────────────
 const GENRES = {

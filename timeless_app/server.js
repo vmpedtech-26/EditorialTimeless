@@ -11,7 +11,9 @@
 
 const express = require('express');
 const path    = require('path');
-const admin   = require('firebase-admin');
+const { initializeApp, cert, getApps } = require('firebase-admin/app');
+const { getFirestore, FieldValue, Timestamp } = require('firebase-admin/firestore');
+const { getAuth } = require('firebase-admin/auth');
 const crypto  = require('crypto');
 const helmet  = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -163,8 +165,8 @@ try {
   } else {
     serviceAccount = require('./serviceAccountKey.json');
   }
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+  initializeApp({
+    credential: cert(serviceAccount)
   });
 } catch (err) {
   console.warn('  ⚠  Firebase Admin: Credenciales no encontradas (.env o serviceAccountKey.json). Funciones de admin limitadas.');
@@ -233,9 +235,9 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
 
     console.log(`  ✦ [dLocal Webhook] Pago APROBADO. Activando premium para usuario: ${userId} (plan: ${planId})`);
 
-    if (admin.apps.length > 0) {
+    if (getApps().length > 0) {
       try {
-        const db = admin.firestore();
+        const db = getFirestore();
         const userRef = db.collection('users').doc(userId);
         const current = await userRef.get();
         if (current.exists && current.data().lastPaymentId === paymentId) {
@@ -246,11 +248,11 @@ app.post('/api/webhook/dlocal', express.raw({type: 'application/json'}), async (
         const prev = current.exists ? current.data() : {};
         const prevUntil = subscriptionActive(prev) && prev.premiumUntil && prev.premiumUntil.toMillis ? prev.premiumUntil.toMillis() : 0;
         const baseMs = Math.max(Date.now(), prevUntil);
-        const premiumUntil = admin.firestore.Timestamp.fromMillis(baseMs + plan.days * 86400000);
+        const premiumUntil = Timestamp.fromMillis(baseMs + plan.days * 86400000);
 
         await userRef.set({
           isPremium: true,
-          subscriptionDate: admin.firestore.FieldValue.serverTimestamp(),
+          subscriptionDate: FieldValue.serverTimestamp(),
           premiumUntil,
           lastPaymentId: paymentId,
           plan: `${planId}_dlocal`
@@ -350,7 +352,7 @@ setInterval(() => localPremiumUsers.clear(), 10 * 60 * 1000).unref();
 // Para endpoints a los que un usuario no-premium debe poder llegar, como el
 // propio checkout que lo va a convertir en premium.
 async function verifyToken(req, res, next) {
-  if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
+  if (!getApps().length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
 
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -359,7 +361,7 @@ async function verifyToken(req, res, next) {
 
   const token = authHeader.split('Bearer ')[1];
   try {
-    req.user = await admin.auth().verifyIdToken(token);
+    req.user = await getAuth().verifyIdToken(token);
     next();
   } catch (err) {
     console.error("  ✗ [verifyToken] Token inválido o expirado:", err.message);
@@ -373,7 +375,7 @@ const FAMILY_MAX_MEMBERS = 6;
 // Familiar activo (familyId apunta a una familia cuyo memberIds lo incluye).
 async function isPremiumViaFamily(uid) {
   try {
-    const db = admin.firestore();
+    const db = getFirestore();
     const userSnap = await db.collection('users').doc(uid).get();
     const familyId = userSnap.exists ? userSnap.data().familyId : null;
     if (!familyId) return false;
@@ -391,7 +393,7 @@ async function isPremiumViaFamily(uid) {
 
 // Crea la familia del Plan Familiar para su titular si todavía no tiene una.
 async function ensureFamilyForOwner(uid, ownerEmail) {
-  const db = admin.firestore();
+  const db = getFirestore();
   const userSnap = await db.collection('users').doc(uid).get();
   if (userSnap.exists && userSnap.data().familyId) {
     return userSnap.data().familyId;
@@ -401,7 +403,7 @@ async function ensureFamilyForOwner(uid, ownerEmail) {
     ownerId: uid,
     ownerEmail: ownerEmail || '',
     memberIds: [uid],
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
+    createdAt: FieldValue.serverTimestamp()
   });
   await db.collection('users').doc(uid).set({ familyId: familyRef.id }, { merge: true });
   return familyRef.id;
@@ -415,13 +417,13 @@ async function checkPremium(decodedToken) {
 
   if (!isPremium) {
     try {
-      const userSnap = await admin.firestore().collection('users').doc(uid).get();
+      const userSnap = await getFirestore().collection('users').doc(uid).get();
       if (userSnap.exists && subscriptionActive(userSnap.data())) {
         isPremium = true;
       } else {
         if (userSnap.exists && userSnap.data().isPremium) {
           // Suscripción vencida: se baja el flag para que la UI también lo refleje.
-          admin.firestore().collection('users').doc(uid).set({ isPremium: false }, { merge: true })
+          getFirestore().collection('users').doc(uid).set({ isPremium: false }, { merge: true })
             .catch(e => console.warn('  ⚠ [checkPremium] No se pudo marcar vencida:', e.message));
         }
         if (userSnap.exists && userSnap.data().familyId) {
@@ -444,16 +446,16 @@ async function checkPremium(decodedToken) {
 // Acceso a los capítulos de un libro: premium, o un regalo ya reclamado de
 // ESE libro (gifts/gift_<libro>_<uid>, que escribe claimGift en el lector).
 async function chunkAccessMiddleware(req, res, next) {
-  if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
+  if (!getApps().length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: { message: "Falta token de autorización Bearer" }});
   }
   try {
-    const decoded = await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1]);
+    const decoded = await getAuth().verifyIdToken(authHeader.split('Bearer ')[1]);
     if (await checkPremium(decoded)) { req.user = decoded; return next(); }
 
-    const giftSnap = await admin.firestore().collection('gifts').doc(`gift_${req.params.id}_${decoded.uid}`).get();
+    const giftSnap = await getFirestore().collection('gifts').doc(`gift_${req.params.id}_${decoded.uid}`).get();
     if (giftSnap.exists && giftSnap.data().claimed === true && giftSnap.data().bookId === req.params.id) {
       req.user = decoded;
       return next();
@@ -467,7 +469,7 @@ async function chunkAccessMiddleware(req, res, next) {
 
 // Middleware para verificar token de Firebase y estado Premium
 async function authMiddleware(req, res, next) {
-  if (!admin.apps.length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
+  if (!getApps().length) return res.status(500).json({ error: { message: "Firebase Admin no inicializado" }});
   
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -476,7 +478,7 @@ async function authMiddleware(req, res, next) {
   
   const token = authHeader.split('Bearer ')[1];
   try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    const decodedToken = await getAuth().verifyIdToken(token);
     const uid = decodedToken.uid;
     
     let isPremium = await checkPremium(decodedToken);
@@ -490,7 +492,7 @@ async function authMiddleware(req, res, next) {
     let wordsUsed = 0;
     try {
       const currentMonth = new Date().toISOString().slice(0, 7); // e.g. "2026-06"
-      const usageDoc = await admin.firestore().collection('users').doc(uid).collection('usage').doc(currentMonth).get();
+      const usageDoc = await getFirestore().collection('users').doc(uid).collection('usage').doc(currentMonth).get();
       if (usageDoc.exists) {
         wordsUsed = usageDoc.data().wordsUsed || 0;
       }
@@ -533,10 +535,10 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
     if (wordsCount > 0 && req.user) {
       const uid = req.user.uid;
       const currentMonth = new Date().toISOString().slice(0, 7);
-      const usageRef = admin.firestore().collection('users').doc(uid).collection('usage').doc(currentMonth);
+      const usageRef = getFirestore().collection('users').doc(uid).collection('usage').doc(currentMonth);
       await usageRef.set({
-        wordsUsed: admin.firestore.FieldValue.increment(wordsCount),
-        lastRequestAt: admin.firestore.FieldValue.serverTimestamp()
+        wordsUsed: FieldValue.increment(wordsCount),
+        lastRequestAt: FieldValue.serverTimestamp()
       }, { merge: true }).catch(err => console.error("Error al registrar palabras en generate:", err));
     }
     
@@ -605,10 +607,10 @@ app.post('/api/stream', authMiddleware, async (req, res) => {
     if (wordsCount > 0 && req.user) {
       const uid = req.user.uid;
       const currentMonth = new Date().toISOString().slice(0, 7);
-      const usageRef = admin.firestore().collection('users').doc(uid).collection('usage').doc(currentMonth);
+      const usageRef = getFirestore().collection('users').doc(uid).collection('usage').doc(currentMonth);
       await usageRef.set({
-        wordsUsed: admin.firestore.FieldValue.increment(wordsCount),
-        lastRequestAt: admin.firestore.FieldValue.serverTimestamp()
+        wordsUsed: FieldValue.increment(wordsCount),
+        lastRequestAt: FieldValue.serverTimestamp()
       }, { merge: true }).catch(err => console.error("Error al registrar palabras en stream:", err));
     }
 
@@ -637,9 +639,9 @@ async function getCachedCatalog() {
     return serverCache.catalog;
   }
   
-  if (admin.apps.length > 0) {
+  if (getApps().length > 0) {
     try {
-      const db = admin.firestore();
+      const db = getFirestore();
       const snap = await db.collection("books").get();
       const books = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       serverCache.catalog = books;
@@ -659,19 +661,19 @@ const telemetryFLUSH_LIMIT = IS_PRODUCTION ? 25 : 5; // en local se vacía rápi
 const TELEMETRY_BUFFER_MAX = 2000; // si Firestore falla en bucle, no crecer sin límite
 
 async function flushTelemetry() {
-  if (telemetryBuffer.length === 0 || admin.apps.length === 0) return;
+  if (telemetryBuffer.length === 0 || getApps().length === 0) return;
   const eventsToFlush = [...telemetryBuffer];
   telemetryBuffer.length = 0;
   
   try {
-    const db = admin.firestore();
+    const db = getFirestore();
     // Firestore admite máx. 500 operaciones por batch.
     for (let i = 0; i < eventsToFlush.length; i += 400) {
       const batch = db.batch();
       eventsToFlush.slice(i, i + 400).forEach(evt => {
         batch.set(db.collection('telemetry_logs').doc(), {
           ...evt,
-          timestamp: admin.firestore.FieldValue.serverTimestamp()
+          timestamp: FieldValue.serverTimestamp()
         });
       });
       await batch.commit();
@@ -694,9 +696,9 @@ app.get('/api/book/:id/chunk/:index', chunkAccessMiddleware, async (req, res) =>
     const catalog = await getCachedCatalog();
     let book = catalog.find(b => b.id === id);
     
-    if (!book && admin.apps.length > 0) {
+    if (!book && getApps().length > 0) {
       // Fuera de la caché (obra recién publicada, o borrador de un usuario): lectura directa.
-      const db = admin.firestore();
+      const db = getFirestore();
       let docSnap = await db.collection('books').doc(id).get();
       if (!docSnap.exists) docSnap = await db.collection('obras').doc(id).get();
       if (docSnap.exists) book = docSnap.data();
@@ -714,9 +716,9 @@ app.get('/api/book/:id/chunk/:index', chunkAccessMiddleware, async (req, res) =>
     // prosa vivía embebida en el propio doc de books/obras, legible por
     // cualquier usuario autenticado vía el SDK cliente; se mantiene ese
     // camino viejo como fallback mientras se migra el catálogo existente.
-    if (admin.apps.length > 0) {
+    if (getApps().length > 0) {
       try {
-        const fullDb = admin.firestore();
+        const fullDb = getFirestore();
         const fullSnap = await fullDb.collection('books_full').doc(id).get();
         if (fullSnap.exists) {
           const fullChapters = fullSnap.data().chapters;
@@ -796,11 +798,11 @@ app.post('/api/telemetry', authMiddleware, async (req, res) => {
     }
 
     // Guardar posición de lectura rápida en Firestore
-    if (admin.apps.length > 0) {
-      admin.firestore().collection('users').doc(userId).collection('reading_progress').doc(clean.bookId).set({
+    if (getApps().length > 0) {
+      getFirestore().collection('users').doc(userId).collection('reading_progress').doc(clean.bookId).set({
         chapterIndex: clean.chapterIndex,
         scrollDepth: clean.scrollDepth,
-        lastReadAt: admin.firestore.FieldValue.serverTimestamp()
+        lastReadAt: FieldValue.serverTimestamp()
       }, { merge: true }).catch(e => console.error("Error actualizando progreso:", e.message));
     }
 
@@ -820,7 +822,7 @@ app.post('/api/telemetry/bulk', authMiddleware, async (req, res) => {
     // Tope por request: cada evento puede implicar una escritura a Firestore.
     const events = req.body.events.slice(0, 100);
     const userId = req.user.uid;
-    const db = admin.apps.length > 0 ? admin.firestore() : null;
+    const db = getApps().length > 0 ? getFirestore() : null;
 
     let accepted = 0;
     for (const rawEv of events) {
@@ -833,7 +835,7 @@ app.post('/api/telemetry/bulk', authMiddleware, async (req, res) => {
         db.collection('users').doc(userId).collection('reading_progress').doc(clean.bookId).set({
           chapterIndex: clean.chapterIndex,
           scrollDepth: clean.scrollDepth,
-          lastReadAt: admin.firestore.FieldValue.serverTimestamp()
+          lastReadAt: FieldValue.serverTimestamp()
         }, { merge: true }).catch(e => console.error("Error actualizando progreso en bulk:", e.message));
       }
     }
@@ -857,9 +859,9 @@ app.get('/api/recommendations', authMiddleware, async (req, res) => {
     
     // Perfil e intereses predeterminados
     let interests = ['ficcion', 'ensayo'];
-    if (admin.apps.length > 0) {
+    if (getApps().length > 0) {
       try {
-        const db = admin.firestore();
+        const db = getFirestore();
         const userSnap = await db.collection('users').doc(userId).get();
         if (userSnap.exists && userSnap.data().interests) {
           interests = userSnap.data().interests;
@@ -931,13 +933,13 @@ app.post('/api/experiment/click', authMiddleware, async (req, res) => {
     
     console.log(`  ✦ [A/B Test] Clic Registrado. Usuario: ${userId.slice(0, 6)}..., Libro: ${bookId}, Variante: ${variant}`);
     
-    if (admin.apps.length > 0) {
-      const db = admin.firestore();
+    if (getApps().length > 0) {
+      const db = getFirestore();
       await db.collection('cover_experiment_logs').add({
         userId,
         bookId,
         variant,
-        clickedAt: admin.firestore.FieldValue.serverTimestamp()
+        clickedAt: FieldValue.serverTimestamp()
       });
     }
     
@@ -1045,12 +1047,12 @@ app.post('/api/create-checkout-session', checkoutLimiter, verifyToken, async (re
     localPremiumUsers.add(userId);
 
     // Escribir en Firestore de forma segura
-    if (admin.apps.length > 0) {
+    if (getApps().length > 0) {
       try {
-        const db = admin.firestore();
+        const db = getFirestore();
         await db.collection('users').doc(userId).set({
           isPremium: true,
-          subscriptionDate: admin.firestore.FieldValue.serverTimestamp(),
+          subscriptionDate: FieldValue.serverTimestamp(),
           plan: `demo_sandbox_bypass_${planId}`
         }, { merge: true });
         console.log(`  ✦ [Firestore Sandbox] Suscripción activada para ${userId}`);
@@ -1131,7 +1133,7 @@ app.post('/api/create-checkout-session', checkoutLimiter, verifyToken, async (re
 app.get('/api/family/status', verifyToken, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const db = admin.firestore();
+    const db = getFirestore();
     const userSnap = await db.collection('users').doc(uid).get();
     const familyId = userSnap.exists ? userSnap.data().familyId : null;
 
@@ -1148,7 +1150,7 @@ app.get('/api/family/status', verifyToken, async (req, res) => {
     const memberIds = family.memberIds || [];
     const members = await Promise.all(memberIds.map(async (memberUid) => {
       try {
-        const memberRecord = await admin.auth().getUser(memberUid);
+        const memberRecord = await getAuth().getUser(memberUid);
         return { uid: memberUid, email: memberRecord.email };
       } catch (e) {
         return { uid: memberUid, email: null };
@@ -1171,7 +1173,7 @@ app.get('/api/family/status', verifyToken, async (req, res) => {
 app.post('/api/family/invite', verifyToken, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const db = admin.firestore();
+    const db = getFirestore();
     const userSnap = await db.collection('users').doc(uid).get();
     const familyId = userSnap.exists ? userSnap.data().familyId : null;
     if (!familyId) {
@@ -1194,7 +1196,7 @@ app.post('/api/family/invite', verifyToken, async (req, res) => {
       familyId,
       invitedBy: uid,
       claimed: false,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp()
     });
 
     res.json({ inviteId });
@@ -1212,7 +1214,7 @@ app.post('/api/family/join', verifyToken, async (req, res) => {
       return res.status(400).json({ error: { message: "Falta el código de invitación." } });
     }
 
-    const db = admin.firestore();
+    const db = getFirestore();
     const inviteRef = db.collection('family_invites').doc(inviteId);
     const inviteSnap = await inviteRef.get();
     if (!inviteSnap.exists) {
@@ -1238,9 +1240,9 @@ app.post('/api/family/join', verifyToken, async (req, res) => {
       return res.status(400).json({ error: { message: `Este Plan Familiar ya tiene el máximo de ${FAMILY_MAX_MEMBERS} cuentas.` } });
     }
 
-    await familyRef.update({ memberIds: admin.firestore.FieldValue.arrayUnion(uid) });
+    await familyRef.update({ memberIds: FieldValue.arrayUnion(uid) });
     await db.collection('users').doc(uid).set({ familyId: invite.familyId }, { merge: true });
-    await inviteRef.update({ claimed: true, claimedBy: uid, claimedAt: admin.firestore.FieldValue.serverTimestamp() });
+    await inviteRef.update({ claimed: true, claimedBy: uid, claimedAt: FieldValue.serverTimestamp() });
     // No se cachea como premium acá: checkPremium decide según el plan vigente del titular.
     localPremiumUsers.delete(uid);
 
@@ -1262,7 +1264,7 @@ app.post('/api/family/remove', verifyToken, async (req, res) => {
       return res.status(400).json({ error: { message: "El titular no puede quitarse a sí mismo del Plan Familiar." } });
     }
 
-    const db = admin.firestore();
+    const db = getFirestore();
     const userSnap = await db.collection('users').doc(uid).get();
     const familyId = userSnap.exists ? userSnap.data().familyId : null;
     if (!familyId) {
@@ -1275,8 +1277,8 @@ app.post('/api/family/remove', verifyToken, async (req, res) => {
       return res.status(403).json({ error: { message: "Solo el titular del Plan Familiar puede quitar miembros." } });
     }
 
-    await familyRef.update({ memberIds: admin.firestore.FieldValue.arrayRemove(memberUid) });
-    await db.collection('users').doc(memberUid).update({ familyId: admin.firestore.FieldValue.delete() }).catch(() => {});
+    await familyRef.update({ memberIds: FieldValue.arrayRemove(memberUid) });
+    await db.collection('users').doc(memberUid).update({ familyId: FieldValue.delete() }).catch(() => {});
     localPremiumUsers.delete(memberUid);
 
     res.json({ success: true });
@@ -1290,7 +1292,7 @@ app.post('/api/family/remove', verifyToken, async (req, res) => {
 app.get('/api/subscription/status', verifyToken, async (req, res) => {
   try {
     const uid = req.user.uid;
-    const snap = await admin.firestore().collection('users').doc(uid).get();
+    const snap = await getFirestore().collection('users').doc(uid).get();
     const d = snap.exists ? snap.data() : {};
     const isEditor = req.user.email === ADMIN_EMAIL;
     const own = subscriptionActive(d);
@@ -1333,7 +1335,7 @@ app.post('/api/gift/create', verifyToken, async (req, res) => {
       return res.status(403).json({ error: { message: "Solo los suscriptores pueden regalar obras." } });
     }
 
-    const db = admin.firestore();
+    const db = getFirestore();
     let title = '';
     const bookSnap = await db.collection('books').doc(bookId).get();
     if (bookSnap.exists) {
@@ -1354,7 +1356,7 @@ app.post('/api/gift/create', verifyToken, async (req, res) => {
       fromName: req.user.name || (req.user.email ? req.user.email.split('@')[0] : 'Un lector'),
       personalNote: note,
       claimed: false,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp()
     });
     res.json({ token });
   } catch (err) {
@@ -1370,7 +1372,7 @@ app.post('/api/gift/claim', verifyToken, async (req, res) => {
       return res.status(400).json({ error: { message: "Link de invitación inválido." } });
     }
     const uid = req.user.uid;
-    const db = admin.firestore();
+    const db = getFirestore();
     const ref = db.collection('gifts').doc(token);
 
     const bookId = await db.runTransaction(async (tx) => {
@@ -1381,7 +1383,7 @@ app.post('/api/gift/claim', verifyToken, async (req, res) => {
       if (d.claimed && d.claimedBy && d.claimedBy !== uid) { const e = new Error("Este regalo ya fue reclamado."); e.status = 409; throw e; }
       tx.set(db.collection('gifts').doc(`gift_${d.bookId}_${uid}`), {
         ...d, claimed: true, claimedBy: uid, sourceToken: token,
-        claimedAt: admin.firestore.FieldValue.serverTimestamp()
+        claimedAt: FieldValue.serverTimestamp()
       });
       tx.update(ref, { claimed: true, claimedBy: uid });
       return d.bookId;
@@ -1407,16 +1409,16 @@ async function adminMiddleware(req, res, next) {
 }
 
 function adminAudit(req, action, detail) {
-  if (admin.apps.length === 0) return;
-  admin.firestore().collection('admin_audit').add({
+  if (getApps().length === 0) return;
+  getFirestore().collection('admin_audit').add({
     by: req.user.email, action, detail: detail || {},
-    at: admin.firestore.FieldValue.serverTimestamp()
+    at: FieldValue.serverTimestamp()
   }).catch(e => console.warn('  ⚠ [admin_audit]', e.message));
 }
 
 app.get('/api/admin/overview', adminMiddleware, async (req, res) => {
   try {
-    const db = admin.firestore();
+    const db = getFirestore();
     const [books, premium, pending] = await Promise.all([
       db.collection('books').count().get(),
       db.collection('users').where('isPremium', '==', true).count().get(),
@@ -1439,7 +1441,7 @@ app.get('/api/admin/overview', adminMiddleware, async (req, res) => {
 
 app.get('/api/admin/tickets', adminMiddleware, async (req, res) => {
   try {
-    const snap = await admin.firestore().collection('arrepentimiento_tickets')
+    const snap = await getFirestore().collection('arrepentimiento_tickets')
       .orderBy('timestamp', 'desc').limit(100).get();
     res.json({ tickets: snap.docs.map(d => d.data()) });
   } catch (err) {
@@ -1453,7 +1455,7 @@ app.post('/api/admin/tickets/:id', adminMiddleware, async (req, res) => {
     const status = req.body.status === 'resolved' ? 'resolved' : 'pending';
     const id = String(req.params.id);
     if (!/^ticket_[A-Za-z0-9_]+$/.test(id)) return res.status(400).json({ error: { message: "Ticket inválido." } });
-    await admin.firestore().collection('arrepentimiento_tickets').doc(id).set({
+    await getFirestore().collection('arrepentimiento_tickets').doc(id).set({
       status, resolvedAt: status === 'resolved' ? new Date().toISOString() : null
     }, { merge: true });
     adminAudit(req, 'ticket_status', { id, status });
@@ -1469,9 +1471,9 @@ app.get('/api/admin/users/lookup', adminMiddleware, async (req, res) => {
     const email = String(req.query.email || '').trim().toLowerCase();
     if (!email) return res.status(400).json({ error: { message: "Falta el email." } });
     let user;
-    try { user = await admin.auth().getUserByEmail(email); }
+    try { user = await getAuth().getUserByEmail(email); }
     catch (e) { return res.status(404).json({ error: { message: "No existe un usuario con ese email." } }); }
-    const snap = await admin.firestore().collection('users').doc(user.uid).get();
+    const snap = await getFirestore().collection('users').doc(user.uid).get();
     const d = snap.exists ? snap.data() : {};
     res.json({
       uid: user.uid, email: user.email, displayName: user.displayName || '',
@@ -1492,10 +1494,10 @@ app.post('/api/admin/users/premium', adminMiddleware, async (req, res) => {
   try {
     const uid = String(req.body.uid || '');
     if (!uid) return res.status(400).json({ error: { message: "Falta el usuario." } });
-    const ref = admin.firestore().collection('users').doc(uid);
+    const ref = getFirestore().collection('users').doc(uid);
 
     if (req.body.revoke === true) {
-      await ref.set({ isPremium: false, premiumUntil: admin.firestore.Timestamp.now() }, { merge: true });
+      await ref.set({ isPremium: false, premiumUntil: Timestamp.now() }, { merge: true });
       localPremiumUsers.delete(uid);
       adminAudit(req, 'premium_revoke', { uid });
       return res.json({ ok: true });
@@ -1510,14 +1512,14 @@ app.post('/api/admin/users/premium', adminMiddleware, async (req, res) => {
     const snap = await ref.get();
     const prev = snap.exists ? snap.data() : {};
     const prevUntil = subscriptionActive(prev) && prev.premiumUntil && prev.premiumUntil.toMillis ? prev.premiumUntil.toMillis() : 0;
-    const premiumUntil = admin.firestore.Timestamp.fromMillis(Math.max(Date.now(), prevUntil) + days * 86400000);
+    const premiumUntil = Timestamp.fromMillis(Math.max(Date.now(), prevUntil) + days * 86400000);
     await ref.set({
       isPremium: true, premiumUntil, plan: `${planId}_admin`,
-      subscriptionDate: admin.firestore.FieldValue.serverTimestamp()
+      subscriptionDate: FieldValue.serverTimestamp()
     }, { merge: true });
     localPremiumUsers.add(uid);
     if (planId === 'family') {
-      const u = await admin.auth().getUser(uid);
+      const u = await getAuth().getUser(uid);
       await ensureFamilyForOwner(uid, u.email);
     }
     adminAudit(req, 'premium_grant', { uid, planId, days });
@@ -1530,7 +1532,7 @@ app.post('/api/admin/users/premium', adminMiddleware, async (req, res) => {
 
 app.get('/api/admin/books', adminMiddleware, async (req, res) => {
   try {
-    const snap = await admin.firestore().collection('books')
+    const snap = await getFirestore().collection('books')
       .select('title', 'author', 'cat', 'genre', 'badge', 'createdAt').get();
     res.json({ books: snap.docs.map(d => {
       const x = d.data();
@@ -1546,7 +1548,7 @@ app.get('/api/admin/books/:id', adminMiddleware, async (req, res) => {
   try {
     const id = String(req.params.id);
     if (!id || id.includes('/')) return res.status(400).json({ error: { message: "Obra inválida." } });
-    const db = admin.firestore();
+    const db = getFirestore();
     const [pub, full] = await Promise.all([db.collection('books').doc(id).get(), db.collection('books_full').doc(id).get()]);
     if (!pub.exists) return res.status(404).json({ error: { message: "Obra no encontrada." } });
     const book = pub.data();
@@ -1590,7 +1592,7 @@ app.post('/api/admin/books', adminMiddleware, async (req, res) => {
     const bookId = editing ? String(req.body.id) : slugify(title);
     if (!bookId || bookId.includes('/')) return bad("No se pudo generar un ID válido para la obra.");
 
-    const db = admin.firestore();
+    const db = getFirestore();
     const ref = db.collection('books').doc(bookId);
     const existing = await ref.get();
     if (editing && !existing.exists) return res.status(404).json({ error: { message: "La obra a editar no existe." } });
@@ -1613,12 +1615,12 @@ app.post('/api/admin/books', adminMiddleware, async (req, res) => {
       data.coverAccent = hex(b.coverAccent, '#d5e3f0');
       data.coverAccentMuted = hex(b.coverAccentMuted, '#a4c2db');
     }
-    if (!existing.exists) data.createdAt = admin.firestore.FieldValue.serverTimestamp();
+    if (!existing.exists) data.createdAt = FieldValue.serverTimestamp();
 
     // merge: al editar se conservan campos que el formulario no expone (tagline, themes, openingQuote…).
     // Se elimina el campo `chapters` heredado de los docs previos a la separación del texto.
     const batch = db.batch();
-    batch.set(ref, { ...data, chapters: admin.firestore.FieldValue.delete() }, { merge: true });
+    batch.set(ref, { ...data, chapters: FieldValue.delete() }, { merge: true });
     batch.set(db.collection('books_full').doc(bookId), { chapters: chapters.map(c => c.content) });
     await batch.commit();
 
@@ -1635,7 +1637,7 @@ app.delete('/api/admin/books/:id', adminMiddleware, async (req, res) => {
   try {
     const id = String(req.params.id);
     if (!id || id.includes('/')) return res.status(400).json({ error: { message: "Obra inválida." } });
-    const db = admin.firestore();
+    const db = getFirestore();
     await Promise.all([db.collection('books').doc(id).delete(), db.collection('books_full').doc(id).delete()]);
     serverCache.catalog = null;
     adminAudit(req, 'book_delete', { id });
@@ -1670,8 +1672,8 @@ app.post('/api/arrepentimiento', strictLimiter, async (req, res) => {
 
     console.log(`  ✦ [Gobernanza] Solicitud de arrepentimiento registrada: ${ticketId}`);
 
-    if (admin.apps.length > 0) {
-      const db = admin.firestore();
+    if (getApps().length > 0) {
+      const db = getFirestore();
       await db.collection('arrepentimiento_tickets').doc(ticketId).set(ticketData);
       console.log(`  ✦ [Gobernanza] Ticket ${ticketId} guardado con éxito en Firestore.`);
     } else {
@@ -1699,9 +1701,9 @@ app.get('/api/config', async (req, res) => {
   // (que es, de todos modos, el único caso en que decryptText() lo usa:
   // la fórmula de la clave incluye auth.currentUser.uid).
   const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ') && admin.apps.length > 0) {
+  if (authHeader && authHeader.startsWith('Bearer ') && getApps().length > 0) {
     try {
-      await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1]);
+      await getAuth().verifyIdToken(authHeader.split('Bearer ')[1]);
       config.drmSalt = DRM_SALT;
     } catch (e) {
       // Token inválido o expirado: se omite el salt.
