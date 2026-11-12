@@ -1,0 +1,38 @@
+name: Timeless - monitor de disponibilidad
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      SITE: https://timeless-editorial.onrender.com
+    steps:
+      - name: El servidor responde (con reintentos por arranque en frío)
+        run: |
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS -m 30 "$SITE/api/health" | grep -q '"ok":true'; then echo "health OK"; exit 0; fi
+            echo "intento $i falló, reintento en 20s"; sleep 20
+          done
+          echo "::error::El sitio no responde"; exit 1
+      - name: La portada carga
+        run: curl -fsS -m 30 -o /dev/null "$SITE/index.html"
+      - name: Los archivos internos siguen sin exponerse
+        run: |
+          for p in /server.js /seed_library_ai.js /package.json /firestore.rules; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -m 30 "$SITE$p")
+            if [ "$code" = "200" ] && curl -s -m 30 "$SITE$p" | head -c 200 | grep -qiE "require\(|rules_version|\"name\""; then
+              echo "::error::$p está expuesto"; exit 1
+            fi
+          done
+      - name: Los capítulos exigen sesión
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" -m 30 "$SITE/api/book/fb2/chunk/0")
+          test "$code" = "401" || { echo "::error::chunk sin token devolvió $code"; exit 1; }
+      - name: El webhook de pagos rechaza avisos sin firma
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" -m 30 -X POST "$SITE/api/webhook/dlocal" -H 'Content-Type: application/json' -d '{"status":"PAID","order_id":"x_annual_1","id":"x","amount":89}')
+          case "$code" in 400|500) echo "webhook OK ($code)";; *) echo "::error::webhook sin firma devolvió $code"; exit 1;; esac
