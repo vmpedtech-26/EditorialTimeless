@@ -288,6 +288,24 @@ async function run() {
   r = await post('/api/telemetry/bulk', A.token, { events: evs.concat([{ bookId: 'x/y' }]) });
   rec('Telemetría masiva acotada a 100 eventos', r.status === 200 && r.body.count === 100, JSON.stringify(r.body));
 
+  // ── IA y experimentos: validación de entrada (no llegan a Gemini)
+  r = await post('/api/generate', null, { contents: [{ role: 'user', parts: [{ text: 'hola' }] }] });
+  rec('Generar sin sesión (401)', r.status === 401, r.status);
+  r = await post('/api/generate', B.token, { contents: [{ role: 'user', parts: [{ text: 'hola' }] }] });
+  rec('Cuenta gratuita no genera (403)', r.status === 403, r.status);
+  r = await post('/api/generate', A.token, { contents: [{ role: 'user', parts: [{ inline_data: { mime_type: 'image/png', data: 'AAAA' } }] }] });
+  rec('Generar rechaza contenido que no es texto (400)', r.status === 400, r.status);
+  r = await post('/api/generate', A.token, { contents: [{ role: 'user', parts: [{ text: 'a'.repeat(130000) }] }] });
+  rec('Generar rechaza pedidos gigantes (400)', r.status === 400, r.status);
+  r = await post('/api/stream', A.token, { contents: [] });
+  rec('Stream rechaza pedidos vacíos (400)', r.status === 400, r.status);
+  r = await post('/api/agent/qa-check', A.token, { title: 'x', chapters: 'no es una lista' });
+  rec('Auditoría exige una lista de capítulos (400)', r.status === 400, r.status);
+  r = await post('/api/experiment/click', A.token, { bookId: 'a/b', variant: 'A' });
+  rec('Clic A/B con libro inválido (400)', r.status === 400, r.status);
+  r = await post('/api/experiment/click', A.token, { bookId: BOOK, variant: 'Z' });
+  rec('Clic A/B con variante inválida (400)', r.status === 400, r.status);
+
   // ── Administración (un premium NO es editor)
   for (const p of ['/api/admin/overview', '/api/admin/tickets', '/api/admin/books', `/api/admin/books/${BOOK}`]) {
     r = await api(p, A.token);

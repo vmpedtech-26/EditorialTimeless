@@ -17,6 +17,8 @@ const { getAuth } = require('firebase-admin/auth');
 const crypto  = require('crypto');
 const helmet  = require('helmet');
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = require('express-rate-limit');
+const { sanitizeGeminiRequest, publicUpstreamError, BadAiRequest } = require('./ai_request');
 require('dotenv').config();
 
 const app  = express();
@@ -29,6 +31,8 @@ const app  = express();
 // mantiene 'unsafe-inline' porque hay decenas de atributos style="" legítimos
 // (colores/layout dinámicos) cuyo refactor no aporta valor de seguridad real.
 app.set('trust proxy', 1);
+// Los query strings se parsean con el módulo nativo (simple), no con qs: ninguna ruta usa objetos anidados en la URL y así no se expone la advisory abierta de qs.
+app.set('query parser', 'simple');
 const SW_REGISTER_HASH   = "'sha256-02bmHLdKc5I7lm5BdooABRuv82llZtNQ96BEpm8RF08='";
 const COOKIE_BANNER_HASH = "'sha256-T9/M+rSmnfgaS19VCgA0R1oa8Egt0FGbiFzylWRZuRg='";
 const REVEAL_IIFE_HASH   = "'sha256-eaC1xasMvnBDsbpcC48jK0yMk4F42Mm+cwV0I5Pt5Xg='";
@@ -285,7 +289,7 @@ app.use(express.json({ limit: '2mb' }));
 // descartar entregas legítimas de dLocal por límite de tasa).
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 100,
+  limit: 300,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: { message: "Demasiadas solicitudes. Por favor, intenta de nuevo en unos minutos." } }
@@ -293,6 +297,18 @@ const apiLimiter = rateLimit({
 app.use('/api/', (req, res, next) => {
   if (req.path === '/health' || req.path === '/config') return next();
   return apiLimiter(req, res, next);
+});
+
+// IA: tope por USUARIO (no por IP, que en una oficina o wifi compartido sería
+// de todos) además del general. Una obra de 12 capítulos con reescrituras usa
+// ~50 llamadas, y cada capítulo tarda decenas de segundos.
+const aiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => (req.user && req.user.uid) || ipKeyGenerator(req.ip),
+  message: { error: { message: "Alcanzaste el límite de generación por ahora. Esperá unos minutos y seguí." } }
 });
 
 // Límite más estricto para el formulario público de arrepentimiento (sin
@@ -514,18 +530,24 @@ async function authMiddleware(req, res, next) {
 }
 
 // ── Endpoint: generación normal (outline, BSC) ───────────────────────────────
-app.post('/api/generate', authMiddleware, async (req, res) => {
+app.post('/api/generate', authMiddleware, aiLimiter, async (req, res) => {
   try {
+    let body;
+    try { body = sanitizeGeminiRequest(req.body); }
+    catch (e) { if (e instanceof BadAiRequest) return res.status(400).json({ error: { message: e.message } }); throw e; }
+
     const upstream = await fetch(`${GEMINI}:generateContent?key=${KEY}`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(req.body),
+      body:    JSON.stringify(body),
     });
 
-    const data = await upstream.json();
+    const data = await upstream.json().catch(() => ({}));
 
     if (!upstream.ok) {
-      return res.status(upstream.status).json(data);
+      console.error('  ✗ [Gemini] generate', upstream.status, data.error?.message || '');
+      const pe = publicUpstreamError(upstream.status, data);
+      return res.status(pe.status).json({ error: { message: pe.message } });
     }
     
     // Contar y registrar palabras de la respuesta
@@ -551,7 +573,14 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
 });
 
 // ── Endpoint: streaming SSE (capítulo) ───────────────────────────────────────
-app.post('/api/stream', authMiddleware, async (req, res) => {
+app.post('/api/stream', authMiddleware, aiLimiter, async (req, res) => {
+  let body;
+  try { body = sanitizeGeminiRequest(req.body); }
+  catch (e) {
+    if (e instanceof BadAiRequest) return res.status(400).json({ error: { message: e.message } });
+    return res.status(500).json({ error: { message: publicErr(e) } });
+  }
+
   // Headers para Server-Sent Events
   res.setHeader('Content-Type',  'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -562,18 +591,21 @@ app.post('/api/stream', authMiddleware, async (req, res) => {
     const upstream = await fetch(`${GEMINI}:streamGenerateContent?alt=sse&key=${KEY}`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(req.body),
+      body:    JSON.stringify(body),
     });
 
     if (!upstream.ok) {
       const err = await upstream.json().catch(() => ({}));
-      const msg = err.error?.message || `HTTP ${upstream.status}`;
-      res.write(`data: ${JSON.stringify({ error: { message: msg } })}\n\n`);
+      console.error('  ✗ [Gemini] stream', upstream.status, err.error?.message || '');
+      const pe = publicUpstreamError(upstream.status, err);
+      res.write(`data: ${JSON.stringify({ error: { message: pe.message } })}\n\n`);
       return res.end();
     }
 
     // Pipe transparente: Gemini SSE → cliente SSE
     const reader  = upstream.body.getReader();
+    // Si el usuario cierra la pestaña, se deja de leer (y de consumir cuota) de Gemini.
+    res.on('close', () => { reader.cancel().catch(() => {}); });
     const decoder = new TextDecoder();
     let accumulatedText = "";
 
@@ -928,11 +960,13 @@ app.get('/api/recommendations', authMiddleware, async (req, res) => {
 // ── Endpoint: Registro de Clics del Test A/B de Portadas (Pilar 3) ───────────
 app.post('/api/experiment/click', authMiddleware, async (req, res) => {
   try {
-    const { bookId, variant } = req.body;
+    const bookId = typeof req.body.bookId === 'string' ? req.body.bookId : '';
+    const variant = req.body.variant;
+    if (!bookId || bookId.length > 120 || bookId.includes('/') || !['A', 'B'].includes(variant)) {
+      return res.status(400).json({ error: { message: "Evento del experimento inválido." } });
+    }
     const userId = req.user.uid;
-    
-    console.log(`  ✦ [A/B Test] Clic Registrado. Usuario: ${userId.slice(0, 6)}..., Libro: ${bookId}, Variante: ${variant}`);
-    
+
     if (getApps().length > 0) {
       const db = getFirestore();
       await db.collection('cover_experiment_logs').add({
@@ -951,15 +985,22 @@ app.post('/api/experiment/click', authMiddleware, async (req, res) => {
 });
 
 // ── Endpoint: Auditoría Literaria y QA del Agente (Pilar 4) ──────────────────
-app.post('/api/agent/qa-check', authMiddleware, async (req, res) => {
+app.post('/api/agent/qa-check', authMiddleware, aiLimiter, async (req, res) => {
   try {
-    const { title, genre, author, outline, chapters } = req.body;
-    
-    if (!chapters || chapters.length === 0) {
-      return res.status(400).json({ error: { message: "Se requiere al menos un capítulo para auditar." } });
+    const cap = (v, n) => String(v === undefined || v === null ? '' : v).slice(0, n);
+    const title = cap(req.body.title, 200), genre = cap(req.body.genre, 80), author = cap(req.body.author, 120);
+    const outline = cap(JSON.stringify(req.body.outline || {}), 6000);
+    const chapters = req.body.chapters;
+
+    if (!Array.isArray(chapters) || chapters.length === 0 || chapters.length > 60 || chapters.some(c => typeof c !== 'string')) {
+      return res.status(400).json({ error: { message: "Se requiere al menos un capítulo (texto) para auditar." } });
     }
-    
-    const textToAudit = chapters.join('\n\n').slice(0, 8000);
+
+    // Se muestrea el principio, el medio y el final de la obra: antes solo se
+    // leían los primeros 8.000 caracteres y el resto del libro no se evaluaba.
+    const full = chapters.join('\n\n');
+    const textToAudit = full.length <= 8000 ? full
+      : `${full.slice(0, 3000)}\n[…]\n${full.slice(Math.floor(full.length / 2) - 1250, Math.floor(full.length / 2) + 1250)}\n[…]\n${full.slice(-2500)}`;
     console.log(`  ✦ [QA Audit] Solicitando auditoría para "${title}"...`);
     
     const systemInstruction = `Eres el Editor en Jefe y Director Literario de Timeless. 
@@ -979,7 +1020,7 @@ Debes devolver estrictamente un objeto JSON con el siguiente formato, sin bloque
     const promptText = `Obra: "${title}"
 Autor: "${author}"
 Género: "${genre}"
-Outline: ${JSON.stringify(outline)}
+Outline: ${outline}
 
 Borrador:
 """
@@ -1009,22 +1050,16 @@ ${textToAudit}
     }
 
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    let parsedResult;
-    try {
-      parsedResult = JSON.parse(responseText);
-    } catch (parseErr) {
-      console.warn("Fallo al parsear respuesta JSON de Gemini QA, usando fallback:", responseText);
-      parsedResult = {
-        score_coherencia: 88,
-        score_originalidad: 85,
-        score_ritmo: 82,
-        score_global: 85,
-        observaciones_coherencia: ["La estructura narrativa es coherente con el bosquejo inicial."],
-        observaciones_originalidad: ["Buena selección semántica, adecuada al tono contemplativo de Timeless."],
-        observaciones_ritmo: ["Fluidez de lectura estable, aunque algunos párrafos densos podrían dividirse."],
-        consejos_mejora: ["Considera incorporar pausas reflexivas para acentuar el ritmo literario."]
-      };
+    // Si el modelo no devuelve un JSON con puntajes numéricos se informa el error:
+    // antes se inventaba una auditoría 88/85/82 que el usuario tomaba como real.
+    let parsedResult = null;
+    try { parsedResult = JSON.parse(responseText); } catch (parseErr) { parsedResult = null; }
+    const scores = ['score_coherencia', 'score_originalidad', 'score_ritmo', 'score_global'];
+    if (!parsedResult || scores.some(k => typeof parsedResult[k] !== 'number' || !Number.isFinite(parsedResult[k]))) {
+      console.warn('  ⚠ [QA Audit] Respuesta de Gemini sin puntajes válidos:', responseText.slice(0, 200));
+      return res.status(502).json({ error: { message: "La IA no devolvió una auditoría válida. Probá de nuevo." } });
     }
+    for (const k of scores) parsedResult[k] = Math.min(100, Math.max(0, Math.round(parsedResult[k])));
 
     res.json(parsedResult);
   } catch (err) {
