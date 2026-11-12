@@ -1048,7 +1048,10 @@ function saveBookOffline(bookId, bookData, licenseKey) {
     return new Promise((resolve, reject) => {
       const tx = db.transaction(['offline_books', 'offline_keys'], 'readwrite');
       tx.objectStore('offline_books').put({ bookId, data: bookData });
-      tx.objectStore('offline_keys').put({ bookId, license: licenseKey, expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000 }); // 30 días
+      // La licencia dura 30 días, pero nunca más que el plan: una copia descargada
+      // no debe poder leerse después de que la suscripción venció.
+      const planEnd = subscriptionStatus && subscriptionStatus.premiumUntil ? Date.parse(subscriptionStatus.premiumUntil) : Infinity;
+      tx.objectStore('offline_keys').put({ bookId, license: licenseKey, expiresAt: Math.min(Date.now() + 30 * 24 * 60 * 60 * 1000, planEnd) });
       tx.oncomplete = () => resolve();
       tx.onerror = (e) => reject(e.target.error);
     });
