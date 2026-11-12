@@ -333,7 +333,7 @@ const checkoutLimiter = rateLimit({
 // configuración. En vez de una lista de bloqueo (que siempre se queda corta
 // cuando aparece un archivo nuevo — así quedaron server.js y seed_library_ai.js
 // descargables), se sirve SOLO una lista de permitidos explícita.
-const PUBLIC_STATIC = /^\/(assets\/.+|(index|reader|agent|admin|architecture|privacy|terms)\.html|sw\.js|manifest\.json|firebase_config\.js|agent_service\.js|prompts\.js|fallback_catalog\.json|kids_fallback_catalog\.json)$/;
+const PUBLIC_STATIC = /^\/(assets\/.+|(index|reader|agent|admin|architecture|privacy|terms)\.html|sw\.js|manifest\.json|robots\.txt|sitemap\.xml|firebase_config\.js|agent_service\.js|prompts\.js|fallback_catalog\.json|kids_fallback_catalog\.json)$/;
 const staticHandler = express.static(path.join(__dirname), { dotfiles: 'deny', index: 'index.html' });
 app.use((req, res, next) => {
   if (req.path === '/' || PUBLIC_STATIC.test(req.path)) return staticHandler(req, res, next);

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /agent.html
+Disallow: /reader.html
+
+Sitemap: https://timeless-editorial.onrender.com/sitemap.xml

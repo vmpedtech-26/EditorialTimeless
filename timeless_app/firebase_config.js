@@ -19,6 +19,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+// Los correos de Firebase (restablecer contraseña, verificación) salen en este idioma.
+auth.languageCode = 'es';
 const db = getFirestore(app);
 
 // Habilitar persistencia de datos offline
