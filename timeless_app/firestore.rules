@@ -30,15 +30,35 @@ service cloud.firestore {
       }
     }
 
-    // Colección 'obras': los usuarios autenticados solo pueden gestionar sus propios borradores
+    // Colección 'obras': borradores que genera el Agente Escritor (función de
+    // suscriptores). Antes cualquier cuenta autenticada, incluso gratuita, podía
+    // crear documentos sin límite ni forma, lo que permitía llenar la base. Ahora
+    // solo crea quien tiene suscripción vigente o pertenece a un Plan Familiar,
+    // únicamente con los campos que escribe el Agente y con topes de tamaño.
+    function canWriteDrafts() {
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(userPath) && (
+        (get(userPath).data.get('isPremium', false) == true &&
+          (get(userPath).data.get('premiumUntil', null) == null || get(userPath).data.premiumUntil > request.time)) ||
+        get(userPath).data.get('familyId', null) != null
+      );
+    }
+    function validDraft(d) {
+      return d.keys().hasOnly(['title', 'genre', 'outline', 'cover', 'chapters', 'userId', 'createdAt', 'bscScore', 'wordCount', 'bscChapters'])
+        && d.title is string && d.title.size() <= 300
+        && d.chapters is list && d.chapters.size() <= 60;
+    }
     match /obras/{obraId} {
-      // Un autor puede gestionar sus obras, o un invitado puede leerla si tiene un regalo válido
+      // Un autor puede leer sus obras, o un invitado si reclamó un regalo (gifts/gift_<obra>_<uid>, que solo escribe el servidor)
       allow read: if request.auth != null && (
         resource.data.userId == request.auth.uid ||
         exists(/databases/$(database)/documents/gifts/$(giftDocId(obraId)))
       );
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid
+        && canWriteDrafts() && validDraft(request.resource.data);
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId && validDraft(request.resource.data);
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
     
     // Colección 'gifts': invitaciones de lectura. Se puede LEER un regalo

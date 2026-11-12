@@ -261,6 +261,39 @@ async function run() {
   rec('El destinatario reclama el borrador', r.status === 200, r.status);
   rec('Tras reclamar, el destinatario lee el borrador (200)', (await fsGet(`obras/${obraId}`, C.token)) === 200);
 
+  // ── Borradores: quién puede crear (reglas de Firestore, como cliente)
+  const draftFields = (uid, extra = {}) => ({
+    title: { stringValue: 'Borrador e2e' }, genre: { stringValue: 'ficcion' }, userId: { stringValue: uid },
+    chapters: { arrayValue: { values: [{ stringValue: 'Texto' }] } }, createdAt: { stringValue: new Date().toISOString() }, ...extra
+  });
+  const createDraft = async (token, fields) => {
+    const res = await fetch(`${FS}/obras`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ fields }) });
+    let body = null; try { body = await res.json(); } catch (e) { /* sin JSON */ }
+    if (res.status === 200 && body && body.name) created.obras.push(body.name.split('/').pop());
+    return { status: res.status, body };
+  };
+  r = await createDraft(B.token, draftFields(B.uid));
+  rec('Cuenta gratuita no crea borradores (403)', r.status === 403, r.status);
+  r = await createDraft(U.expired.token, draftFields(U.expired.uid));
+  rec('Suscripción vencida no crea borradores (403)', r.status === 403, r.status);
+  r = await createDraft(A.token, draftFields(C.uid));
+  rec('No se puede crear un borrador a nombre de otro (403)', r.status === 403, r.status);
+  r = await createDraft(A.token, draftFields(A.uid, { esAdmin: { booleanValue: true } }));
+  rec('Campos desconocidos en un borrador se rechazan (403)', r.status === 403, r.status);
+  r = await createDraft(A.token, draftFields(A.uid, { chapters: { arrayValue: { values: Array.from({ length: 61 }, () => ({ stringValue: 'x' })) } } }));
+  rec('Más de 60 capítulos se rechaza (403)', r.status === 403, r.status);
+  r = await createDraft(A.token, draftFields(A.uid, { title: { stringValue: 'x'.repeat(301) } }));
+  rec('Título de más de 300 caracteres se rechaza (403)', r.status === 403, r.status);
+  r = await createDraft(A.token, draftFields(A.uid, { wordCount: { integerValue: '1200' }, bscScore: { integerValue: '88' } }));
+  rec('Un suscriptor crea un borrador con el formato del Agente (200)', r.status === 200, r.status);
+  const myDraft = created.obras[created.obras.length - 1];
+  const patch = async (token, fields, mask) => (await fetch(`${FS}/obras/${myDraft}?${mask.map(m => 'updateMask.fieldPaths=' + m).join('&')}`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ fields }) })).status;
+  rec('El dueño edita su borrador (200)', (await patch(A.token, { title: { stringValue: 'Editado' } }, ['title'])) === 200);
+  rec('Editar no permite agregar campos arbitrarios (403)', (await patch(A.token, { basura: { stringValue: 'x' } }, ['basura'])) === 403);
+  rec('Otro usuario no edita un borrador ajeno (403)', (await patch(C.token, { title: { stringValue: 'hack' } }, ['title'])) === 403);
+  rec('Otro usuario no borra un borrador ajeno (403)', (await fetch(`${FS}/obras/${myDraft}`, { method: 'DELETE', headers: { Authorization: `Bearer ${C.token}` } })).status === 403);
+  rec('El dueño borra su borrador (200)', (await fetch(`${FS}/obras/${myDraft}`, { method: 'DELETE', headers: { Authorization: `Bearer ${A.token}` } })).status === 200);
+
   // ── Plan familiar
   r = await post('/api/family/invite', U.famowner.token);
   const inv = r.body && r.body.inviteId; if (inv) created.invites.push(inv);
@@ -271,6 +304,8 @@ async function run() {
   rec('Miembro con titular vigente lee (200)', r.status === 200, r.status);
   r = await api('/api/subscription/status', U.member.token);
   rec('Estado del miembro indica acceso por familia', r.status === 200 && r.body.active === true && r.body.viaFamily === true, JSON.stringify(r.body));
+  r = await createDraft(U.member.token, draftFields(U.member.uid));
+  rec('Un miembro de Plan Familiar crea borradores (200)', r.status === 200, r.status);
   r = await post('/api/family/invite', B.token);
   rec('Quien no es titular no puede invitar (403)', r.status === 403, r.status);
   r = await post('/api/family/invite', U.expfamowner.token);
