@@ -1,0 +1,20 @@
+{
+  "correccion": {
+    "ortografia_gramatica_revisadas": false,
+    "continuidad_revisada": false,
+    "revisado_por": ""
+  },
+  "legal": {
+    "sin_personas_ni_empresas_reales_asociadas_a_delitos": false,
+    "sin_texto_copiado_de_otras_obras": false,
+    "titulo_sin_conflicto_con_obras_existentes": false
+  },
+  "arte": {
+    "portada_definida": false
+  },
+  "comite_editorial": {
+    "aprobado": false,
+    "aprobado_por": "",
+    "fecha": ""
+  }
+}

@@ -38,7 +38,13 @@ node scripts/libro_revisar.js <nombre> 1
 
 **4. Leer el libro completo** y verificar continuidad: nombres, fechas, lugares, tono y voz iguales de punta a punta. Corregí lo que no cierre.
 
-**5. Publicar.**
+**5. Control editorial (antes de publicar).** Copiá `libros/_plantilla/ficha.json` a `libros/<nombre>/ficha.json` y completala solo después de hacerlo de verdad:
+- *Corrección*: leer el libro completo buscando ortografía, gramática, puntuación del diálogo, repeticiones y errores de continuidad (nombres, edades, fechas, lugares, objetos). Corregir en los `cap-NN.txt`.
+- *Legal*: ninguna empresa, institución o persona real asociada a delitos o escándalos; nada copiado de otras obras (ni frases reconocibles); título que no choque con una obra conocida.
+- *Arte*: la portada del libro está definida.
+- *Comité editorial*: lo aprueba el usuario (nombre y fecha). El agente nunca lo marca por su cuenta.
+
+**6. Publicar.**
 ```bash
 node scripts/libro_revisar.js <nombre>        # todos los capítulos deben dar ✔
 node scripts/libro_publicar.js <nombre>       # simulacro: valida y muestra qué se escribiría

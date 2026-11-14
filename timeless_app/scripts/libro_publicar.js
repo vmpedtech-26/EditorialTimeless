@@ -26,6 +26,15 @@ const L = require('./libro_lib');
     if (!r.pass) problems.push(`el capítulo ${n} no aprueba el detector (${r.score}/100): corregilo con libro_revisar.js`);
     raw.push(text);
   }
+  // Control editorial: corrección, legal, arte y aprobación del comité (ficha.json).
+  const fichaPath = L.path.join(d, 'ficha.json');
+  if (!L.fs.existsSync(fichaPath)) problems.push('falta ficha.json (copiala desde libros/_plantilla/ficha.json y completala tras la revisión)');
+  else {
+    const f = JSON.parse(L.fs.readFileSync(fichaPath, 'utf8'));
+    const open = (obj, pre) => Object.entries(obj).flatMap(([k, v]) => typeof v === 'object' ? open(v, pre + k + '.') : (v === false || v === '') ? [pre + k] : []);
+    const pend = open(f, '');
+    if (pend.length) problems.push('ficha editorial incompleta: ' + pend.join(', '));
+  }
   if (problems.length) { console.error('✘ No se puede publicar:\n - ' + problems.join('\n - ')); process.exit(1); }
 
   const html = raw.map(t => t.split('\n').map(p => p.trim()).filter(Boolean).map(p => `<p>${p.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`).join('\n'));
