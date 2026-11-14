@@ -371,7 +371,7 @@ Generá exactamente ${chapterCount} capítulos. El primero abre con la acción y
     const { genre, tone, writerId } = params;
     const formatId = params.format || _global.TIMELESS_FORMAT_FOR[genre] || 'novela';
     const format = _global.TIMELESS_FORMATS[formatId] || _global.TIMELESS_FORMATS.novela;
-    const ch = outline.chapters[chapterIndex];
+    const ch = { ...outline.chapters[chapterIndex], index: outline.chapters[chapterIndex].index ?? chapterIndex + 1 };
     const isLast = chapterIndex === outline.chapters.length - 1;
     const prev = outline.chapters
       .slice(0, chapterIndex)
