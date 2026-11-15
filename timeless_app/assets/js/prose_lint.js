@@ -117,9 +117,68 @@ export function lintProse(text, opts = {}) {
   const triples = (clean.match(/\b[a-záéíóúñ]{3,}, [a-záéíóúñ]{3,} y [a-záéíóúñ]{3,}\b/gi) || []).length;
   if (triples >= 6) add('enumeraciones_de_tres', `${triples} enumeraciones del tipo «A, B y C». Es un ritmo automático: rompelo.`, 4);
 
+
+  // 12. Redacción: errores mecánicos que un corrector marcaría de inmediato
+  const mech = [];
+  const dbl = (clean.match(/[^\s] {2,}[^\s]/g) || []).length;
+  if (dbl) mech.push(`${dbl} espacios dobles`);
+  const spBefore = (clean.match(/\S [,.;:](?=\s|$)/g) || []).length;
+  if (spBefore) mech.push(`${spBefore} espacios antes de coma o punto`);
+  const cnt = (re) => (clean.match(re) || []).length;
+  if (cnt(/¿/g) !== cnt(/\?/g)) mech.push(`signos de pregunta desparejos (${cnt(/¿/g)} ¿ / ${cnt(/\?/g)} ?)`);
+  if (cnt(/¡/g) !== cnt(/!/g)) mech.push(`signos de exclamación desparejos (${cnt(/¡/g)} ¡ / ${cnt(/!/g)} !)`);
+  if (cnt(/\(/g) !== cnt(/\)/g)) mech.push('paréntesis sin cerrar');
+  if (cnt(/«/g) !== cnt(/»/g)) mech.push('comillas « » sin cerrar');
+  if (cnt(/"/g) % 2) mech.push('comillas rectas sin cerrar');
+  const OKREP = /^(no|sí|si|ya|muy|ja|jaja|bla|tan|así|vamos|dale|poco|bien|mal|todo|nada|mil|tic|tac|toc|y)$/i;
+  const reps = [...clean.matchAll(/\b([a-záéíóúñ]{2,})\s+\1\b/gi)].filter(m => !OKREP.test(m[1]));
+  if (reps.length) mech.push(`palabra repetida seguida («${reps[0][0]}»)`);
+  const deq = clean.match(/\b(pienso|creo|opino|dijo|dice|digo|sé|supo|sabía|pensó|pensaba|parece|aseguró|cree|creía|dijeron|dicen) de que\b/i);
+  if (deq) mech.push(`dequeísmo («${deq[0]}»)`);
+  const que = clean.match(/\b(me di cuenta|se dio cuenta|se dieron cuenta|nos dimos cuenta|te das cuenta|me doy cuenta) que\b/i);
+  if (que) mech.push(`queísmo («${que[0]}»)`);
+  const hab = clean.match(/\b(habían|hubieron|habrán|habrían|habían)\s+(muchos|muchas|varios|varias|pocos|pocas|algunos|algunas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/i);
+  if (hab) mech.push(`«${hab[0]}»: «haber» impersonal va en singular`);
+  const mule = clean.match(/\b(a nivel de|en base a|en el día de hoy|de cara a)\b/i);
+  if (mule) mech.push(`muletilla de oficina («${mule[0]}»)`);
+  if (mech.length) add('redaccion', `Errores de redacción: ${mech.join('; ')}. Corregilos uno por uno.`, Math.min(30, 5 * mech.length));
+
+  // 13. Registro: voseo y tuteo en el mismo texto
+  const vos = clean.match(/\b(tenés|querés|sabés|podés|decís|sos|vos|hacé|mirá|andá|venís|pensás|salís|ponés)\b/gi) || [];
+  const tu = clean.match(/\b(tienes|quieres|sabes|puedes|dices|eres|tú|haces|vienes|piensas|sales|pones)\b/gi) || [];
+  if (vos.length && tu.length) add('voseo_mezclado', `Mezcla voseo («${vos[0]}») y tuteo («${tu[0]}»). Elegí uno según quién habla y mantenelo.`, 12);
+
+  // 14. Argentinismos de decorado
+  const FOLK = /\b(che|boludo|boluda|pibe|pibes|piba|pibas|laburo|laburar|laburando|guita|quilombo|bondi|morfar|mango|mangos|pelotudo|chabón|chamuyo|afanar|garpar|bardo|fiaca|posta|re (lindo|linda|bueno|buena|loco|loca|mal|bien)|dale[,.!]|viste\?|capaz que)\b|\b(mate|asado|fernet|choripán|choripan|dulce de leche|medialunas|alfajor|alfajores)\b/gi;
+  const folk = clean.match(FOLK) || [];
+  const dens = folk.length / wc * 1000;
+  if (dens > 4) add('argentinismo_forzado', `Argentinismos y color local de postal (${[...new Set(folk.map(x => x.toLowerCase()))].slice(0, 6).join(', ')}): ${folk.length} en ${wc} palabras. Suena a decorado. Dejá solo lo que un personaje diría de verdad y sacá el resto.`, dens > 9 ? 14 : 7);
+
   const penalty = findings.reduce((n, f) => n + f.penalty, 0);
   const score = Math.max(0, 100 - penalty);
   return { score, pass: score >= LINT_THRESHOLD && !findings.some(f => f.rule === 'meta'), wordCount: wc, findings };
+}
+
+
+// Continuidad entre capítulos: nombres propios nuevos o escritos de dos maneras.
+// `known` = texto de referencia (plan + capítulos anteriores). Devuelve avisos.
+export function checkContinuity(text, known) {
+  const clean = String(text || '').replace(/<[^>]+>/g, ' ');
+  const ref = String(known || '');
+  const nameRe = /(?<![.!?…¿¡—"«]\s)(?<!^)\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b/g;
+  const STOPN = new Set(['Pero', 'Cuando', 'Entonces', 'Después', 'Mientras', 'Aunque', 'Como', 'Porque', 'Todo', 'Nada', 'Algo', 'Nadie', 'Tal', 'Así', 'Ahora', 'Luego', 'Siempre', 'Nunca', 'Aquí', 'Allí', 'Dios', 'Señor', 'Señora', 'Doña', 'Don']);
+  const counts = {};
+  for (const m of clean.matchAll(nameRe)) { if (!STOPN.has(m[1])) counts[m[1]] = (counts[m[1]] || 0) + 1; }
+  const refNames = new Set([...ref.matchAll(/\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b/g)].map(m => m[1]));
+  const lev = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
+  const out = [];
+  for (const [n, c] of Object.entries(counts)) {
+    if (refNames.has(n)) continue;
+    const near = [...refNames].find(r => r.length > 3 && lev(n.toLowerCase(), r.toLowerCase()) <= 1);
+    if (near) out.push({ level: 'error', msg: `«${n}» parece una variante de «${near}»: un nombre se escribe siempre igual.` });
+    else if (c >= 2) out.push({ level: 'aviso', msg: `Aparece «${n}» ×${c} y no figura en el plan ni en los capítulos anteriores. ¿Es un personaje o lugar nuevo previsto?` });
+  }
+  return out;
 }
 
 // Convierte los hallazgos en una instrucción de corrección para la reescritura.

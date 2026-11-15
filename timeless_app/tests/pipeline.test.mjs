@@ -110,3 +110,30 @@ test('el detector puntúa más bajo la prosa de piloto automático que la humana
   assert.ok(lintProse(CLEAN('')).score >= 90);
   assert.ok(lintProse(TICS).score < 60);
 });
+
+test('el detector marca errores de redacción, voseo mezclado y argentinismos de decorado', async () => {
+  const { lintProse } = await import('../assets/js/prose_lint.js');
+  const base = CLEAN('Hacía frío.');
+  const rules = (t) => lintProse(t).findings.map(f => f.rule);
+  assert.ok(!rules(base).some(r => ['redaccion', 'voseo_mezclado', 'argentinismo_forzado'].includes(r)));
+  assert.ok(rules(base + ' Dijo de que venía tarde y había (un problema.').includes('redaccion'));
+  assert.ok(rules(base + ' —Vos sabés lo que pasó. —Tú sabes que no.').includes('voseo_mezclado'));
+  assert.ok(rules(base + ' —Che, boludo, tomá un mate. Dale, pibe, qué quilombo, re lindo el asado, che.').includes('argentinismo_forzado'));
+});
+
+test('la continuidad detecta variantes de un nombre y nombres no previstos', async () => {
+  const { checkContinuity } = await import('../assets/js/prose_lint.js');
+  const r = checkContinuity('Fue con Ines al pueblo. Después llegó Ramiro, y Ramiro se fue. Ramiro volvió.', 'Inés Ramos y Lucho');
+  assert.ok(r.some(x => x.level === 'error' && /Inés/.test(x.msg)));
+  assert.ok(r.some(x => x.level === 'aviso' && /Ramiro/.test(x.msg)));
+  assert.equal(checkContinuity('Fue con Inés al pueblo.', 'Inés Ramos').length, 0);
+});
+
+test('el encargo de capítulo incluye la biblia de continuidad y el sistema las cualidades de la forma', () => {
+  const outline = { title: 'T', premise: 'p', chapters: [{ title: 'a', arc: 'x' }, { title: 'b', arc: 'y' }] };
+  const u = TIMELESS_PROMPTS.buildChapter(outline, 1, { genre: 'ficcion', tone: 't', previousText: 'fin', continuity: 'CAPÍTULO 1\nHECHOS: llegó Inés.' });
+  assert.match(u, /BIBLIA DE CONTINUIDAD/);
+  assert.match(u, /llegó Inés/);
+  assert.match(TIMELESS_PROMPTS.buildSystem('libre', 'cuento'), /CUALIDADES DEL CUENTO/);
+  assert.match(TIMELESS_PROMPTS.buildSummary('texto', 1, 'a'), /HILOS ABIERTOS/);
+});

@@ -66,3 +66,13 @@ Cada libro de adultos lleva portada propia, en el estilo de casa (fotografía ed
 2. `node scripts/libro_portada.js <nombre>` imprime el encargo de imagen. Generala con `antigravity_image` usando `assets/cover_memoria.png` como referencia de estilo y guardala en `libros/<nombre>/portada.png`.
 3. Revisá que no tenga texto, rostros ni marcas. Si falla, repetí. Después optimizala a 720×720 JPEG (calidad 88) como `libros/<nombre>/portada.jpg`; el PNG queda de original.
 4. `libro_publicar.js` exige `portada.jpg` y la copia a `assets/covers/`; hay que subir ese archivo a git junto con el libro. Los libros infantiles usan la tapa tipográfica del sitio, no portada de imagen.
+
+## Continuidad entre capítulos
+Cada capítulo tiene su ficha de continuidad. Es lo que evita que cambien nombres, edades, objetos o lo que sabe cada personaje.
+1. Al terminar el capítulo N y pasarlo por `libro_revisar.js`: `node scripts/libro_prompt.js <nombre> resumen N` imprime el pedido. Guardá el resultado en `libros/<nombre>/cap-NN.resumen.txt`.
+2. `libro_prompt.js <nombre> N+1` incluye solo esas fichas como biblia de la obra. Si falta alguna, no te da el encargo.
+3. `libro_revisar.js` avisa de nombres nuevos que el plan no prevé y rechaza variantes de un mismo nombre (Inés / Ines).
+4. `libro_publicar.js` exige las fichas de todos los capítulos.
+
+## Qué revisa el detector (además del estilo)
+Errores de redacción (espacios, signos desparejos, dequeísmo y queísmo, «habían» plural, muletillas), mezcla de voseo y tuteo, y argentinismos de decorado. Que pase el detector es el piso, no el techo: la lectura de un corrector humano sigue siendo el paso de Corrección de la ficha.

@@ -222,6 +222,40 @@ _global.TIMELESS_FORMATS = {
   },
 };
 
+
+const _QUALITY = {
+  novela: `CUALIDADES DE LA NOVELA
+- Una pregunta dramática central que se abre en el primer capítulo y se cierra en el último, con una complicación que cambia lo que el protagonista creía a mitad de camino.
+- Dos planos de tiempo como máximo y siempre claros. El pasado entra por objetos y conversaciones, no por capítulos de recuerdos.
+- Cada personaje principal tiene una manera propia de hablar que se reconoce sin el nombre.
+- El final no explica: el protagonista hace algo que antes no podía hacer.`,
+  cuento: `CUALIDADES DEL CUENTO
+- Unidad de efecto: un solo conflicto y una sola emoción dominante. Todo lo que no aporta a eso, sobra.
+- Empezá lo más tarde posible y terminá en cuanto el lector pueda completar el resto. El final tiene que cambiar el sentido del comienzo.
+- En una colección, cada cuento tiene voz y forma propias (uno en primera persona, otro casi todo diálogo, otro en cartas), con un hilo común discreto: un lugar, un objeto o un personaje que cruza de uno a otro.`,
+  serie: `CUALIDADES DE LA SERIE
+- Biblia de temporada: cada episodio respeta lo que se estableció antes (quién sabe qué, qué objeto está dónde) y suma una pieza al misterio mayor.
+- Los giros se ganan con información que el lector ya tenía.`,
+  ensayo: `CUALIDADES DEL ENSAYO
+- Una tesis que cuesta algo defender, no una obviedad. La objeción más fuerte aparece en el texto y se contesta de frente.
+- El pensamiento se ve avanzar: duda, retrocede, encuentra un caso que lo contradice. El estilo es de alguien que piensa en voz alta con rigor.
+- Una anécdota o imagen vuelve al final cargada de otro sentido.`,
+  divulgacion: `CUALIDADES DE LA DIVULGACIÓN
+- Cada capítulo responde una pregunta que el lector de verdad se haría, y la respuesta llega con una analogía exacta que se pueda repetir en una charla.
+- Precisión antes que efecto: si algo se discute, se dice. Nada de "los científicos descubrieron" sin decir qué y con qué límites.`,
+  thriller: `CUALIDADES DEL THRILLER
+- Plantar y cobrar: cada detalle útil aparece una vez antes de necesitarse. Un reloj o una fecha limita el tiempo del protagonista.
+- El antagonista tiene lógica y un interés comprensible. Lo que está en juego es concreto y personal.`,
+  comedia: `CUALIDADES DE LA COMEDIA
+- Una regla absurda sostenida con seriedad total. La escalada tiene orden: cada situación es un grado peor que la anterior.`,
+  biografia: `CUALIDADES DE LA BIOGRAFÍA NOVELADA
+- Cronología sin errores de fechas y edades. Cada etapa deja una marca visible en la siguiente.`,
+  tecnica: `CUALIDADES DEL LIBRO TÉCNICO
+- Cada ejemplo se puede reproducir paso a paso. Una sola terminología, definida la primera vez y usada igual después.`,
+  infantil: `CUALIDADES DEL TEXTO INFANTIL
+- Escrito para el oído: se lee en voz alta sin tropezar, con un ritmo que se puede marcar con las manos.`,
+};
+
 // Categoría del catálogo (o género elegido) → formato.
 _global.TIMELESS_FORMAT_FOR = {
   ficcion: 'novela', novela: 'novela', cuento: 'cuento', serie: 'serie', ensayo: 'ensayo', biografia: 'biografia',
@@ -244,7 +278,13 @@ OFICIO: LO QUE HACE HUMANO A UN TEXTO
 7. Un poco de desorden humano: una digresión breve, un chiste interno, un dato inútil que da verdad. Los personajes se equivocan, dicen lo que no deberían, no entienden al otro, se contradicen.
 8. Interioridad medida. Mostrá lo que piensa alguien con un gesto o una frase suelta, no con un párrafo que explica qué siente. El lector no es tonto.
 9. Cada capítulo termina en movimiento: una acción, una frase dicha, un objeto en una mano. Nunca con una reflexión, una moraleja ni con alguien que "comprendió" algo.
-10. Voz consistente. Elegí desde la primera línea quién narra (persona, tiempo, registro) y no lo cambies. Español rioplatense culto-coloquial, con voseo en los diálogos si el mundo es argentino; si el mundo es otro, la variante de ese lugar. Nunca un "español neutro" de manual.
+10. Voz consistente. Elegí desde la primera línea quién narra (persona, tiempo, registro) y no lo cambies.
+11. Registro natural, sin folclore. La narración va en español estándar cuidado, el de un buen novelista que no hace turismo con su propia lengua. El voseo solo aparece en diálogos de personajes que realmente hablan así, y no se mezcla con tuteo. La marca local se nota en cómo la gente habla de plata, de familia y de trabajo, nunca en una lista de palabras. Prohibido como decorado: che, boludo, pibe, laburo, guita, quilombo, bondi, morfar, mango, "re lindo", "dale", "¿viste?", y el catálogo de postal (mate, asado, fernet, dulce de leche, choripán, fútbol, Boca y River). Si el mundo es otro, mismo criterio. Nombrá un lugar una vez; no recites geografía ni nombres de calles para sonar auténtico.
+12. Subtexto. Los personajes casi nunca dicen lo que sienten ni lo que quieren: dicen otra cosa, cambian de tema, ofrecen comida, discuten por un objeto. El lector entiende lo que está debajo. Si un personaje explica su emoción en una oración completa, reescribilo.
+13. Causalidad. Cada escena es consecuencia de la anterior ("por eso", "pero", "entonces"), no una sucesión de "y después". Lo que se plantó tiene que cobrarse, y nada importante aparece sin haber sido preparado.
+14. Punto de vista disciplinado. El texto solo sabe lo que sabe quien lo cuenta en ese momento. No salgas de su cabeza sin motivo ni expliques lo que no puede ver.
+15. Motivos. Elegí dos o tres objetos o imágenes concretas que vuelven a lo largo de la obra y cambian de sentido cada vez que reaparecen. Eso, y no la explicación, es lo que da unidad.
+16. Continuidad. Respetá al pie de la letra los nombres, edades, fechas, lugares, objetos y lo que cada personaje sabe, según la biblia de la obra. No introduzcas personajes con nombre propio que el plan no prevea. Un nombre se escribe siempre igual.
 
 LISTA NEGRA (no aparece jamás)
 - La estructura "No era X. Era Y." y "no solo X, sino Y".
@@ -253,7 +293,7 @@ LISTA NEGRA (no aparece jamás)
 - Personificar lugares y objetos: la casa "se había encogido", el silencio "se instaló", el aire "se volvió espeso".
 - "Algo dentro de ella se rompió", "por primera vez en años", "una mezcla de X y Y", "el peso de…".
 - Transiciones prolijas ("Mientras tanto", "Al día siguiente"): saltá el tiempo con un corte.
-- Nombres de personaje de piloto automático (${_NOMBRES_GASTADOS}) y títulos como ${_TITULOS_GASTADOS}. Usá nombres y apellidos propios de la región, la edad y la clase social de cada personaje.
+- Nombres de personaje de piloto automático (${_NOMBRES_GASTADOS}) y títulos como ${_TITULOS_GASTADOS}. Usá nombres y apellidos verosímiles para el lugar, con edad y clase social propias de cada personaje, sin caricatura.
 - Resoluciones que cierran todo, moralejas, finales que explican lo que el personaje entendió.
 
 FORMA DE ENTREGA
@@ -279,7 +319,7 @@ _global.TIMELESS_PROMPTS = {
     const writer = _global.TIMELESS_WRITERS.find(w => w.id === writerId) || _global.TIMELESS_WRITERS[0];
     const format = _global.TIMELESS_FORMATS[formatId] || _global.TIMELESS_FORMATS.novela;
 
-    let system = `${_CRAFT_BASE}\n\n${format.guide}`;
+    let system = `${_CRAFT_BASE}\n\n${format.guide}${_QUALITY[formatId] ? '\n\n' + _QUALITY[formatId] : ''}`;
 
     if (writer && writer.id !== 'libre') {
       system += `\n\nVOZ DE REFERENCIA (influencia, no imitación)
@@ -407,13 +447,31 @@ ${planLines}
 
 CAPÍTULOS PREVIOS
 ${prev || '  (Este es el primero.)'}
-${params.previousText ? `\nFINAL DEL CAPÍTULO ANTERIOR (texto real; retomá desde acá con la misma voz, tiempo verbal y ritmo, sin repetirlo ni resumirlo):\n<<<\n${params.previousText}\n>>>\n` : ''}${params.editorNote ? `\nNOTA DEL EDITOR SOBRE UN INTENTO ANTERIOR DE ESTE CAPÍTULO (corregí exactamente esto en la nueva versión, sin mencionar que hubo un intento previo):\n${params.editorNote}\n` : ''}
+${params.continuity ? `\nBIBLIA DE CONTINUIDAD (hechos ya establecidos en los capítulos anteriores; no los contradigas ni cambies un nombre, edad, lugar u objeto)\n${params.continuity}\n` : ''}${params.previousText ? `\nFINAL DEL CAPÍTULO ANTERIOR (texto real; retomá desde acá con la misma voz, tiempo verbal y ritmo, sin repetirlo ni resumirlo):\n<<<\n${params.previousText}\n>>>\n` : ''}${params.editorNote ? `\nNOTA DEL EDITOR SOBRE UN INTENTO ANTERIOR DE ESTE CAPÍTULO (corregí exactamente esto en la nueva versión, sin mencionar que hubo un intento previo):\n${params.editorNote}\n` : ''}
 INSTRUCCIONES
 - Largo: entre ${format.words[0]} y ${format.words[1]} palabras.
 - Empezá directamente con el texto: ${chapterIndex === 0 ? 'con la acción ya en marcha, nunca con el clima ni con una presentación' : 'retomando el pulso del capítulo anterior, sin recapitular'}.
 - ${format.expository ? 'Abrí con la escena o el caso concreto y subí a la idea; cada párrafo tiene que ganarse el siguiente.' : 'Trabajá en escenas: alguien quiere algo, algo se lo impide, algo cambia. Dejá que el diálogo cargue información sin explicar.'}
 - ${isLast ? 'Es el último capítulo: cerrá el recorrido sin atar todos los cabos y sin explicar el sentido.' : 'Cerrá el capítulo en movimiento (acción, frase dicha u objeto), con una pregunta abierta distinta de la del capítulo anterior.'}
 - Solo el texto del capítulo: sin título, sin "Capítulo ${ch.index}", sin comentarios.`;
+  },
+
+  // ── Resumen de continuidad de un capítulo ya escrito ────────────
+  buildSummary(chapterText, chapterNumber, title) {
+    return `Sos el editor de continuidad de una obra. Leé el capítulo ${chapterNumber}${title ? ` ("${title}")` : ''} y escribí su ficha de continuidad en texto plano, sin adornos ni valoraciones, con estos encabezados:
+
+HECHOS: qué pasa, en orden, en 4 a 8 líneas.
+PERSONAJES: cada personaje que aparece, con nombre tal como se escribió, edad o dato de edad si se dio, y qué sabe o cree al terminar el capítulo.
+LUGARES Y OBJETOS: lugares y objetos con nombre propio o con papel en la trama, y dónde quedan.
+FECHAS Y TIEMPO: día, hora, estación o cantidad de tiempo transcurrido, si se mencionó.
+HILOS ABIERTOS: preguntas, promesas o pistas que el texto dejó sin resolver y que habrá que cobrar.
+
+Usá solo lo que está en el texto; no inventes. Máximo 250 palabras.
+
+TEXTO:
+<<<
+${String(chapterText).slice(0, 12000)}
+>>>`;
   },
 
   // ── BSC: evalúa la calidad ───────────────────────────────────────

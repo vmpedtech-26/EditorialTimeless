@@ -24,8 +24,10 @@ const L = require('./libro_lib');
     const text = L.fs.readFileSync(p, 'utf8').trim();
     const r = lintProse(text, { kind });
     if (!r.pass) problems.push(`el capítulo ${n} no aprueba el detector (${r.score}/100): corregilo con libro_revisar.js`);
+    if (!L.fs.existsSync(L.path.join(d, `cap-${L.pad(n)}.resumen.txt`))) problems.push(`falta la ficha de continuidad del capítulo ${n} (libro_prompt.js ${slug} resumen ${n})`);
     raw.push(text);
   }
+  { const { checkContinuity } = await L.lint(); const ref = JSON.stringify(outline) + JSON.stringify(enc); raw.forEach((t, k) => { const known = ref + raw.slice(0, k).join(' '); checkContinuity(t, known).filter(c => c.level === 'error').forEach(c => problems.push(`cap ${k + 1}: ${c.msg}`)); }); }
   // Control editorial: corrección, legal, arte y aprobación del comité (ficha.json).
   const fichaPath = L.path.join(d, 'ficha.json');
   if (!L.fs.existsSync(fichaPath)) problems.push('falta ficha.json (copiala desde libros/_plantilla/ficha.json y completala tras la revisión)');
