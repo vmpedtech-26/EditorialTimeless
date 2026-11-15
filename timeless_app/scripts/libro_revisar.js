@@ -21,7 +21,7 @@ const L = require('./libro_lib');
     const n = parseInt(f.match(/\d+/)[0], 10);
     if (only && n !== parseInt(only, 10)) continue;
     const txt = L.fs.readFileSync(L.path.join(d, f), 'utf8');
-    const r = lintProse(txt, { kind });
+    const r = lintProse(txt, { kind, words: [min, max] });
     const known = outlineTxt + ' ' + caps.filter(x => parseInt(x.match(/\d+/)[0], 10) < n).map(x => L.fs.readFileSync(L.path.join(d, x), 'utf8')).join(' ');
     for (const c of checkContinuity(txt, known)) {
       if (c.level === 'error') r.findings.push({ rule: 'continuidad', detail: c.msg, penalty: 10 }); else console.log(`  ⚠ cap ${n}: ${c.msg}`);

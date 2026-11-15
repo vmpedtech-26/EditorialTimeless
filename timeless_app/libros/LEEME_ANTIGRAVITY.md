@@ -76,3 +76,12 @@ Cada capítulo tiene su ficha de continuidad. Es lo que evita que cambien nombre
 
 ## Qué revisa el detector (además del estilo)
 Errores de redacción (espacios, signos desparejos, dequeísmo y queísmo, «habían» plural, muletillas), mezcla de voseo y tuteo, y argentinismos de decorado. Que pase el detector es el piso, no el techo: la lectura de un corrector humano sigue siendo el paso de Corrección de la ficha.
+
+## Reescribir un libro que ya está en el catálogo
+Los libros actuales (126) son esbozos de ~170 palabras por capítulo: hay que escribirlos de nuevo, no retocarlos.
+1. `node scripts/catalogo_exportar.js --lista` muestra todos con su extensión actual (solo lectura).
+2. `node scripts/catalogo_exportar.js <id>` (por ejemplo `fb2`) crea `libros/rev-<id>/` con el encargo en modo reemplazo, el texto viejo en `original/` y la ficha vacía.
+3. Completá `encargo.json` (`tone`; la premisa viene del catálogo) y seguí los pasos de arriba: plan, capítulos, revisión, fichas de continuidad, control editorial.
+4. `node scripts/libro_publicar.js rev-<id> --apply` **reemplaza** el libro conservando su id, portada y fecha de alta, y deja un respaldo del original en `../Backups/`. Mismas reglas: solo con la aprobación del usuario.
+5. Si el libro cambia de cantidad de capítulos, el progreso guardado de algún lector puede quedar apuntando a uno que no existe.
+Orden recomendado: primero `fb2` (La Memoria del Agua, el libro que muestra la portada del sitio); después un libro por formato. No hace falta reescribir los 126.

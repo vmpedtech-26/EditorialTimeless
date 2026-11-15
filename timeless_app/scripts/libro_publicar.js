@@ -22,7 +22,7 @@ const L = require('./libro_lib');
     const p = L.capFile(d, n);
     if (!L.fs.existsSync(p)) { problems.push(`falta el capítulo ${n}`); continue; }
     const text = L.fs.readFileSync(p, 'utf8').trim();
-    const r = lintProse(text, { kind });
+    const r = lintProse(text, { kind, words: fmt.words });
     if (!r.pass) problems.push(`el capítulo ${n} no aprueba el detector (${r.score}/100): corregilo con libro_revisar.js`);
     if (!L.fs.existsSync(L.path.join(d, `cap-${L.pad(n)}.resumen.txt`))) problems.push(`falta la ficha de continuidad del capítulo ${n} (libro_prompt.js ${slug} resumen ${n})`);
     raw.push(text);
@@ -37,7 +37,7 @@ const L = require('./libro_lib');
     const pend = open(f, '');
     if (pend.length) problems.push('ficha editorial incompleta: ' + pend.join(', '));
   }
-  if (!L.fs.existsSync(L.path.join(d, 'portada.jpg'))) problems.push('falta portada.jpg, la portada optimizada de 720 px (node scripts/libro_portada.js ' + slug + ' arma el encargo de arte)');
+  if (!enc.reemplaza && !L.fs.existsSync(L.path.join(d, 'portada.jpg'))) problems.push('falta portada.jpg, la portada optimizada de 720 px (node scripts/libro_portada.js ' + slug + ' arma el encargo de arte)');
   if (problems.length) { console.error('✘ No se puede publicar:\n - ' + problems.join('\n - ')); process.exit(1); }
 
   const html = raw.map(t => t.split('\n').map(p => p.trim()).filter(Boolean).map(p => `<p>${p.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`).join('\n'));
@@ -68,17 +68,34 @@ const L = require('./libro_lib');
     outline: { title: outline.title, chapters: outline.chapters.map(c => ({ title: c.title, arc: c.arc })) },
     ...(isKids ? { ageBadge: pick(['4-8 años', '6-10 años', '8-12 años']), collectionTitle: enc.genreLabel.toUpperCase(), coverAccent: accent.p, coverAccentMuted: accent.s } : {}),
   };
-  const id = `tl-${enc.cat}-${slug.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  const replacing = typeof enc.reemplaza === 'string' && enc.reemplaza;
+  const id = replacing ? enc.reemplaza : `tl-${enc.cat}-${slug.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   console.log(`✔ Validado: "${outline.title}" · ${total} capítulos · ${totalWords} palabras · ${pages} págs · id ${id}`);
   if (flag !== '--apply') return console.log('Simulacro: no se escribió nada. Revisá y corré de nuevo con --apply.');
 
-  if (!isKids) { const dest = L.path.join(__dirname, '..', 'assets', 'covers'); L.fs.mkdirSync(dest, { recursive: true }); L.fs.copyFileSync(L.path.join(d, 'portada.jpg'), L.path.join(dest, coverFile)); console.log('✔ Portada copiada a assets/covers/' + coverFile + ' (hay que subirla a git para que se vea en el sitio)'); }
+  if (!isKids && !replacing) { const dest = L.path.join(__dirname, '..', 'assets', 'covers'); L.fs.mkdirSync(dest, { recursive: true }); L.fs.copyFileSync(L.path.join(d, 'portada.jpg'), L.path.join(dest, coverFile)); console.log('✔ Portada copiada a assets/covers/' + coverFile + ' (hay que subirla a git para que se vea en el sitio)'); }
   const { initializeApp, cert } = require('firebase-admin/app');
   const { getFirestore, FieldValue } = require('firebase-admin/firestore');
   const sa = process.env.FIREBASE_SERVICE_ACCOUNT ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) : require('../serviceAccountKey.json');
   initializeApp({ credential: cert(sa) });
   const db = getFirestore();
-  if ((await db.collection('books').doc(id).get()).exists) { console.error(`✘ Ya existe books/${id}. Cambiá el nombre de la carpeta o borralo desde el panel de administración.`); process.exit(1); }
+  const cur = await db.collection('books').doc(id).get();
+  if (replacing) {
+    if (!cur.exists) { console.error(`✘ No existe books/${id} para reemplazar.`); process.exit(1); }
+    // Respaldo antes de tocar nada.
+    const bak = (await db.collection('books_full').doc(id).get()).data() || {};
+    const bdir = L.path.join(__dirname, '..', '..', 'Backups'); L.fs.mkdirSync(bdir, { recursive: true });
+    const bfile = L.path.join(bdir, `reescritura-${id}-${new Date().toISOString().slice(0, 10)}.json`);
+    L.fs.writeFileSync(bfile, JSON.stringify({ books: cur.data(), books_full: bak }, null, 1));
+    console.log('✔ Respaldo guardado en ' + bfile);
+    // Se conservan id, portada, insignias y fecha de alta: la biblioteca de los lectores no se rompe.
+    const { cover, badge, badgeText, createdAt, ...rest } = doc;
+    const keepCover = L.fs.existsSync(L.path.join(d, 'portada.jpg')) && !isKids ? { cover } : {};
+    await db.collection('books').doc(id).set({ ...rest, ...keepCover, rewrittenAt: FieldValue.serverTimestamp() }, { merge: true });
+    await db.collection('books_full').doc(id).set({ chapters: html, production: { voice: enc.writerId || 'libre', format: L.TIMELESS_FORMAT_FOR[enc.cat] || 'novela', rewritten: true } });
+    return console.log(`✔ Reescrito: books/${id} y books_full/${id}. Si cambió el número de capítulos, el progreso guardado de algún lector puede apuntar a uno que ya no existe.`);
+  }
+  if (cur.exists) { console.error(`✘ Ya existe books/${id}. Cambiá el nombre de la carpeta o borralo desde el panel de administración.`); process.exit(1); }
   await db.collection('books').doc(id).set({ ...doc, createdAt: FieldValue.serverTimestamp() });
   await db.collection('books_full').doc(id).set({ chapters: html, production: { voice: enc.writerId || 'libre', format: L.TIMELESS_FORMAT_FOR[enc.cat] || 'novela' } });
   console.log(`✔ Publicado: books/${id} y books_full/${id}`);

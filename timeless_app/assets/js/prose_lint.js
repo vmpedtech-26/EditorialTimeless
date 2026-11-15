@@ -51,6 +51,9 @@ export function lintProse(text, opts = {}) {
   const add = (rule, detail, penalty, sample) => findings.push({ rule, detail, penalty, ...(sample ? { sample } : {}) });
   if (wc < 40) return { score: 0, pass: false, wordCount: wc, findings: [{ rule: 'vacio', detail: 'Texto demasiado corto para evaluar.', penalty: 100 }] };
 
+  // 0. Largo: un capítulo que no llega a la extensión de su formato es un fragmento, no un capítulo.
+  if (Array.isArray(opts.words) && wc < opts.words[0] * 0.6) add('longitud', `Tiene ${wc} palabras y el formato pide entre ${opts.words[0]} y ${opts.words[1]}. Es un fragmento: desarrollá escenas completas.`, 40);
+
   // 1. Texto que habla de sí mismo o de la máquina: nunca debe llegar a un libro.
   const meta = clean.match(META_AI);
   if (meta) add('meta', `Aparece «${meta[0]}»: el texto habla de su propia producción. Debe ser solo literatura.`, 60, snippet(clean, meta.index));
