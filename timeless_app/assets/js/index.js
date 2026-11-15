@@ -336,7 +336,7 @@ function renderKidsGrid(books, offlineIds = new Set()) {
   if (!kidsGrid) return;
   
   if (!books.length) {
-    kidsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--ink-faint);">No hay obras infantiles en este momento.</div>';
+    kidsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--ink-faint);">Estamos preparando nuevas historias para esta sección.</div>';
     return;
   }
   
@@ -480,9 +480,9 @@ async function fetchLibrary(category = 'all') {
 
     if (books.length === 0 && !hadEditorial) {
       books = [...FALLBACK_BOOKS, ...KIDS_FALLBACK_BOOKS];
-    } else {
-      books = [...books, ...KIDS_FALLBACK_BOOKS];
     }
+    // Las tarjetas infantiles estáticas (kid1…kid_s15) no tienen texto en ningún lado:
+    // solo se muestran cuando no hay catálogo en Firestore (modo sin conexión).
     
     // Obtener recomendaciones personalizadas si hay usuario logueado (Pilar 3)
     if (currentUser && category === 'all') {
