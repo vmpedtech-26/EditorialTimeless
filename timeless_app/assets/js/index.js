@@ -461,7 +461,9 @@ async function fetchLibrary(category = 'all') {
 
     let q = collection(db, 'books');
     const editorialSnap = await getDocs(q);
-    let books = editorialSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Obras ocultas del catálogo (campo `hidden`): siguen existiendo, pero no se muestran.
+    const hadEditorial = !editorialSnap.empty;
+    let books = editorialSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(b => !b.hidden);
 
     if (currentUser) {
       const uq = query(collection(db, 'obras'), where('userId', '==', currentUser.uid));
@@ -476,7 +478,7 @@ async function fetchLibrary(category = 'all') {
       books = [...books, ...userBooks];
     }
 
-    if (books.length === 0) {
+    if (books.length === 0 && !hadEditorial) {
       books = [...FALLBACK_BOOKS, ...KIDS_FALLBACK_BOOKS];
     } else {
       books = [...books, ...KIDS_FALLBACK_BOOKS];

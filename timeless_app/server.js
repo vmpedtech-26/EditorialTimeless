@@ -894,7 +894,7 @@ app.post('/api/telemetry/bulk', authMiddleware, async (req, res) => {
 app.get('/api/recommendations', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.uid;
-    const catalog = await getCachedCatalog();
+    const catalog = (await getCachedCatalog()).filter(b => !b.hidden);
     
     // Perfil e intereses predeterminados
     let interests = ['ficcion', 'ensayo'];
