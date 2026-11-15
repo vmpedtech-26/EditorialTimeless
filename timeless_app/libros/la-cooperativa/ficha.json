@@ -16,5 +16,8 @@
     "aprobado": false,
     "aprobado_por": "",
     "fecha": ""
+  },
+  "marketing": {
+    "texto_ajustado_al_libro_final": false
   }
 }

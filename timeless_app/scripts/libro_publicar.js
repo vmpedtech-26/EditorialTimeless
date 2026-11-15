@@ -48,6 +48,8 @@ const L = require('./libro_lib');
   const accents = [{ p: '#e0a96d', s: '#c8945a' }, { p: '#84a98c', s: '#a3b18a' }, { p: '#fbc2eb', s: '#a6c1ee' }, { p: '#84c7d0', s: '#5a9ba6' }];
   const accent = pick(accents);
   const coverFile = `tl-${enc.cat}-${slug.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
+  const mkPath = L.path.join(d, 'marketing.json');
+  const mk = L.fs.existsSync(mkPath) ? JSON.parse(L.fs.readFileSync(mkPath, 'utf8')) : {};
   const doc = {
     title: outline.title,
     author: 'Timeless Editorial',
@@ -57,9 +59,9 @@ const L = require('./libro_lib');
     badge: 'new', badgeText: 'Nuevo',
     pages,
     duration: isKids ? `${minutes}min` : `${Math.floor(minutes / 60)}h ${minutes % 60}min`,
-    desc: outline.premise,
-    tagline: outline.premise.split('.')[0] + '.',
-    themes: outline.themes || [],
+    desc: mk.desc || outline.premise,
+    tagline: mk.tagline || outline.premise.split('.')[0] + '.',
+    themes: mk.temas || outline.themes || [],
     previewChapter: html[0].split('\n').slice(0, 3).join('\n'),
     outline: { title: outline.title, chapters: outline.chapters.map(c => ({ title: c.title, arc: c.arc })) },
     ...(isKids ? { ageBadge: pick(['4-8 años', '6-10 años', '8-12 años']), collectionTitle: enc.genreLabel.toUpperCase(), coverAccent: accent.p, coverAccentMuted: accent.s } : {}),
