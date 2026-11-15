@@ -35,6 +35,7 @@ const L = require('./libro_lib');
     const pend = open(f, '');
     if (pend.length) problems.push('ficha editorial incompleta: ' + pend.join(', '));
   }
+  if (!L.fs.existsSync(L.path.join(d, 'portada.jpg'))) problems.push('falta portada.jpg, la portada optimizada de 720 px (node scripts/libro_portada.js ' + slug + ' arma el encargo de arte)');
   if (problems.length) { console.error('✘ No se puede publicar:\n - ' + problems.join('\n - ')); process.exit(1); }
 
   const html = raw.map(t => t.split('\n').map(p => p.trim()).filter(Boolean).map(p => `<p>${p.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`).join('\n'));
@@ -46,12 +47,13 @@ const L = require('./libro_lib');
   const isKids = enc.cat === 'kids';
   const accents = [{ p: '#e0a96d', s: '#c8945a' }, { p: '#84a98c', s: '#a3b18a' }, { p: '#fbc2eb', s: '#a6c1ee' }, { p: '#84c7d0', s: '#5a9ba6' }];
   const accent = pick(accents);
+  const coverFile = `tl-${enc.cat}-${slug.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
   const doc = {
     title: outline.title,
     author: 'Timeless Editorial',
     cat: enc.cat,
     genre: enc.genreLabel,
-    cover: isKids ? pick(['🦊', '🐉', '🌙', '🦁', '🐢', '🦉', '🌊', '🍄', '🐋', '⭐']) : pick(['assets/cover_memoria.png', 'assets/cover_umbral.png', 'assets/cover_arquitecto.png', 'assets/cover_contemplacion.png']),
+    cover: isKids ? pick(['🦊', '🐉', '🌙', '🦁', '🐢', '🦉', '🌊', '🍄', '🐋', '⭐']) : `assets/covers/${coverFile}`,
     badge: 'new', badgeText: 'Nuevo',
     pages,
     duration: isKids ? `${minutes}min` : `${Math.floor(minutes / 60)}h ${minutes % 60}min`,
@@ -66,6 +68,7 @@ const L = require('./libro_lib');
   console.log(`✔ Validado: "${outline.title}" · ${total} capítulos · ${totalWords} palabras · ${pages} págs · id ${id}`);
   if (flag !== '--apply') return console.log('Simulacro: no se escribió nada. Revisá y corré de nuevo con --apply.');
 
+  if (!isKids) { const dest = L.path.join(__dirname, '..', 'assets', 'covers'); L.fs.mkdirSync(dest, { recursive: true }); L.fs.copyFileSync(L.path.join(d, 'portada.jpg'), L.path.join(dest, coverFile)); console.log('✔ Portada copiada a assets/covers/' + coverFile + ' (hay que subirla a git para que se vea en el sitio)'); }
   const { initializeApp, cert } = require('firebase-admin/app');
   const { getFirestore, FieldValue } = require('firebase-admin/firestore');
   const sa = process.env.FIREBASE_SERVICE_ACCOUNT ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) : require('../serviceAccountKey.json');

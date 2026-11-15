@@ -59,3 +59,10 @@ La publicación usa la cuenta de servicio local (`serviceAccountKey.json`). El l
 - Nombres de personajes propios de la región y la edad; nunca los de piloto automático (Elena, Mateo, Lucía…).
 - No asociar empresas, instituciones o personas reales con delitos o escándalos: inventar el nombre.
 - Los pilotos de referencia están en https://claude.ai/artifact/JgcHrkrEuBarfuf6bPvdnj
+
+## Portada (Arte)
+Cada libro de adultos lleva portada propia, en el estilo de casa (fotografía editorial, sobria, sin texto).
+1. Definí el motivo en `encargo.json` → `"portada"` (un solo objeto o escena, con paleta).
+2. `node scripts/libro_portada.js <nombre>` imprime el encargo de imagen. Generala con `antigravity_image` usando `assets/cover_memoria.png` como referencia de estilo y guardala en `libros/<nombre>/portada.png`.
+3. Revisá que no tenga texto, rostros ni marcas. Si falla, repetí. Después optimizala a 720×720 JPEG (calidad 88) como `libros/<nombre>/portada.jpg`; el PNG queda de original.
+4. `libro_publicar.js` exige `portada.jpg` y la copia a `assets/covers/`; hay que subir ese archivo a git junto con el libro. Los libros infantiles usan la tapa tipográfica del sitio, no portada de imagen.
