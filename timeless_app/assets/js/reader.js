@@ -793,14 +793,29 @@ async function claimGift(token) {
   }
 }
 
-function renderPreview() {
+async function renderPreview() {
   const ch = state.book.chapters[0];
   const container = $('reading-content');
 
   // El preview viene precalculado en el doc público (previewChapter) — nunca
   // desde el capítulo completo, que ya no llega al cliente sin suscripción.
   const previewParagraphs = (state.book.previewChapter || "").split('\n').filter(p => p.trim()).slice(0, 3);
-  const contentHtml = sanitizeChapterHtml(previewParagraphs.map(p => `<p>${p}</p>`).join(''));
+  let contentHtml = sanitizeChapterHtml(previewParagraphs.map(p => `<p>${p}</p>`).join(''));
+
+  // Capítulo 1 gratis: con sesión iniciada se pide completo (el servidor solo
+  // lo entrega para el índice 0 de obras publicadas). Si falla, queda el fragmento.
+  let fullFree = false;
+  if (!state.gift && auth.currentUser) {
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const r = await fetch(`/api/book/${state.bookId}/chunk/0`, { headers: { 'Authorization': `Bearer ${token}` } });
+      if (r.ok) {
+        const chunk = await r.json();
+        contentHtml = sanitizeChapterHtml(await decryptText(chunk.data, chunk.iv));
+        fullFree = true;
+      }
+    } catch (e) { console.warn('[Reader] Capítulo gratis no disponible, se muestra el fragmento:', e.message); }
+  }
 
   let ctaHtml = '';
   if (state.gift) {
@@ -817,8 +832,8 @@ function renderPreview() {
   } else {
     ctaHtml = `
       <div class="cta-card" style="border: 1px solid var(--gold-faint); background: rgba(28, 28, 26, 0.6); backdrop-filter: blur(10px);">
-        <h3 style="color: var(--gold); font-family: var(--font-serif); font-size: 22px;">Suscripción Requerida</h3>
-        <p style="margin: 10px 0 20px; line-height: 1.5; color: var(--text-secondary);">Esta obra es parte de la colección exclusiva de Timeless. Adquiere una suscripción anual para disfrutar de lectura ilimitada, tomar notas y personalizar tu experiencia.</p>
+        <h3 style="color: var(--gold); font-family: var(--font-serif); font-size: 22px;">${fullFree ? 'Seguí con el capítulo 2' : 'Suscripción Requerida'}</h3>
+        <p style="margin: 10px 0 20px; line-height: 1.5; color: var(--text-secondary);">${fullFree ? 'Terminaste el primer capítulo, que es gratis. Suscribite para leer el resto de la obra, tomar notas y personalizar tu lectura.' : 'Esta obra es parte de la colección exclusiva de Timeless. Adquiere una suscripción anual para disfrutar de lectura ilimitada, tomar notas y personalizar tu experiencia.'}</p>
         <button data-action="go-subscribe" class="btn-accept-invitation" style="background: var(--gold); color: #1C1C1A; font-weight: bold; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase;">
           Suscribirse por $89/año
         </button>
@@ -832,9 +847,9 @@ function renderPreview() {
       <h1 class="chapter-title">${escapeHtml(ch.title)}</h1>
       <div class="chapter-desc">${escapeHtml(ch.desc || "")}</div>
     </div>
-    <div class="reading-body font-${state.fontFamily} preview-mode">
+    <div class="reading-body font-${state.fontFamily}${fullFree ? '' : ' preview-mode'}">
       ${contentHtml}
-      <div class="preview-fade"></div>
+      ${fullFree ? '' : '<div class="preview-fade"></div>'}
     </div>
     <div class="invitation-cta">
       ${ctaHtml}

@@ -25,4 +25,5 @@ Borrador para aprobar. Nada se publica ni se paga sin tu visto bueno.
 ## Pendiente de vos
 - Cuentas y canales reales (Instagram, newsletter, dominio): no los puedo crear.
 - Presupuesto de pauta, si lo hay.
-- Decidir si el primer capítulo completo va gratis o solo el fragmento actual.
+- Decidido: el primer capítulo completo es gratis para cualquier lector con sesión iniciada (el servidor solo lo entrega para el capítulo 1 de obras publicadas).
+- Todavía a crear por vos: Instagram, newsletter y dominio.

@@ -471,6 +471,13 @@ async function chunkAccessMiddleware(req, res, next) {
     const decoded = await getAuth().verifyIdToken(authHeader.split('Bearer ')[1]);
     if (await checkPremium(decoded)) { req.user = decoded; return next(); }
 
+    // Capítulo 1 gratis: cualquier lector con sesión puede leer el primer capítulo
+    // de una obra publicada en el catálogo (no de borradores 'obras').
+    if (parseInt(req.params.index, 10) === 0) {
+      const pub = await getFirestore().collection('books').doc(req.params.id).get();
+      if (pub.exists) { req.user = decoded; return next(); }
+    }
+
     const giftSnap = await getFirestore().collection('gifts').doc(`gift_${req.params.id}_${decoded.uid}`).get();
     if (giftSnap.exists && giftSnap.data().claimed === true && giftSnap.data().bookId === req.params.id) {
       req.user = decoded;
