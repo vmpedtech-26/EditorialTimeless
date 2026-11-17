@@ -1,4 +1,4 @@
-const CACHE_NAME = 'timeless-v2';
+const CACHE_NAME = 'timeless-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

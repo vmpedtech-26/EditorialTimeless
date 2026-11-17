@@ -23,24 +23,23 @@
   {
     "id": "fb2",
     "cat": "ficcion",
-    "title": "La Memoria del Agua",
+    "title": "Se deja constancia",
     "author": "Timeless Editorial",
     "genre": "Ficción",
     "cover": "assets/cover_memoria.png",
     "badge": "new",
     "badgeText": "Nuevo",
-    "pages": 342,
-    "readTime": "8h 20min",
-    "chapters": 18,
-    "tagline": "Los muertos no se van. Se disuelven en el sistema de acueductos.",
-    "synopsis": "En una ciudad que comienza a olvidarse a sí misma, una archivista descubre que los recuerdos de los muertos persisten atrapados en el agua que bebe la gente. Cada vez que alguien llora, recuerda algo que no vivió. Claudia Iriarte teje una novela sobre el peso invisible de la memoria colectiva, la violencia silenciosa del olvido institucional y el amor que se filtra entre las grietas del concreto.",
+    "pages": 32,
+    "readTime": "36min",
+    "chapters": 5,
+    "tagline": "Tiene hasta el viernes para inventariar un sótano que van a triturar.",
+    "synopsis": "Ofelia Ledesma es archivista de la Dirección de Aguas y le quedan cinco días para catalogar un sótano de planillas antes de que lo vacíen. El lunes toma agua de la canilla del archivo y recuerda una cocina que nunca pisó. Sigue el rastro hasta la cisterna de la planta y hasta un libro de guardia al que le faltan tres hojas.",
     "themes": [
+      "Archivo",
       "Memoria",
-      "Pérdida",
-      "Ciudad",
-      "Duelo colectivo"
-    ],
-    "openingQuote": "«El agua tiene memoria. Es lo único que no podemos purificar del todo.»"
+      "Trabajo",
+      "Ciudad"
+    ]
   },
   {
     "id": "fb3",
