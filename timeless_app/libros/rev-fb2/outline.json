@@ -1,0 +1,137 @@
+{
+  "title": "Se deja constancia",
+  "premise": "Ofelia Ledesma, archivista de la Dirección de Aguas de una ciudad sobre el Paraná, tiene hasta el viernes para inventariar un sótano de planillas que van a triturar. Cuando empieza a recordar escenas que no vivió después de tomar agua de ciertas canillas, y su madre, que ya no la reconoce, empieza a hablarle con la voz de otro, entiende que la memoria de Rubén Ibáñez, un operario desaparecido en 1976, quedó en la cisterna norte de la planta. El libro de guardia que prueba su última noche está en la lista de expurgo.",
+  "themes": [
+    "lo que una institución decide archivar y lo que decide triturar",
+    "la memoria que se pierde en los vivos y se conserva en otra parte",
+    "un oficio hecho de paciencia y de papel"
+  ],
+  "setting": "Una ciudad de trescientos mil habitantes sobre el Paraná, en un otoño de sequía, con la bajante dejando a la vista los pilotes del viejo muelle. La Dirección de Aguas ocupa un edificio de 1938 con sótano; la planta potabilizadora, con sus dos cisternas, queda sobre la costanera, al norte.",
+  "narrator": "Tercera persona cercana a Ofelia, pasado, seca y con ironía de oficina. Lo imposible se cuenta con el mismo tono que un trámite: nadie se asombra más de lo necesario.",
+  "characters": [
+    {
+      "name": "Ofelia Ledesma",
+      "role": "archivista de la Dirección de Aguas desde hace once años, cincuenta y cuatro años, vive sola en un departamento de planta baja",
+      "want": "terminar el inventario del sótano antes del viernes y conservar el empleo hasta jubilarse",
+      "fear": "quedarse sin oficio y sin una madre que la nombre",
+      "arc": "de catalogar lo que otros dejaron a decidir qué se salva y salvarlo"
+    },
+    {
+      "name": "Amalia Ledesma",
+      "role": "la madre, ochenta y tres años, internada en la residencia Las Acacias con demencia, antes costurera",
+      "want": "(sin saberlo) que alguien oiga lo que dice con la voz de otro",
+      "fear": "no se sabe",
+      "arc": "habla como Rubén Ibáñez cuando toma el agua de la cisterna norte"
+    },
+    {
+      "name": "Hernán Quiroga",
+      "role": "ingeniero, jefe de la Dirección de Aguas, cuarenta y cinco años",
+      "want": "vaciar el sótano y digitalizar lo que se pueda antes de la auditoría del viernes",
+      "fear": "que la auditoría encuentre papeles que nadie quiere explicar",
+      "arc": "no cambia: obedece una orden que no firmó"
+    },
+    {
+      "name": "Celestino Pared",
+      "role": "operario jubilado de la planta potabilizadora, setenta y ocho años",
+      "want": "que alguien lea el libro de guardia de la noche del 24 de marzo de 1976",
+      "fear": "hablar y que lo traten de viejo confundido",
+      "arc": "de callar cuarenta y nueve años a firmar un testimonio"
+    },
+    {
+      "name": "Rubén Ibáñez",
+      "role": "operario de la planta, veintinueve años, desaparecido en la madrugada del 25 de marzo de 1976",
+      "want": "(en la memoria que quedó en el agua) volver a su casa antes de que amanezca",
+      "fear": "que no lo busquen",
+      "arc": "se lo conoce solo por lo que el agua trae"
+    },
+    {
+      "name": "Silvia Ibáñez",
+      "role": "hija de Rubén, cuarenta y nueve años, costurera, vive en el barrio de la costanera",
+      "want": "saber qué pasó con su padre sin pelearse con nadie",
+      "fear": "enterarse de algo peor que no saber",
+      "arc": "recibe el libro de guardia y lo lee en voz alta"
+    }
+  ],
+  "chapters": [
+    {
+      "index": 1,
+      "title": "Expurgo",
+      "arc": "Ofelia recibe la orden de inventariar y entregar el sótano para triturar el viernes, y esa tarde, tomando agua de la canilla del archivo, recuerda una cocina y una voz que no son suyas.",
+      "key_events": [
+        "Quiroga da la orden con fecha",
+        "la caja 14 trae planillas de 1976",
+        "el vaso de agua de la canilla del archivo",
+        "la cocina con olor a jabón y una radio"
+      ],
+      "scene_goal": "empezar el inventario y terminarlo en cinco días",
+      "obstacle": "la fecha, el polvo y una memoria ajena que le interrumpe la lectura",
+      "turn": "Ofelia deja de tomar agua del archivo y anota en el inventario lo que recordó",
+      "hook": "Ofelia escribe en la planilla, en la columna de observaciones, «olor a jabón de cocina» y la tacha con una sola raya",
+      "narrative_function": "planteamiento"
+    },
+    {
+      "index": 2,
+      "title": "Muestras",
+      "arc": "Ofelia lleva frascos de agua de distintas canillas a su departamento y prueba qué recuerda con cada uno; en la residencia, su madre toma de uno y la llama Rubén.",
+      "key_events": [
+        "siete frascos rotulados",
+        "solo el de la cisterna norte trae recuerdos",
+        "Amalia toma un poco y dice «Rubén, la guardia termina a las seis»",
+        "Ofelia anota la frase"
+      ],
+      "scene_goal": "averiguar de dónde viene el agua que recuerda",
+      "obstacle": "su propia incredulidad y la visita limitada de la residencia",
+      "turn": "Ofelia sabe que la memoria viene de la planta y que su madre la oye",
+      "hook": "Ofelia le pregunta a su madre quién es Rubén y su madre contesta que se le va a enfriar la comida",
+      "narrative_function": "incidente_desencadenante"
+    },
+    {
+      "index": 3,
+      "title": "Libro de guardia",
+      "arc": "En la caja 14 Ofelia encuentra el libro de guardia de la planta de 1976 con tres hojas arrancadas; Celestino Pared, el operario jubilado, la reconoce en la calle y le dice qué falta.",
+      "key_events": [
+        "el libro de guardia está en la lista de expurgo",
+        "faltan las hojas del 24 al 26 de marzo",
+        "Celestino la espera a la salida y la lleva a un bar",
+        "Celestino dice el nombre de Rubén Ibáñez"
+      ],
+      "scene_goal": "entender qué falta en el libro de guardia",
+      "obstacle": "el expurgo está marcado para el viernes y Celestino no quiere hablar en voz alta",
+      "turn": "Ofelia entiende que la memoria del agua es la de un operario desaparecido",
+      "hook": "Celestino le da una llave de la planta y dice que la cisterna norte se limpia los jueves a la noche",
+      "narrative_function": "desarrollo"
+    },
+    {
+      "index": 4,
+      "title": "Cisterna norte",
+      "arc": "Ofelia entra de noche a la planta con la llave de Celestino, bebe de la cisterna y recuerda la última guardia de Rubén Ibáñez; Quiroga la encuentra y le exige el libro.",
+      "key_events": [
+        "la planta de noche, la bajante visible",
+        "Ofelia bebe y recuerda la madrugada del 25 de marzo",
+        "Quiroga aparece con el vigilador",
+        "Ofelia guarda el libro de guardia en la cartera y no se lo entrega"
+      ],
+      "scene_goal": "entrar a la cisterna y saber qué pasó en esa guardia",
+      "obstacle": "el vigilador, Quiroga y la memoria que la desborda",
+      "turn": "Ofelia se queda con el libro y con la memoria completa de esa noche",
+      "hook": "Ofelia le dice a Quiroga que el inventario está terminado salvo una caja y cierra la cartera",
+      "narrative_function": "clímax"
+    },
+    {
+      "index": 5,
+      "title": "Viernes",
+      "arc": "El viernes se tritura el sótano; Ofelia lleva el libro de guardia a Silvia Ibáñez y lo lee en voz alta en una cocina que reconoce.",
+      "key_events": [
+        "la trituradora en el patio",
+        "Ofelia presenta el inventario con una caja menos",
+        "Silvia la recibe en una cocina con olor a jabón y una radio",
+        "Ofelia lee en voz alta la entrada del 24 de marzo"
+      ],
+      "scene_goal": "entregar el libro de guardia a la hija de Rubén",
+      "obstacle": "Quiroga la espera en el edificio y Silvia no quiere saber",
+      "turn": "Ofelia ya no tiene el libro; Silvia lo tiene",
+      "hook": "Silvia pone la pava en el fuego, abre el libro por la primera hoja y le pide a Ofelia que siga leyendo",
+      "narrative_function": "resolución"
+    }
+  ]
+}

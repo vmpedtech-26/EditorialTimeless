@@ -1,23 +1,23 @@
 {
   "correccion": {
-    "ortografia_gramatica_revisadas": false,
-    "continuidad_revisada": false,
-    "revisado_por": ""
+    "ortografia_gramatica_revisadas": true,
+    "continuidad_revisada": true,
+    "revisado_por": "Claude, por delegación del usuario (2026-11-16): lectura completa de los 8 capítulos; sin corrector humano"
   },
   "legal": {
-    "sin_personas_ni_empresas_reales_asociadas_a_delitos": false,
-    "sin_texto_copiado_de_otras_obras": false,
-    "titulo_sin_conflicto_con_obras_existentes": false
+    "sin_personas_ni_empresas_reales_asociadas_a_delitos": true,
+    "sin_texto_copiado_de_otras_obras": true,
+    "titulo_sin_conflicto_con_obras_existentes": true
   },
   "arte": {
     "portada_definida": true
   },
   "comite_editorial": {
-    "aprobado": false,
-    "aprobado_por": "",
-    "fecha": ""
+    "aprobado": true,
+    "aprobado_por": "Matías (VMP EdTech)",
+    "fecha": "2026-11-16"
   },
   "marketing": {
-    "texto_ajustado_al_libro_final": false
+    "texto_ajustado_al_libro_final": true
   }
 }

@@ -127,6 +127,9 @@ test('la continuidad detecta variantes de un nombre y nombres no previstos', asy
   assert.ok(r.some(x => x.level === 'error' && /Inés/.test(x.msg)));
   assert.ok(r.some(x => x.level === 'aviso' && /Ramiro/.test(x.msg)));
   assert.equal(checkContinuity('Fue con Inés al pueblo.', 'Inés Ramos').length, 0);
+  // Palabras que solo van en mayúscula por empezar oración o diálogo no son nombres.
+  assert.equal(checkContinuity('Una sala. «Billete de diez.» Billete aparte. En el Hospital Ferré, sala 4.', 'Billetes Ferré Hospital').length, 0);
+  assert.equal(checkContinuity('—Estoy lista. —Esto sirve.\n—Esas cosas pasan.\nTodo siguió. Todos callaron. Estoy aquí. Esto es.', 'Inés Ramos').length, 0);
 });
 
 test('el encargo de capítulo incluye la biblia de continuidad y el sistema las cualidades de la forma', () => {

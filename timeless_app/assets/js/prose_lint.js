@@ -168,11 +168,11 @@ export function lintProse(text, opts = {}) {
 export function checkContinuity(text, known) {
   const clean = String(text || '').replace(/<[^>]+>/g, ' ');
   const ref = String(known || '');
-  const nameRe = /(?<![.!?…¿¡—"«]\s)(?<!^)\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b/g;
+  const nameRe = /(?<!(?:^|\n|[.!?…¿¡—"«»:(]\s*|\p{L}))([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})(?!\p{L})/gu;
   const STOPN = new Set(['Pero', 'Cuando', 'Entonces', 'Después', 'Mientras', 'Aunque', 'Como', 'Porque', 'Todo', 'Nada', 'Algo', 'Nadie', 'Tal', 'Así', 'Ahora', 'Luego', 'Siempre', 'Nunca', 'Aquí', 'Allí', 'Dios', 'Señor', 'Señora', 'Doña', 'Don']);
   const counts = {};
   for (const m of clean.matchAll(nameRe)) { if (!STOPN.has(m[1])) counts[m[1]] = (counts[m[1]] || 0) + 1; }
-  const refNames = new Set([...ref.matchAll(/\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b/g)].map(m => m[1]));
+  const refNames = new Set([...ref.matchAll(/(?<!\p{L})([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})(?!\p{L})/gu)].map(m => m[1]));
   const lev = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
   const out = [];
   for (const [n, c] of Object.entries(counts)) {
