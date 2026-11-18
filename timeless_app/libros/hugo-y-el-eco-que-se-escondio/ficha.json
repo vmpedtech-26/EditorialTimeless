@@ -1,0 +1,23 @@
+{
+  "correccion": {
+    "ortografia_gramatica_revisadas": true,
+    "continuidad_revisada": true,
+    "revisado_por": "Claude, por delegación del usuario (2026-11-17): lectura completa de los 3 capítulos y correcciones de continuidad; sin corrector humano"
+  },
+  "legal": {
+    "sin_personas_ni_empresas_reales_asociadas_a_delitos": true,
+    "sin_texto_copiado_de_otras_obras": true,
+    "titulo_sin_conflicto_con_obras_existentes": true
+  },
+  "arte": {
+    "portada_definida": true
+  },
+  "comite_editorial": {
+    "aprobado": true,
+    "aprobado_por": "Matías (VMP EdTech), por instrucción de publicar",
+    "fecha": "2026-11-18"
+  },
+  "marketing": {
+    "texto_ajustado_al_libro_final": true
+  }
+}

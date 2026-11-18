@@ -1,0 +1,19 @@
+{
+  "title": "Doña Fermina y el huevo cuadrado",
+  "premise": "En la chacra La Querencia el gallinero está en una cuesta y todos los huevos se escapan rodando hasta la zanja. Doña Fermina, una gallina colorada, pone un día un huevo cuadrado que no rueda ni a empujones, y todo el corral opina qué hay que hacer con él, hasta que llega una tormenta.",
+  "themes": ["lo raro que resulta útil", "la vergüenza de ser distinta", "un corral con muchas opiniones"],
+  "setting": "La Querencia, una chacra chica del sur de Santa Fe, con gallinero en una cuesta que baja hasta una zanja de agua, un tanque australiano, un molino y un tractor viejo. Es octubre y hay viento.",
+  "narrator": "Tercera persona, pasado, tono de cuentacuentos de corral; frases cortas, sonidos de animales y un estribillo que repiten todos: «Un huevo es redondo, y lo redondo rueda».",
+  "characters": [
+    { "name": "Doña Fermina", "role": "gallina colorada, la que más huevos pone de La Querencia", "want": "que ningún huevo suyo se pierda en la zanja", "fear": "que los demás se rían de su huevo cuadrado", "arc": "deja de esconder el huevo y lo usa" },
+    { "name": "Clemente", "role": "el gallo, canta a las cinco aunque no haga falta", "want": "que todo sea como siempre", "fear": "lo que nunca se vio", "arc": "es el que más opina y el que más se sorprende" },
+    { "name": "Casimira", "role": "la pata, nada en el tanque australiano", "want": "chismear", "fear": "perderse algo", "arc": "no cambia" },
+    { "name": "Chacho", "role": "el perro ovejero, viejo y con una oreja caída", "want": "dormir", "fear": "el trueno", "arc": "ayuda a empujar" },
+    { "name": "don Aurelio", "role": "el chacarero, recoge los huevos con un canasto", "want": "juntar una docena", "fear": "las tormentas de octubre", "arc": "se rasca la cabeza" }
+  ],
+  "chapters": [
+    { "index": 1, "title": "Lo redondo rueda", "arc": "Todas las mañanas los huevos de La Querencia se van rodando cuesta abajo y doña Fermina corre a atajarlos; una mañana pone uno cuadrado que se queda quieto.", "key_events": ["el estribillo del corral", "los huevos rodando hasta la zanja", "el huevo cuadrado"], "scene_goal": "atajar los huevos antes de que lleguen a la zanja", "obstacle": "la cuesta y la prisa", "turn": "pone un huevo que no rueda", "hook": "El huevo cuadrado se quedó donde estaba, bien quieto, mientras los demás huevos bajaban rodando a la zanja", "narrative_function": "planteamiento" },
+    { "index": 2, "title": "Todos opinan", "arc": "Clemente, Casimira y Chacho opinan sobre el huevo; Fermina intenta esconderlo y después redondearlo sentándose encima; don Aurelio lo mira y se rasca la cabeza.", "key_events": ["Clemente dice que no es un huevo", "Casimira lo cuenta a todo el corral", "Fermina intenta que ruede", "el viento sube"], "scene_goal": "que el huevo se parezca a los otros", "obstacle": "no cede ni a empujones", "turn": "el cielo se pone negro y la lluvia viene a bajar la cuesta", "hook": "Un trueno largo; Chacho se mete debajo del tractor", "narrative_function": "desarrollo" },
+    { "index": 3, "title": "La tormenta de octubre", "arc": "Llueve, la cuesta se vuelve barro y los huevos redondos empiezan a bajar; el huevo cuadrado, puesto al pie de la cuesta, los ataja.", "key_events": ["los huevos ruedan en el barro", "Fermina arrastra el cuadrado con Chacho", "los huevos se frenan contra el cuadrado", "pasa la tormenta, sale el sol"], "scene_goal": "salvar los huevos", "obstacle": "el barro y la pendiente", "turn": "el corral entero reconoce al huevo cuadrado", "hook": "Veintiún días después, del huevo cuadrado salió un pollito amarillo redondo, y se fue rodando de contento", "narrative_function": "resolución" }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "title": "El gran estornudo de Dante",
+  "premise": "Dante Sosa tiene seis años y un estornudo tan grande que levanta sombreros, manteles y hasta la fila de patos de la plaza. Mañana es el acto del jardín y la señorita Marta pidió que nadie estornude durante el himno.",
+  "themes": ["un cuerpo que no obedece", "la vergüenza que se vuelve fiesta", "el abuelo que sabe un truco"],
+  "setting": "Un barrio de casas bajas de Córdoba, con una plaza que tiene un laguito de patos y un jardín de infantes que se llama Los Teros. Es septiembre y mañana se hace el acto de primavera.",
+  "narrator": "Tercera persona, pasado, voz de quien cuenta en voz alta: frases cortas, un estribillo que vuelve («Ah… ah… ah…») y sonidos.",
+  "characters": [
+    { "name": "Dante Sosa", "role": "nene de seis años, sala de cinco del jardín Los Teros", "want": "pasar el acto sin estornudar durante el himno", "fear": "que todos se rían de él y que la seño se enoje", "arc": "descubre que hay una cosa que nunca le pasa cuando canta fuerte" },
+    { "name": "Nino Sosa", "role": "el abuelo, jubilado, lleva a Dante a la plaza con el mate", "want": "que su nieto esté tranquilo", "fear": "que se le vuele el sombrero otra vez", "arc": "no cambia: es el que sabe cantar mientras toma el mate" },
+    { "name": "Marta Quinteros", "role": "la seño de la sala de cinco", "want": "un acto prolijo", "fear": "que se le caiga la guirnalda de banderitas", "arc": "se ríe al final" },
+    { "name": "Ferrari", "role": "un vecino de la plaza con sombrero de paja", "want": "tomar el sol tranquilo", "fear": "estornudos", "arc": "recupera el sombrero del laguito" }
+  ],
+  "chapters": [
+    { "index": 1, "title": "Ah… ah… ah…", "arc": "En la plaza, un estornudo de Dante se lleva el sombrero de don Ferrari y despeina a los patos; esa noche llega la nota de la seño sobre el himno.", "key_events": ["el estornudo vuela el sombrero", "Dante canta Arroz con leche con los patos y no estornuda", "la nota de la seño"], "scene_goal": "Dante quiere tomar la leche con facturas en paz", "obstacle": "el estornudo se le viene justo cuando pasan los patos", "turn": "sabe que mañana tiene que cantar el himno sin estornudar", "hook": "En la cama, con la nota debajo de la almohada, la nariz le hace cosquillas: ah… ah…", "narrative_function": "planteamiento" },
+    { "index": 2, "title": "Tres maneras de no estornudar", "arc": "Dante prueba tres trucos para aguantar el estornudo; ninguno sirve para el himno.", "key_events": ["taparse la nariz con los dedos hace que le silben los oídos", "aguantar la respiración lo pone colorado como tomate", "el truco del abuelo, el dedo bajo la nariz, sirve pero necesita la mano del corazón"], "scene_goal": "encontrar un truco que sirva con la mano en el corazón", "obstacle": "el himno se canta con la mano derecha en el corazón y la izquierda con la banderita", "turn": "llega el día del acto y no tiene ninguno", "hook": "En la fila del patio, mientras suena el primer acorde del piano, la nariz empieza: ah…", "narrative_function": "desarrollo" },
+    { "index": 3, "title": "El himno", "arc": "Dante canta el himno a todo pulmón; no estornuda mientras canta; el estornudo llega en el silencio de después y levanta todas las banderitas.", "key_events": ["canta fuerte y la cosquilla no encuentra lugar", "el himno termina y la sala queda en silencio", "el estornudo llega y las banderitas vuelan"], "scene_goal": "llegar al final del himno", "obstacle": "la cosquilla espera en cada pausa", "turn": "el estornudo sale cuando ya no importa y la seño se ríe", "hook": "El sombrero de don Ferrari, que había venido a ver el acto, aterrizó en la falda de la seño", "narrative_function": "resolución" }
+  ]
+}

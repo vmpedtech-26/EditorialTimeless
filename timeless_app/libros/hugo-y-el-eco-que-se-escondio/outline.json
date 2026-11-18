@@ -1,0 +1,18 @@
+{
+  "title": "Hugo y el eco que se escondió",
+  "premise": "Todas las tardes, Hugo grita desde el mirador y el eco de la Pared Grande le contesta. La mañana de la primera nevada, el eco no contesta. Hugo sale a buscarlo por el arroyo, el pinar y la cueva, con un poco de miedo, hasta que da con el único lugar donde el viento barrió la nieve.",
+  "themes": ["lo que se esconde bajo la nieve", "un miedo que se atraviesa de a poco", "hablarle a algo que no se ve"],
+  "setting": "Rincón Chico, un pueblito de la cordillera neuquina de unas cuarenta casas con estufa a leña, un arroyo que baja del cerro, un pinar y una pared de roca al otro lado del valle que le llaman la Pared Grande. Es mayo y está por nevar.",
+  "narrator": "Tercera persona, pasado, tono sereno de cuento antes de dormir; frases cortas, sonidos y la repetición del eco que devuelve el final de las palabras.",
+  "characters": [
+    { "name": "Hugo Mansilla", "role": "nene de ocho años, vive con su abuela", "want": "que el eco le conteste como siempre", "fear": "la cueva oscura y haber espantado al eco", "arc": "va a buscar lo que le falta en vez de esperar" },
+    { "name": "Nilda Mansilla", "role": "la abuela, teje gorros de lana en la cocina a leña", "want": "que el nieto no pase frío", "fear": "que se enferme", "arc": "no cambia: le da el gorro de lana" },
+    { "name": "don Cirilo", "role": "vecino viejo, arriero, siempre con el mate", "want": "contar historias", "fear": "ninguno", "arc": "da la pista de la nieve" },
+    { "name": "Truco", "role": "el perro de Hugo, mestizo, orejas paradas", "want": "ir adelante", "fear": "los pájaros grandes", "arc": "acompaña" }
+  ],
+  "chapters": [
+    { "index": 1, "title": "La Pared Grande", "arc": "Hugo le grita al eco desde el mirador cada tarde; el gorro de lana de la abuela se come sus gritos; la noche antes de nevar, el eco contesta fuerte; a la mañana cae la nieve y no contesta.", "key_events": ["el eco devuelve la última sílaba", "el gorro de lana se come el grito", "la Pared Grande tiene arriba una peña pelada donde el viento no deja nieve", "primera nevada"], "scene_goal": "gritarle al eco como todas las tardes", "obstacle": "esta vez no contesta", "turn": "Hugo decide ir a buscarlo", "hook": "Hugo se puso las botas, agarró el gorro de lana y le dijo a Truco: vamos", "narrative_function": "planteamiento" },
+    { "index": 2, "title": "Tres lugares", "arc": "Hugo busca al eco en el arroyo, en el pinar y en la boca de una cueva; en la cueva siente miedo; don Cirilo le dice dónde dejar de buscar.", "key_events": ["el arroyo no devuelve nada, solo corre", "el pinar se come el grito con la nieve en las ramas", "la cueva oscura le devuelve otra voz que no le gusta", "don Cirilo: la nieve nueva es una frazada"], "scene_goal": "encontrar al eco", "obstacle": "no está donde lo busca", "turn": "entiende que la nieve apaga lo que le grita", "hook": "Hugo levantó la vista a la parte de arriba de la Pared Grande, donde la roca estaba pelada y oscura", "narrative_function": "desarrollo" },
+    { "index": 3, "title": "La peña pelada", "arc": "Hugo y Truco suben hasta la peña pelada donde no hay nieve; Hugo grita y el eco contesta; se sientan a hablar con él hasta que anochece.", "key_events": ["la subida con el viento", "el primer grito", "el eco contesta", "baja con el gorro puesto"], "scene_goal": "llegar a la peña", "obstacle": "el viento, el frío y el miedo a las alturas", "turn": "el eco contesta y Hugo ya sabe dónde buscarlo", "hook": "Abajo se prendió la luz de la cocina; Hugo gritó chau y el eco contestó au, au, au", "narrative_function": "resolución" }
+  ]
+}

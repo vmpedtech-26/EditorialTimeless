@@ -1,0 +1,20 @@
+{
+  "title": "El domingo que no se terminaba",
+  "premise": "Un domingo de otoño en Rosario, a las seis y cincuenta y nueve de la tarde, el reloj de la cocina se detiene y el sol se queda quieto sobre la terraza. Todos lo disfrutan hasta que se dan cuenta de que ya hicieron todo lo del domingo tres veces. Fina, de siete años, sube a la azotea y encuentra por qué.",
+  "themes": ["despedirse de lo que uno quiere", "el domingo a la tarde", "las costumbres chicas de una familia"],
+  "setting": "Una casa con patio, parra y escalera caracol a la azotea en el barrio Echesortu, en Rosario. Es un domingo de abril. Pasa un heladero en bicicleta con campanita, el vecino de al lado escucha la radio con el partido.",
+  "narrator": "Tercera persona, pasado, tono de cuento antes de dormir: oraciones cortas, olores y cosas de la casa, repeticiones suaves.",
+  "characters": [
+    { "name": "Josefina Marchetti (Fina)", "role": "nena de siete años, segundo grado", "want": "que el domingo no se termine", "fear": "el lunes, la mochila lista sobre la silla", "arc": "descubre que el domingo se va cuando uno lo despide" },
+    { "name": "Chela Marchetti", "role": "la abuela paterna, cocina los domingos", "want": "que la mesa esté llena", "fear": "que se enfríe la comida", "arc": "le da las gracias a la mesa cuando se levantan" },
+    { "name": "Ariel Marchetti", "role": "papá, taxista", "want": "dormir la siesta", "fear": "llegar tarde al turno del lunes", "arc": "se queda dormido tres veces" },
+    { "name": "Verónica Marchetti", "role": "mamá, maestra de música", "want": "ordenar la ropa de la semana", "fear": "no llegar a planchar", "arc": "plancha la misma camisa tres veces" },
+    { "name": "Mostaza", "role": "el gato naranja de la casa", "want": "el sol en el patio", "fear": "ninguno", "arc": "siempre está en el lugar tibio" },
+    { "name": "don Tito", "role": "el heladero de la bicicleta con campanita", "want": "vender", "fear": "que se derrita", "arc": "pasa tres veces por la misma esquina" }
+  ],
+  "chapters": [
+    { "index": 1, "title": "Las seis y cincuenta y nueve", "arc": "Un domingo perfecto en la casa de los Marchetti: mate, comida de la abuela, siesta, patio; y la costumbre de dar las gracias a lo que termina; a las seis y cincuenta y nueve el reloj se queda quieto.", "key_events": ["la abuela Chela le da las gracias a la mesa", "el reloj de la cocina marca las seis cincuenta y nueve", "el sol se queda quieto"], "scene_goal": "que el domingo dure un poco más", "obstacle": "a las siete hay que bañarse y preparar la mochila", "turn": "el reloj se detiene", "hook": "El reloj de la cocina hizo tic y no hizo tac", "narrative_function": "planteamiento" },
+    { "index": 2, "title": "Tres veces el mismo domingo", "arc": "Todos disfrutan; después la merienda, la siesta y la plancha se repiten tres veces; el heladero pasa tres veces; nadie puede irse a dormir porque no se hace de noche; Fina se da cuenta de que algo falta.", "key_events": ["papá se duerme tres veces", "mamá plancha la misma camisa", "don Tito pasa tres veces", "Mostaza sigue en el mismo rayito de sol"], "scene_goal": "que alguien note qué pasa", "obstacle": "todos están cómodos y nadie quiere cortar", "turn": "Fina recuerda lo que hace la abuela con las cosas que se terminan", "hook": "Fina subió la escalera caracol hasta la azotea", "narrative_function": "desarrollo" },
+    { "index": 3, "title": "Gracias, domingo", "arc": "En la azotea, Fina encuentra al domingo tendido como un gran animal tibio sobre el tanque de agua; le da las gracias y lo despide; el sol baja y el reloj marca las siete.", "key_events": ["el domingo huele a pan tostado y ropa planchada", "Fina le da las gracias", "el domingo se levanta y se va", "el reloj sigue: tac"], "scene_goal": "despedir al domingo", "obstacle": "le da pena", "turn": "el domingo se va y llega la noche", "hook": "Abajo, la abuela Chela, que ya había levantado la mesa, le dio las gracias a la silla", "narrative_function": "resolución" }
+  ]
+}

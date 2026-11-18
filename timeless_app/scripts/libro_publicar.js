@@ -37,7 +37,7 @@ const L = require('./libro_lib');
     const pend = open(f, '');
     if (pend.length) problems.push('ficha editorial incompleta: ' + pend.join(', '));
   }
-  if (!enc.reemplaza && !L.fs.existsSync(L.path.join(d, 'portada.jpg'))) problems.push('falta portada.jpg, la portada optimizada de 720 px (node scripts/libro_portada.js ' + slug + ' arma el encargo de arte)');
+  if (!enc.reemplaza && enc.cat !== 'kids' && !L.fs.existsSync(L.path.join(d, 'portada.jpg'))) problems.push('falta portada.jpg, la portada optimizada de 720 px (node scripts/libro_portada.js ' + slug + ' arma el encargo de arte)');
   if (problems.length) { console.error('✘ No se puede publicar:\n - ' + problems.join('\n - ')); process.exit(1); }
 
   const html = raw.map(t => t.split('\n').map(p => p.trim()).filter(Boolean).map(p => `<p>${p.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`).join('\n'));
@@ -57,7 +57,7 @@ const L = require('./libro_lib');
     author: 'Timeless Editorial',
     cat: enc.cat,
     genre: enc.genreLabel,
-    cover: isKids ? pick(['🦊', '🐉', '🌙', '🦁', '🐢', '🦉', '🌊', '🍄', '🐋', '⭐']) : `assets/covers/${coverFile}`,
+    cover: isKids ? (mk.emoji || pick(['🦊', '🐉', '🌙', '🦁', '🐢', '🦉', '🌊', '🍄', '🐋', '⭐'])) : `assets/covers/${coverFile}`,
     badge: 'new', badgeText: 'Nuevo',
     pages,
     duration: isKids ? `${minutes}min` : `${Math.floor(minutes / 60)}h ${minutes % 60}min`,
@@ -66,7 +66,7 @@ const L = require('./libro_lib');
     themes: mk.temas || outline.themes || [],
     previewChapter: html[0].split('\n').slice(0, 3).join('\n'),
     outline: { title: outline.title, chapters: outline.chapters.map(c => ({ title: c.title, arc: c.arc })) },
-    ...(isKids ? { ageBadge: pick(['4-8 años', '6-10 años', '8-12 años']), collectionTitle: enc.genreLabel.toUpperCase(), coverAccent: accent.p, coverAccentMuted: accent.s } : {}),
+    ...(isKids ? { ageBadge: mk.age || pick(['4-8 años', '6-10 años', '8-12 años']), collectionTitle: enc.genreLabel.toUpperCase(), coverAccent: accent.p, coverAccentMuted: accent.s } : {}),
   };
   const replacing = typeof enc.reemplaza === 'string' && enc.reemplaza;
   const id = replacing ? enc.reemplaza : `tl-${enc.cat}-${slug.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;

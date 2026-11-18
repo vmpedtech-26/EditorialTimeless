@@ -349,8 +349,8 @@ function renderKidsGrid(books, offlineIds = new Set()) {
     
     const isEmoji = b.cover && !b.cover.startsWith('assets') && !b.cover.startsWith('http') && !b.cover.includes('/');
     const coverHtml = isEmoji
-      ? `<div class="kids-card-cover-placeholder" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, ${accent}, ${accentMuted});">
-          <div style="font-size: 72px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));">${b.cover}</div>
+      ? `<div class="kids-card-cover-placeholder" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:44px; box-sizing:border-box; background:linear-gradient(135deg, ${accent}, ${accentMuted});">
+          <div style="font-size: 52px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));">${b.cover}</div>
          </div>`
       : `<img src="${b.cover}" alt="${b.title}" loading="lazy" />`;
       
